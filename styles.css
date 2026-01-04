@@ -1,8 +1,298 @@
-/*
+/* 整体容器布局 */
+.mtt-layout-container {
+    display: flex;
+    height: 100%;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    font-family: var(--font-interface);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* 标题通用样式 */
+.mtt-panel-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    padding-left: 0.5rem;
+}
 
-If your plugin does not need CSS, delete this file.
+/* 左侧栏：工具导航 */
+.mtt-left-panel {
+    flex: 0 0 220px;
+    background-color: var(--background-secondary);
+    border-right: 1px solid var(--background-modifier-border);
+    padding: 1.5rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
-*/
+.mtt-tool-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.mtt-tool-item:hover {
+    background-color: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.mtt-tool-item.is-active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.mtt-tool-icon {
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+}
+
+/* 中间栏：编辑器区域 */
+.mtt-center-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background-color: var(--background-primary);
+    gap: 1rem;
+}
+
+.mtt-center-header {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.mtt-textarea {
+    flex: 1;
+    width: 100%;
+    padding: 1rem;
+    font-family: var(--font-monospace);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.mtt-textarea:focus {
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+.mtt-center-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 右侧栏：设置区域 */
+.mtt-right-panel {
+    flex: 0 0 280px;
+    background-color: var(--background-secondary);
+    border-left: 1px solid var(--background-modifier-border);
+    padding: 1.5rem;
+}
+
+.mtt-settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mtt-settings-content label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-normal);
+    margin-bottom: -0.5rem;
+}
+
+.mtt-settings-content input {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--background-primary);
+}
+
+.mtt-run-btn {
+    margin-top: 1rem;
+    width: 100%;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    font-weight: 500;
+}
+
+.mtt-run-btn:hover {
+    filter: brightness(1.1);
+}
+
+.mtt-empty-state {
+    font-style: italic;
+    color: var(--text-faint);
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.mtt-center-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.mtt-undo-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.mtt-undo-btn:hover {
+    color: var(--text-normal);
+    background: var(--background-modifier-hover);
+}
+
+.mtt-undo-btn.is-disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.mtt-undo-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.mtt-action-group {
+    display: flex;
+    gap: 4px;
+}
+
+.mtt-icon-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.mtt-icon-btn:hover:not(.is-disabled) {
+    color: var(--text-normal);
+    background: var(--background-modifier-hover);
+}
+
+.mtt-icon-btn.is-disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+.mtt-icon-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.mtt-setting-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.mtt-setting-row select {
+    padding: 6px;
+    border-radius: 4px;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    color: var(--text-normal);
+}
+
+.mtt-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.mtt-checkbox-label input {
+    width: auto !important; /* 覆盖之前的 100% 宽度 */
+}
+
+.mtt-footer-btn-group {
+    display: flex;
+    gap: 12px; /* 按钮之间的间距 */
+}
+
+/* 次要按钮样式（保存副本） */
+.mtt-secondary-btn {
+    background-color: var(--background-modifier-border);
+    color: var(--text-normal);
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.mtt-secondary-btn:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+/* 覆盖原笔记按钮（强调色） */
+button.mod-cta {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    /* Obsidian 默认 mod-cta 已经有样式，这里可以根据需要微调 */
+}
+
+.mtt-select {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.mtt-small-input {
+    margin-bottom: 10px;
+}
+
+input[type="number"].mtt-small-input {
+    width: 60px;
+}
+
+.mtt-setting-row-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+.mtt-number-input {
+    width: 50px !important;
+    padding: 4px !important;
+    text-align: center;
+}
