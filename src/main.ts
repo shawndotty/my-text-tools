@@ -39,6 +39,15 @@ export default class MyTextTools extends Plugin {
 				this.activateView();
 			},
 		});
+
+		// 3. 添加 ribbon icon 触发命令
+		this.addRibbonIcon(
+			"remove-formatting",
+			"开启 MyTextTools 增强工作台",
+			() => {
+				this.activateView();
+			}
+		);
 	}
 
 	async activateView() {

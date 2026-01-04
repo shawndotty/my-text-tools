@@ -1,90 +1,77 @@
-# Obsidian Sample Plugin
+[中文说明](README_zh.md)
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+# My Text Tools for Obsidian
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+An advanced text processing workbench for Obsidian, inspired by and paying tribute to [mytexttools.com](https://mytexttools.com).
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+This plugin adds a dedicated "Text Tools Workbench" to Obsidian, providing a suite of powerful utilities for manipulating, formatting, and analyzing text without leaving your vault. It features a temporary editing area, allowing you to process text safely before applying changes to your notes.
 
-## First time developing plugins?
+## Features
 
-Quick starting guide for new plugin devs:
+My Text Tools organizes its utilities into several categories:
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### 🛠️ Basic Tools
 
-## Releasing new releases
+-   **Regex Find & Replace**: Perform complex search and replace operations using regular expressions.
+-   **Remove Whitespace**:
+    -   Trim leading/trailing whitespace.
+    -   Compress multiple spaces into one.
+    -   Remove all spaces or tabs.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+### 📝 Line Operations
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+-   **Remove Duplicate Lines**: Instantly clean up lists by removing duplicates.
+-   **Remove Empty Lines**: Strip out blank lines from your text.
+-   **Add Prefix/Suffix**: Bulk add text to the beginning or end of every line.
+-   **Filter Lines**: Keep or remove lines based on whether they contain a specific string or regex pattern.
+-   **Number List**: Convert lines into a numbered list with customizable start numbers, steps, and formats.
+-   **Line Breaks**: Manage line breaks (add or remove).
 
-## Adding your plugin to the community plugin list
+### 📊 Column Operations
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+Great for processing CSV-like data or structured text:
 
-## How to use
+-   **Extract Column**: Pull out a specific column based on delimiters (Comma, Tab, Pipe, Space, or Custom).
+-   **Swap Columns**: Easily swap the positions of two columns.
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+### 🔍 Extraction & Analysis
 
-## Manually installing the plugin
+-   **Extract Content**: Extract text occurring between two markers (start/end tags), with regex support.
+-   **Word Frequency**: Analyze text to find the most frequent words, with options to filter by length and include/exclude numbers.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+## How to Use
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+1. **Open the Workbench**:
 
-## Funding URL
+    - Click the "My Text Tools" icon (remove-formatting icon) in the left ribbon.
+    - Or use the Command Palette (`Cmd/Ctrl + P`) and search for **"My Text Tools: 开启 MyTextTools 增强工作台"**.
 
-You can include funding URLs where people who use your plugin can financially support it.
+2. **The Workbench Interface**:
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+    - **Left Panel**: Select the tool you want to use.
+    - **Center Panel (Temporary Editor)**:
+        - This text area is initialized with the content of your active note.
+        - **Modifications here are temporary** and do not affect your note until you choose to save.
+        - Supports **Undo (Ctrl+Z)** and **Redo (Ctrl+Y)**.
+    - **Right Panel**: Configure settings for the selected tool (e.g., regex patterns, delimiters).
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+3. **Saving Changes**:
+    - **Apply to Note**: Overwrites the original note with the content from the workbench.
+    - **Save as New Note**: Creates a new file with the processed text.
 
-If you have multiple URLs, you can also do:
+## Installation
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+Currently, this plugin is available for manual installation:
 
-## API Documentation
+1. Download the `main.js`, `manifest.json`, and `styles.css` files from the latest release.
+2. Create a folder named `my-text-tools` in your vault's plugin directory: `.obsidian/plugins/my-text-tools`.
+3. Place the downloaded files into this folder.
+4. Reload Obsidian and enable the plugin in Settings > Community Plugins.
 
-See https://docs.obsidian.md
+## Credits & Inspiration
+
+This plugin is a tribute to **[mytexttools.com](https://mytexttools.com)**. We aim to bring the convenience and power of their online text utilities directly into your local Obsidian environment.
+
+---
+
+_Note: This plugin is a work in progress. Always backup your data before performing bulk text operations._

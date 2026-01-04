@@ -3,9 +3,9 @@
 	"name": "My Text Tools",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "My Text Tools",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "An advanced text processing workbench for Obsidian, inspired by mytexttools.com",
+	"author": "JohnnyLearns",
+	"authorUrl": "https://github.com/shawndotty",
+	"fundingUrl": "https://space.bilibili.com/432408734",
 	"isDesktopOnly": false
 }
