@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "my-text-tools",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "This is a plugin for manipulate text in note, head tip for mytexttools.com",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
