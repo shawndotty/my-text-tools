@@ -24,8 +24,8 @@
     padding: 1.5rem 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    overflow: scroll;
+    gap: 2px;
+    overflow: auto;
 }
 
 .mtt-tool-item {
