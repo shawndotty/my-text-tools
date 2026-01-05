@@ -1,7 +1,7 @@
 {
 	"name": "my-text-tools",
 	"version": "1.0.1",
-	"description": "This is a plugin for manipulate text in note, head tip for mytexttools.com",
+	"description": "An advanced text processing workbench for Obsidian, inspired by mytexttools.com",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
