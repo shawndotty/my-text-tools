@@ -6,6 +6,7 @@ import {
 	TFile,
 	normalizePath,
 } from "obsidian";
+import { t } from "../lang/helpers";
 
 export const MY_TEXT_TOOLS_VIEW = "my-text-tools-view";
 
@@ -66,7 +67,7 @@ export class MyTextToolsView extends ItemView {
 		return MY_TEXT_TOOLS_VIEW;
 	}
 	getDisplayText() {
-		return "MyTextTools 工作台";
+		return t("WORKBENCH_TITLE");
 	}
 	getIcon() {
 		return "remove-formatting";
@@ -114,69 +115,84 @@ export class MyTextToolsView extends ItemView {
 
 	// 左侧工具列表
 	renderTools(parent: HTMLElement) {
-		parent.createEl("h4", { text: "文本工具", cls: "mtt-panel-title" });
+		parent.createEl("h4", {
+			text: t("TEXT_TOOLS"),
+			cls: "mtt-panel-title",
+		});
 
 		const groups = [
 			{
-				name: "基础工具",
+				name: t("GROUP_BASIC"),
 				tools: [
-					{ id: "regex", name: "正则替换", icon: "search" },
+					{ id: "regex", name: t("TOOL_REGEX"), icon: "search" },
 					{
 						id: "remove-whitespace",
-						name: "去除多余空白",
+						name: t("TOOL_WHITESPACE"),
 						icon: "brush-cleaning",
 					},
 				],
 			},
 			{
-				name: "行处理工具",
+				name: t("GROUP_LINES"),
 				tools: [
-					{ id: "dedupe", name: "去除重复行", icon: "list-minus" },
-					{ id: "empty-line", name: "删除空行", icon: "list-x" },
+					{
+						id: "dedupe",
+						name: t("TOOL_DEDUPE"),
+						icon: "list-minus",
+					},
+					{
+						id: "empty-line",
+						name: t("TOOL_EMPTY_LINE"),
+						icon: "list-x",
+					},
 					{
 						id: "line-break-tools",
-						name: "增加或删除换行",
+						name: t("TOOL_LINE_BREAK"),
 						icon: "wrap-text",
 					},
 					{
 						id: "add-wrap",
-						name: "添加前后缀",
+						name: t("TOOL_WRAP"),
 						icon: "list-collapse",
 					},
 					{
 						id: "remove-string",
-						name: "按条件过滤行",
+						name: t("TOOL_FILTER"),
 						icon: "filter",
 					},
 					{
 						id: "number-list",
-						name: "生成有序列表",
+						name: t("TOOL_NUMBER_LIST"),
 						icon: "list-ordered",
 					},
 				],
 			},
 			{
-				name: "列处理工具",
+				name: t("GROUP_COLUMNS"),
 				tools: [
-					{ id: "extract-column", name: "提取列", icon: "columns" },
+					{
+						id: "extract-column",
+						name: t("TOOL_EXTRACT_COL"),
+						icon: "columns",
+					},
 					{
 						id: "swap-columns",
-						name: "交换列",
+						name: t("TOOL_SWAP_COL"),
 						icon: "arrow-left-right",
 					},
 				],
 			},
 			{
-				name: "提取与分析",
+				name: t("GROUP_ANALYSIS"),
 				tools: [
 					{
 						id: "extract-between",
-						name: "内容提取",
+						name: t("TOOL_EXTRACT_BETWEEN"),
 						icon: "scissors",
 					},
 					{
 						id: "word-frequency",
-						name: "词频分析",
+						name: t("TOOL_WORD_FREQ"),
 						icon: "bar-chart",
 					},
 				],
@@ -213,7 +229,7 @@ export class MyTextToolsView extends ItemView {
 	// 中间编辑器
 	renderMainEditor(parent: HTMLElement) {
 		const header = parent.createDiv({ cls: "mtt-center-header" });
-		header.createEl("span", { text: "临时编辑区 (不会自动保存到原笔记)" });
+		header.createEl("span", { text: t("EDITOR_HEADER") });
 
 		// 按钮容器
 		const actionGroup = header.createDiv({ cls: "mtt-action-group" });
@@ -221,7 +237,7 @@ export class MyTextToolsView extends ItemView {
 		// 撤销按钮
 		const undoBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
-			attr: { "aria-label": "撤销 (Ctrl+Z)" },
+			attr: { "aria-label": t("BTN_UNDO") },
 		});
 		setIcon(undoBtn, "undo-2");
 		undoBtn.toggleClass("is-disabled", this.history.length === 0);
@@ -230,7 +246,7 @@ export class MyTextToolsView extends ItemView {
 		// 重做按钮
 		const redoBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
-			attr: { "aria-label": "重做 (Ctrl+Y)" },
+			attr: { "aria-label": t("BTN_REDO") },
 		});
 		setIcon(redoBtn, "redo-2");
 		redoBtn.toggleClass("is-disabled", this.redoHistory.length === 0);
@@ -243,7 +259,7 @@ export class MyTextToolsView extends ItemView {
 
 		const textArea = parent.createEl("textarea", {
 			cls: "mtt-textarea",
-			attr: { placeholder: "在此输入或处理文本..." },
+			attr: { placeholder: t("EDITOR_PLACEHOLDER") },
 		});
 		textArea.value = this.content;
 
@@ -258,7 +274,7 @@ export class MyTextToolsView extends ItemView {
 
 		// 按钮 1：存为新笔记
 		const saveNewBtn = btnGroup.createEl("button", {
-			text: "保存为新笔记",
+			text: t("BTN_SAVE_NEW"),
 			cls: "mtt-secondary-btn",
 		});
 		saveNewBtn.onclick = () => this.saveToNewFile();
@@ -266,7 +282,7 @@ export class MyTextToolsView extends ItemView {
 		// 按钮 2：覆盖原笔记
 		if (this.originalEditor) {
 			const saveOverBtn = btnGroup.createEl("button", {
-				text: "应用并覆盖原笔记",
+				text: t("BTN_SAVE_ORIGINAL"),
 				cls: "mod-cta",
 			});
 			saveOverBtn.onclick = () => this.saveToOriginal();
@@ -275,11 +291,14 @@ export class MyTextToolsView extends ItemView {
 
 	// 右侧设置面板 (核心逻辑)
 	renderSettings(parent: HTMLElement) {
-		parent.createEl("h3", { text: "参数设置", cls: "mtt-panel-title" });
+		parent.createEl("h3", {
+			text: t("SETTINGS_TITLE"),
+			cls: "mtt-panel-title",
+		});
 
 		if (!this.activeTool) {
 			parent.createEl("p", {
-				text: "在左侧选择一个工具开始处理",
+				text: t("SETTINGS_EMPTY"),
 				cls: "mtt-empty-state",
 			});
 			return;
@@ -290,10 +309,12 @@ export class MyTextToolsView extends ItemView {
 		});
 
 		if (this.activeTool === "remove-string") {
-			settingsContent.createEl("label", { text: "匹配字符串/正则:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_FILTER_TEXT"),
+			});
 			const filterInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "输入关键字...",
+				placeholder: t("PLACEHOLDER_FILTER"),
 				value: this.settingsState.filterText,
 			});
 			filterInput.onchange = (e) =>
@@ -305,14 +326,14 @@ export class MyTextToolsView extends ItemView {
 			const modeDiv = settingsContent.createDiv({
 				cls: "mtt-setting-row",
 			});
-			modeDiv.createEl("label", { text: "模式:" });
+			modeDiv.createEl("label", { text: t("SETTING_FILTER_MODE") });
 			const modeSelect = modeDiv.createEl("select");
 			modeSelect.createEl("option", {
-				text: "删除包含该字符的行",
+				text: t("OPTION_CONTAINING"),
 				value: "containing",
 			});
 			modeSelect.createEl("option", {
-				text: "删除不包含该字符的行",
+				text: t("OPTION_NOT_CONTAINING"),
 				value: "not-containing",
 			});
 			modeSelect.value = this.settingsState.filterMode;
@@ -331,7 +352,7 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.filterCase = (
 					e.target as HTMLInputElement
 				).checked);
-			caseLabel.appendText(" 区分大小写");
+			caseLabel.appendText(" " + t("CHECKBOX_CASE"));
 
 			// 复选框：正则表达式
 			const regexLabel = settingsContent.createEl("label", {
@@ -345,15 +366,15 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.filterRegex = (
 					e.target as HTMLInputElement
 				).checked);
-			regexLabel.appendText(" 启用正则匹配");
+			regexLabel.appendText(" " + t("CHECKBOX_REGEX"));
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "执行过滤",
+				text: t("BTN_RUN_FILTER"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("remove-string");
 		} else if (this.activeTool === "regex") {
-			settingsContent.createEl("label", { text: "查找 (Regex):" });
+			settingsContent.createEl("label", { text: t("SETTING_FIND") });
 			const findInput = settingsContent.createEl("input", {
 				type: "text",
 				value: this.settingsState.findText,
@@ -363,7 +384,9 @@ export class MyTextToolsView extends ItemView {
 					e.target as HTMLInputElement
 				).value);
 
-			settingsContent.createEl("label", { text: "替换为:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_REPLACE"),
+			});
 			const replaceInput = settingsContent.createEl("input", {
 				type: "text",
 				value: this.settingsState.replaceText,
@@ -374,7 +397,7 @@ export class MyTextToolsView extends ItemView {
 				).value);
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "执行替换",
+				text: t("BTN_RUN_REPLACE"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("regex");
@@ -383,10 +406,10 @@ export class MyTextToolsView extends ItemView {
 				cls: "mtt-settings-content",
 			});
 
-			wrapContent.createEl("label", { text: "在行首添加 (前缀):" });
+			wrapContent.createEl("label", { text: t("SETTING_PREFIX") });
 			const preInput = wrapContent.createEl("input", {
 				type: "text",
-				placeholder: "例如: - [ ] ",
+				placeholder: t("PLACEHOLDER_PREFIX"),
 				value: this.settingsState.prefix,
 			});
 			preInput.onchange = (e) =>
@@ -394,10 +417,10 @@ export class MyTextToolsView extends ItemView {
 					e.target as HTMLInputElement
 				).value);
 
-			wrapContent.createEl("label", { text: "在行尾添加 (后缀):" });
+			wrapContent.createEl("label", { text: t("SETTING_SUFFIX") });
 			const sufInput = wrapContent.createEl("input", {
 				type: "text",
-				placeholder: "例如: !!",
+				placeholder: t("PLACEHOLDER_SUFFIX"),
 				value: this.settingsState.suffix,
 			});
 			sufInput.onchange = (e) =>
@@ -406,30 +429,44 @@ export class MyTextToolsView extends ItemView {
 				).value);
 
 			const runBtn = wrapContent.createEl("button", {
-				text: "执行添加",
+				text: t("BTN_RUN_WRAP"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("add-wrap");
 		} else if (this.activeTool === "extract-column") {
-			settingsContent.createEl("label", { text: "选择分隔符:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_DELIMITER"),
+			});
 			const delimSelect = settingsContent.createEl("select", {
 				cls: "mtt-select",
 			});
-			delimSelect.createEl("option", { text: "逗号 (,)", value: "," });
 			delimSelect.createEl("option", {
-				text: "制表符 (Tab)",
+				text: t("DELIMITER_COMMA"),
+				value: ",",
+			});
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_TAB"),
 				value: "\t",
 			});
-			delimSelect.createEl("option", { text: "竖线 (|)", value: "|" });
-			delimSelect.createEl("option", { text: "空格", value: " " });
-			delimSelect.createEl("option", { text: "自定义", value: "custom" });
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_PIPE"),
+				value: "|",
+			});
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_SPACE"),
+				value: " ",
+			});
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_CUSTOM"),
+				value: "custom",
+			});
 
 			delimSelect.value = this.settingsState.columnDelimiter;
 
 			// 如果是自定义，显示输入框
 			const customInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "输入自定义字符",
+				placeholder: t("PLACEHOLDER_CUSTOM_DELIMITER"),
 				cls: "mtt-small-input",
 				value: this.settingsState.customDelimiter,
 			});
@@ -449,7 +486,7 @@ export class MyTextToolsView extends ItemView {
 				).value);
 
 			settingsContent.createEl("label", {
-				text: "提取第几列 (从1开始):",
+				text: t("SETTING_COL_NUM"),
 			});
 			const numInput = settingsContent.createEl("input", {
 				type: "number",
@@ -461,30 +498,44 @@ export class MyTextToolsView extends ItemView {
 					parseInt((e.target as HTMLInputElement).value) || 1);
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "提取列",
+				text: t("BTN_RUN_EXTRACT_COL"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("extract-column");
 		} else if (this.activeTool === "swap-columns") {
-			settingsContent.createEl("label", { text: "选择分隔符:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_DELIMITER"),
+			});
 			const delimSelect = settingsContent.createEl("select", {
 				cls: "mtt-select",
 			});
-			delimSelect.createEl("option", { text: "逗号 (,)", value: "," });
 			delimSelect.createEl("option", {
-				text: "制表符 (Tab)",
+				text: t("DELIMITER_COMMA"),
+				value: ",",
+			});
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_TAB"),
 				value: "\t",
 			});
-			delimSelect.createEl("option", { text: "竖线 (|)", value: "|" });
-			delimSelect.createEl("option", { text: "空格", value: " " });
-			delimSelect.createEl("option", { text: "自定义", value: "custom" });
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_PIPE"),
+				value: "|",
+			});
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_SPACE"),
+				value: " ",
+			});
+			delimSelect.createEl("option", {
+				text: t("DELIMITER_CUSTOM"),
+				value: "custom",
+			});
 
 			delimSelect.value = this.settingsState.columnDelimiterSC;
 
 			// 如果是自定义，显示输入框
 			const customInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "输入自定义字符",
+				placeholder: t("PLACEHOLDER_CUSTOM_DELIMITER"),
 				cls: "mtt-small-input",
 				value: this.settingsState.customDelimiterSC,
 			});
@@ -507,7 +558,7 @@ export class MyTextToolsView extends ItemView {
 				cls: "mtt-setting-row-inline",
 			});
 
-			colInputGroup.createSpan({ text: "交换第" });
+			colInputGroup.createSpan({ text: t("LABEL_SWAP_1") });
 			const input1 = colInputGroup.createEl("input", {
 				type: "number",
 				cls: "mtt-number-input",
@@ -517,7 +568,7 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.swapCol1 =
 					parseInt((e.target as HTMLInputElement).value) || 1);
 
-			colInputGroup.createSpan({ text: "列 与 第" });
+			colInputGroup.createSpan({ text: t("LABEL_SWAP_2") });
 			const input2 = colInputGroup.createEl("input", {
 				type: "number",
 				cls: "mtt-number-input",
@@ -527,15 +578,17 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.swapCol2 =
 					parseInt((e.target as HTMLInputElement).value) || 1);
 
-			colInputGroup.createSpan({ text: "列" });
+			colInputGroup.createSpan({ text: t("LABEL_SWAP_3") });
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "执行交换",
+				text: t("BTN_RUN_SWAP"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("swap-columns");
 		} else if (this.activeTool === "word-frequency") {
-			settingsContent.createEl("label", { text: "最小单词长度:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_MIN_LEN"),
+			});
 			const minLenInput = settingsContent.createEl("input", {
 				type: "number",
 				value: this.settingsState.minWordLength.toString(),
@@ -553,18 +606,18 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.includeNumbers = (
 					e.target as HTMLInputElement
 				).checked);
-			numLabel.appendText(" 包含数字");
+			numLabel.appendText(" " + t("CHECKBOX_INCLUDE_NUM"));
 
-			settingsContent.createEl("label", { text: "排序方式:" });
+			settingsContent.createEl("label", { text: t("SETTING_SORT") });
 			const sortSelect = settingsContent.createEl("select", {
 				cls: "mtt-select",
 			});
 			sortSelect.createEl("option", {
-				text: "频率从高到低",
+				text: t("OPTION_DESC"),
 				value: "desc",
 			});
 			sortSelect.createEl("option", {
-				text: "频率从低到高",
+				text: t("OPTION_ASC"),
 				value: "asc",
 			});
 			sortSelect.value = this.settingsState.sortOrder;
@@ -574,12 +627,12 @@ export class MyTextToolsView extends ItemView {
 				).value);
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "分析词频",
+				text: t("BTN_RUN_FREQ"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("word-frequency");
 		} else if (this.activeTool === "number-list") {
-			settingsContent.createEl("label", { text: "起始数字:" });
+			settingsContent.createEl("label", { text: t("SETTING_START_NUM") });
 			const startInput = settingsContent.createEl("input", {
 				type: "number",
 				value: this.settingsState.startNumber.toString(),
@@ -588,7 +641,7 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.startNumber =
 					parseInt((e.target as HTMLInputElement).value) || 1);
 
-			settingsContent.createEl("label", { text: "递增步长:" });
+			settingsContent.createEl("label", { text: t("SETTING_STEP_NUM") });
 			const stepInput = settingsContent.createEl("input", {
 				type: "number",
 				value: this.settingsState.stepNumber.toString(),
@@ -597,10 +650,12 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.stepNumber =
 					parseInt((e.target as HTMLInputElement).value) || 1);
 
-			settingsContent.createEl("label", { text: "数字前缀 (可选):" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_LIST_PREFIX"),
+			});
 			const preInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "如: 第",
+				placeholder: t("PLACEHOLDER_LIST_PREFIX"),
 				value: this.settingsState.listPrefix,
 			});
 			preInput.onchange = (e) =>
@@ -608,10 +663,12 @@ export class MyTextToolsView extends ItemView {
 					e.target as HTMLInputElement
 				).value);
 
-			settingsContent.createEl("label", { text: "数字后缀/分隔符:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_LIST_SUFFIX"),
+			});
 			const sepInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "如: . ",
+				placeholder: t("PLACEHOLDER_LIST_SUFFIX"),
 				value: this.settingsState.listSeparator,
 			});
 			sepInput.onchange = (e) =>
@@ -620,15 +677,17 @@ export class MyTextToolsView extends ItemView {
 				).value);
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "生成编号",
+				text: t("BTN_RUN_NUMBERING"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("number-list");
 		} else if (this.activeTool === "extract-between") {
-			settingsContent.createEl("label", { text: "开始标记 (Start):" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_EXTRACT_START"),
+			});
 			const startInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "例如: <td> 或 [",
+				placeholder: t("PLACEHOLDER_EXTRACT_START"),
 				value: this.settingsState.extractStart,
 			});
 			startInput.onchange = (e) =>
@@ -636,10 +695,12 @@ export class MyTextToolsView extends ItemView {
 					e.target as HTMLInputElement
 				).value);
 
-			settingsContent.createEl("label", { text: "结束标记 (End):" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_EXTRACT_END"),
+			});
 			const endInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "例如: </td> 或 ]",
+				placeholder: t("PLACEHOLDER_EXTRACT_END"),
 				value: this.settingsState.extractEnd,
 			});
 			endInput.onchange = (e) =>
@@ -658,10 +719,10 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.extractRegex = (
 					e.target as HTMLInputElement
 				).checked);
-			regexLabel.appendText(" 启用正则表达式匹配");
+			regexLabel.appendText(" " + t("CHECKBOX_EXTRACT_REGEX"));
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "提取内容",
+				text: t("BTN_RUN_EXTRACT_BETWEEN"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("extract-between");
@@ -683,21 +744,23 @@ export class MyTextToolsView extends ItemView {
 				lbl.appendText(` ${label}`);
 			};
 
-			createCheck("压缩连续空格 (多个变一个)", "wsCompress");
-			createCheck("删除行首/行尾空格 (Trim)", "wsTrim");
-			createCheck("彻底删除所有空格", "wsAll");
-			createCheck("彻底删除所有制表符 (Tab)", "wsTabs");
+			createCheck(t("CHECKBOX_WS_COMPRESS"), "wsCompress");
+			createCheck(t("CHECKBOX_WS_TRIM"), "wsTrim");
+			createCheck(t("CHECKBOX_WS_ALL"), "wsAll");
+			createCheck(t("CHECKBOX_WS_TABS"), "wsTabs");
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "执行清理",
+				text: t("BTN_RUN_CLEAN"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("remove-whitespace");
 		} else if (this.activeTool === "line-break-tools") {
-			settingsContent.createEl("label", { text: "匹配字符或正则:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_LB_TRIGGER"),
+			});
 			const triggerInput = settingsContent.createEl("input", {
 				type: "text",
-				placeholder: "例如: 。 或 d+",
+				placeholder: t("PLACEHOLDER_LB_TRIGGER"),
 				value: this.settingsState.lbTrigger,
 			});
 			triggerInput.onchange = (e) =>
@@ -716,26 +779,28 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState.lbRegex = (
 					e.target as HTMLInputElement
 				).checked);
-			regexLabel.appendText(" 启用正则表达式");
+			regexLabel.appendText(" " + t("CHECKBOX_LB_REGEX"));
 
-			settingsContent.createEl("label", { text: "执行操作:" });
+			settingsContent.createEl("label", {
+				text: t("SETTING_LB_ACTION"),
+			});
 			const actionSelect = settingsContent.createEl("select", {
 				cls: "mtt-select",
 			});
 			actionSelect.createEl("option", {
-				text: "在此内容 后 添加换行",
+				text: t("OPTION_ADD_AFTER"),
 				value: "add-after",
 			});
 			actionSelect.createEl("option", {
-				text: "在此内容 前 添加换行",
+				text: t("OPTION_ADD_BEFORE"),
 				value: "add-before",
 			});
 			actionSelect.createEl("option", {
-				text: "移除 此内容 后的换行",
+				text: t("OPTION_REMOVE_AFTER"),
 				value: "remove-after",
 			});
 			actionSelect.createEl("option", {
-				text: "移除 此内容 前的换行",
+				text: t("OPTION_REMOVE_BEFORE"),
 				value: "remove-before",
 			});
 
@@ -746,13 +811,13 @@ export class MyTextToolsView extends ItemView {
 				).value);
 
 			const runBtn = settingsContent.createEl("button", {
-				text: "执行换行处理",
+				text: t("BTN_RUN_LB"),
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("line-break-tools");
 		} else {
 			settingsContent.createEl("p", {
-				text: "该工具无需额外设置，点击左侧按钮已直接触发。",
+				text: t("SETTINGS_NO_CONFIG"),
 			});
 		}
 	}
@@ -765,11 +830,11 @@ export class MyTextToolsView extends ItemView {
 		switch (type) {
 			case "dedupe":
 				this.content = Array.from(new Set(lines)).join("\n");
-				new Notice("已去除重复行");
+				new Notice(t("NOTICE_DEDUPE"));
 				break;
 			case "empty-line":
 				this.content = lines.filter((l) => l.trim() !== "").join("\n");
-				new Notice("已删除空行");
+				new Notice(t("NOTICE_EMPTY_LINE"));
 				break;
 			case "regex":
 				try {
@@ -778,9 +843,9 @@ export class MyTextToolsView extends ItemView {
 						regex,
 						this.settingsState.replaceText
 					);
-					new Notice("正则替换完成");
+					new Notice(t("NOTICE_REGEX_DONE"));
 				} catch (e) {
-					new Notice("正则表达式错误！");
+					new Notice(t("NOTICE_REGEX_ERROR"));
 				}
 				break;
 			case "add-wrap":
@@ -793,14 +858,14 @@ export class MyTextToolsView extends ItemView {
 					})
 					.join("\n");
 
-				new Notice("已完成前后缀添加");
+				new Notice(t("NOTICE_WRAP_DONE"));
 				break;
 			case "remove-string":
 				const { filterText, filterMode, filterCase, filterRegex } =
 					this.settingsState;
 
 				if (!filterText) {
-					new Notice("请输入要过滤的字符");
+					new Notice(t("NOTICE_FILTER_INPUT"));
 					return;
 				}
 
@@ -814,7 +879,7 @@ export class MyTextToolsView extends ItemView {
 								const regex = new RegExp(filterText, flags);
 								isMatch = regex.test(line);
 							} catch (e) {
-								new Notice("正则表达式有误");
+								new Notice(t("NOTICE_REGEX_INVALID"));
 								return true; // 保持行不变
 							}
 						} else {
@@ -833,7 +898,7 @@ export class MyTextToolsView extends ItemView {
 					})
 					.join("\n");
 
-				new Notice(`已根据条件过滤行`);
+				new Notice(t("NOTICE_FILTER_DONE"));
 				break;
 			case "extract-column":
 				const { columnDelimiter, customDelimiter, columnNumber } =
@@ -845,7 +910,7 @@ export class MyTextToolsView extends ItemView {
 						: columnDelimiter;
 
 				if (!actualDelim && columnDelimiter === "custom") {
-					new Notice("请输入自定义分隔符");
+					new Notice(t("NOTICE_CUSTOM_DELIM"));
 					return;
 				}
 
@@ -861,7 +926,9 @@ export class MyTextToolsView extends ItemView {
 					.filter((val) => val !== "") // 可选：过滤掉无法提取的行（空结果）
 					.join("\n");
 
-				new Notice(`已提取第 ${columnNumber} 列`);
+				new Notice(
+					t("NOTICE_EXTRACT_COL_DONE", [columnNumber.toString()])
+				);
 				break;
 			case "swap-columns":
 				const {
@@ -876,7 +943,7 @@ export class MyTextToolsView extends ItemView {
 						: columnDelimiterSC;
 
 				if (!delim) {
-					new Notice("请指定分隔符");
+					new Notice(t("NOTICE_DELIM_REQUIRED"));
 					return;
 				}
 
@@ -897,7 +964,12 @@ export class MyTextToolsView extends ItemView {
 					})
 					.join("\n");
 
-				new Notice(`已交换第 ${swapCol1} 和 ${swapCol2} 列`);
+				new Notice(
+					t("NOTICE_SWAP_DONE", [
+						swapCol1.toString(),
+						swapCol2.toString(),
+					])
+				);
 				break;
 			case "word-frequency":
 				const { minWordLength, includeNumbers, sortOrder } =
@@ -931,7 +1003,9 @@ export class MyTextToolsView extends ItemView {
 					.map(([word, count]) => `${word} (${count})`)
 					.join("\n");
 
-				new Notice(`分析完成，共统计 ${sortedWords.length} 个唯一单词`);
+				new Notice(
+					t("NOTICE_FREQ_DONE", [sortedWords.length.toString()])
+				);
 				break;
 			case "number-list":
 				const { startNumber, stepNumber, listSeparator, listPrefix } =
@@ -947,14 +1021,14 @@ export class MyTextToolsView extends ItemView {
 					})
 					.join("\n");
 
-				new Notice("已成功生成有序列表");
+				new Notice(t("NOTICE_NUMBER_DONE"));
 				break;
 			case "extract-between":
 				const { extractStart, extractEnd, extractRegex } =
 					this.settingsState;
 
 				if (!extractStart && !extractEnd) {
-					new Notice("请至少输入一个提取边界");
+					new Notice(t("NOTICE_EXTRACT_BOUNDS"));
 					return;
 				}
 
@@ -989,12 +1063,16 @@ export class MyTextToolsView extends ItemView {
 
 					if (matches.length > 0) {
 						this.content = matches.join("\n");
-						new Notice(`成功提取 ${matches.length} 处内容`);
+						new Notice(
+							t("NOTICE_EXTRACT_DONE", [
+								matches.length.toString(),
+							])
+						);
 					} else {
-						new Notice("未找到匹配的内容");
+						new Notice(t("NOTICE_NO_MATCH"));
 					}
 				} catch (e) {
-					new Notice("提取配置有误，请检查正则语法");
+					new Notice(t("NOTICE_EXTRACT_ERROR"));
 				}
 				break;
 			case "remove-whitespace":
@@ -1027,12 +1105,12 @@ export class MyTextToolsView extends ItemView {
 				}
 
 				this.content = result;
-				new Notice("空格清理完成");
+				new Notice(t("NOTICE_WS_DONE"));
 				break;
 			case "line-break-tools":
 				const { lbTrigger, lbAction, lbRegex } = this.settingsState;
 				if (!lbTrigger) {
-					new Notice("请输入触发内容");
+					new Notice(t("NOTICE_LB_TRIGGER"));
 					return;
 				}
 
@@ -1083,9 +1161,9 @@ export class MyTextToolsView extends ItemView {
 						});
 					}
 
-					new Notice("换行处理完成");
+					new Notice(t("NOTICE_LB_DONE"));
 				} catch (e) {
-					new Notice("正则语法有误");
+					new Notice(t("NOTICE_LB_ERROR"));
 				}
 				this.render();
 				break;
@@ -1097,9 +1175,9 @@ export class MyTextToolsView extends ItemView {
 	saveToOriginal() {
 		if (this.originalEditor) {
 			this.originalEditor.setValue(this.content);
-			new Notice("✅ 已保存到笔记");
+			new Notice(t("NOTICE_SAVE_SUCCESS"));
 		} else {
-			new Notice("❌ 错误：找不到原笔记编辑器");
+			new Notice(t("NOTICE_SAVE_ERROR"));
 		}
 	}
 
@@ -1132,11 +1210,11 @@ export class MyTextToolsView extends ItemView {
 			const previousContent = this.history.pop();
 			if (previousContent !== undefined) {
 				this.content = previousContent;
-				new Notice("已撤销");
+				new Notice(t("NOTICE_UNDO"));
 				this.render(); // 重新渲染界面
 			}
 		} else {
-			new Notice("没有可以撤销的历史记录");
+			new Notice(t("NOTICE_NO_UNDO"));
 		}
 	}
 
@@ -1152,7 +1230,7 @@ export class MyTextToolsView extends ItemView {
 				this.render();
 			}
 		} else {
-			new Notice("没有可以重做的记录");
+			new Notice(t("NOTICE_NO_REDO"));
 		}
 	}
 
@@ -1162,7 +1240,9 @@ export class MyTextToolsView extends ItemView {
 		// 1. 确定基础路径和文件名
 		// 如果没有打开的笔记，则定位到根目录，文件名为 "未命名"
 		const folderPath = activeFile?.parent ? activeFile.parent.path : "/";
-		const baseName = activeFile ? activeFile.basename : "未命名";
+		const baseName = activeFile
+			? activeFile.basename
+			: t("DEFAULT_FILENAME");
 		const extension = activeFile ? activeFile.extension : "md";
 
 		let newFileName = "";
@@ -1188,7 +1268,7 @@ export class MyTextToolsView extends ItemView {
 				newFileName,
 				this.content
 			);
-			new Notice(`✅ 已创建副本: ${baseName}_${counter}`);
+			new Notice(t("NOTICE_COPY_CREATED", [`${baseName}_${counter}`]));
 
 			// 3. 在新标签页中打开这个文件
 			if (newFile instanceof TFile) {
@@ -1200,7 +1280,7 @@ export class MyTextToolsView extends ItemView {
 			}
 		} catch (error) {
 			console.error(error);
-			new Notice("❌ 创建新笔记失败");
+			new Notice(t("NOTICE_COPY_ERROR"));
 		}
 	}
 }
