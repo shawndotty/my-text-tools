@@ -141,4 +141,11 @@ export default {
 	NOTICE_SKIP_FM_AND_HEADER: "已跳過元數據及首行標題",
 	NOTICE_SKIP_FRONTMATTER: "已跳過元數據區",
 	NOTICE_SKIP_HEADER: "已跳過首行標題",
+	CHECKBOX_DEDUPE_INCLUDE_EMPTY: " 將空行也視為重複項進行合併",
+	BTN_RUN_DEDUPE: "立即執行去重",
+	SETTING_EMPTY_LINE_MODE: "處理模式:",
+	OPTION_EMPTY_LINE_ALL: "刪除所有空行",
+	OPTION_EMPTY_LINE_MERGE: "合併連續空行為一個",
+	BTN_RUN_EMPTY_LINE: "立即執行",
+	NOTICE_EMPTY_LINE_MERGED: "已合併連續空行",
 };

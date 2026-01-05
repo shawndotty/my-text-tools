@@ -143,4 +143,11 @@ export default {
 	NOTICE_SKIP_FM_AND_HEADER: "Skipped frontmatter and header",
 	NOTICE_SKIP_FRONTMATTER: "Skipped frontmatter section",
 	NOTICE_SKIP_HEADER: "Skipped header line",
+	CHECKBOX_DEDUPE_INCLUDE_EMPTY: " Treat empty lines as duplicates for merging",
+	BTN_RUN_DEDUPE: "Run Dedupe",
+	SETTING_EMPTY_LINE_MODE: "Processing Mode:",
+	OPTION_EMPTY_LINE_ALL: "Delete All Empty Lines",
+	OPTION_EMPTY_LINE_MERGE: "Merge Consecutive Empty Lines into One",
+	BTN_RUN_EMPTY_LINE: "Run",
+	NOTICE_EMPTY_LINE_MERGED: "Consecutive empty lines merged",
 };

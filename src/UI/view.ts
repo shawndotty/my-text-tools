@@ -55,6 +55,8 @@ export class MyTextToolsView extends ItemView {
 		lbRegex: false, // 是否启用正则
 		preserveFrontmatter: true, // 默认开启保护
 		preserveHeader: false, // 默认不开启，用户按需勾选
+		dedupeIncludeEmpty: false, // 默认不包含空行，即：空行不参与去重，原样保留
+		emptyLineMode: "all", // "all" 为删除所有空行，"merge" 为合并相邻空行为一个
 	};
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any) {
@@ -219,9 +221,7 @@ export class MyTextToolsView extends ItemView {
 				btn.onclick = () => {
 					this.activeTool = tool.id;
 					// 如果是简单功能直接执行，如果是复杂功能则先切换设置面板
-					if (tool.id === "dedupe" || tool.id === "empty-line") {
-						this.processText(tool.id);
-					}
+
 					this.render(); // 重新渲染以更新 UI 状态
 				};
 			});
@@ -868,6 +868,58 @@ export class MyTextToolsView extends ItemView {
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("line-break-tools");
+		} else if (this.activeTool === "dedupe") {
+			const dedupeContent = settingsContent.createDiv({
+				cls: "mtt-settings-content",
+			});
+
+			const emptyLabel = dedupeContent.createEl("label", {
+				cls: "mtt-checkbox-label",
+			});
+			const emptyCheck = emptyLabel.createEl("input", {
+				type: "checkbox",
+			});
+			emptyCheck.checked = this.settingsState.dedupeIncludeEmpty;
+			emptyCheck.onchange = (e) =>
+				(this.settingsState.dedupeIncludeEmpty = (
+					e.target as HTMLInputElement
+				).checked);
+			emptyLabel.appendText(t("CHECKBOX_DEDUPE_INCLUDE_EMPTY"));
+
+			const runBtn = dedupeContent.createEl("button", {
+				text: t("BTN_RUN_DEDUPE"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => this.processText("dedupe");
+		} else if (this.activeTool === "empty-line") {
+			const elContent = settingsContent.createDiv({
+				cls: "mtt-settings-content",
+			});
+
+			elContent.createEl("label", { text: t("SETTING_EMPTY_LINE_MODE") });
+			const modeSelect = elContent.createEl("select", {
+				cls: "mtt-select",
+			});
+			modeSelect.createEl("option", {
+				text: t("OPTION_EMPTY_LINE_ALL"),
+				value: "all",
+			});
+			modeSelect.createEl("option", {
+				text: t("OPTION_EMPTY_LINE_MERGE"),
+				value: "merge",
+			});
+
+			modeSelect.value = this.settingsState.emptyLineMode;
+			modeSelect.onchange = (e) =>
+				(this.settingsState.emptyLineMode = (
+					e.target as HTMLSelectElement
+				).value);
+
+			const runBtn = elContent.createEl("button", {
+				text: t("BTN_RUN_EMPTY_LINE"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => this.processText("empty-line");
 		} else {
 			settingsContent.createEl("p", {
 				text: t("SETTINGS_NO_CONFIG"),
@@ -908,12 +960,66 @@ export class MyTextToolsView extends ItemView {
 
 		switch (type) {
 			case "dedupe":
-				processedBody = Array.from(new Set(lines)).join("\n");
+				const { dedupeIncludeEmpty } = this.settingsState;
+				if (dedupeIncludeEmpty) {
+					// 经典模式：所有行参与去重（包括空行也会被合并为剩一行）
+					processedBody = Array.from(new Set(lines)).join("\n");
+				} else {
+					// 智能模式：保护空行
+					const seen = new Set();
+					const result: string[] = [];
+
+					for (const line of lines) {
+						const trimmed = line.trim();
+						if (trimmed === "") {
+							// 如果是空行，直接放入结果，不参与去重检测
+							result.push(line);
+						} else {
+							// 如果是非空行，进行重复检测
+							if (!seen.has(line)) {
+								seen.add(line);
+								result.push(line);
+							}
+						}
+					}
+					processedBody = result.join("\n");
+				}
 				new Notice(t("NOTICE_DEDUPE"));
 				break;
 			case "empty-line":
-				processedBody = lines.filter((l) => l.trim() !== "").join("\n");
-				new Notice(t("NOTICE_EMPTY_LINE"));
+				const { emptyLineMode } = this.settingsState;
+
+				if (emptyLineMode === "all") {
+					// 模式 1：彻底删除所有空行
+					this.content = lines
+						.filter((l) => l.trim() !== "")
+						.join("\n");
+				} else {
+					// 模式 2：合并相邻空行
+					const result: string[] = [];
+					let prevWasEmpty = false;
+
+					for (const line of lines) {
+						const isEmpty = line.trim() === "";
+						if (!isEmpty) {
+							// 非空行，直接加入结果
+							result.push(line);
+							prevWasEmpty = false;
+						} else {
+							// 当前是空行，只有在前一行不是空行时才加入（即合并多个为一个）
+							if (!prevWasEmpty) {
+								result.push("");
+								prevWasEmpty = true;
+							}
+						}
+					}
+					processedBody = result.join("\n");
+				}
+				new Notice(
+					emptyLineMode === "all"
+						? t("NOTICE_EMPTY_LINE")
+						: t("NOTICE_EMPTY_LINE_MERGED")
+				);
 				break;
 			case "regex":
 				try {
