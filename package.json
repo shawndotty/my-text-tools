@@ -1,6 +1,6 @@
 {
 	"name": "my-text-tools",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "This is a plugin for manipulate text in note, head tip for mytexttools.com",
 	"main": "main.js",
 	"type": "module",
