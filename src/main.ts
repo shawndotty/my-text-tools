@@ -12,7 +12,6 @@ import {
 	MyTextToolsSettings,
 	MyTextToolsSettingTab,
 } from "./settings";
-import { TextToolsModal } from "./UI/TextToolsModal";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
 
 // Remember to rename these classes and interfaces!
