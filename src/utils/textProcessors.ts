@@ -53,7 +53,10 @@ export function processText(
 	let extractedHeader = "";
 
 	// --- 第一层：保护 Frontmatter ---
-	const fmResult = extractFrontmatter(textToProcess, settings.preserveFrontmatter);
+	const fmResult = extractFrontmatter(
+		textToProcess,
+		settings.preserveFrontmatter
+	);
 	extractedFrontmatter = fmResult.frontmatter;
 	textToProcess = fmResult.body;
 
@@ -87,7 +90,11 @@ export function processText(
 			);
 			break;
 		case "add-wrap":
-			processedBody = processAddWrap(lines, settings.prefix, settings.suffix);
+			processedBody = processAddWrap(
+				lines,
+				settings.prefix,
+				settings.suffix
+			);
 			new Notice(t("NOTICE_WRAP_DONE"));
 			break;
 		case "remove-string":
@@ -221,10 +228,7 @@ function processDedupe(lines: string[], includeEmpty: boolean): string {
 	}
 }
 
-function processEmptyLine(
-	lines: string[],
-	mode: "all" | "merge"
-): string {
+function processEmptyLine(lines: string[], mode: "all" | "merge"): string {
 	if (mode === "all") {
 		// 模式 1：彻底删除所有空行
 		return lines.filter((l) => l.trim() !== "").join("\n");
@@ -474,9 +478,7 @@ function processExtractBetween(
 
 		if (matches.length > 0) {
 			const result = matches.join("\n");
-			new Notice(
-				t("NOTICE_EXTRACT_DONE", [matches.length.toString()])
-			);
+			new Notice(t("NOTICE_EXTRACT_DONE", [matches.length.toString()]));
 			return result;
 		} else {
 			new Notice(t("NOTICE_NO_MATCH"));
@@ -595,16 +597,96 @@ function processClearFormat(
 ): string {
 	let result = text;
 
+	// 保护 URL 的辅助函数：使用临时标记替换 URL，处理完后再恢复
+	// 使用独特的占位符格式，避免与文本内容冲突
+	// 使用方括号和特殊字符组合，确保不会被误匹配
+	const urlPlaceholders: string[] = [];
+	const URL_PLACEHOLDER_PREFIX = "【MTT_URL_";
+	const URL_PLACEHOLDER_SUFFIX = "】";
+
+	// 保护 Markdown 链接中的 URL: [text](url)
+	const linkPlaceholders: string[] = [];
+	const LINK_PLACEHOLDER_PREFIX = "【MTT_LINK_";
+	const LINK_PLACEHOLDER_SUFFIX = "】";
+
+	// 保护普通 URL（http://, https://, ftp:// 等）
+	// 只在清理斜体时需要保护 URL，因为只有斜体清理会误处理 URL 中的下划线
+	if (clearItalic) {
+		// 先保护 Markdown 链接中的 URL（避免处理链接中的 URL）
+		result = result.replace(/\[([^\]]*)\]\(([^)]+)\)/g, (match) => {
+			const placeholder = `${LINK_PLACEHOLDER_PREFIX}${linkPlaceholders.length}${LINK_PLACEHOLDER_SUFFIX}`;
+			linkPlaceholders.push(match);
+			return placeholder;
+		});
+
+		// 再保护独立的 URL（不在链接中的）
+		// 匹配 http://, https://, ftp://, ftps://, file:// 等协议开头的 URL
+		// 也匹配 www. 开头的 URL
+		result = result.replace(
+			/(https?|ftp|ftps|file):\/\/[^\s<>"{}|\\^`\[\]]+|www\.[^\s<>"{}|\\^`\[\]]+/gi,
+			(match) => {
+				const placeholder = `${URL_PLACEHOLDER_PREFIX}${urlPlaceholders.length}${URL_PLACEHOLDER_SUFFIX}`;
+				urlPlaceholders.push(match);
+				return placeholder;
+			}
+		);
+	}
+
 	// 1. 清理加粗 (**text** 或 __text__)
 	if (clearBold) {
 		result = result.replace(/(\*\*|__)(.*?)\1/g, "$2");
 	}
 
 	// 2. 清理斜体 (*text* 或 _text_)
-	// 注意：正则需要避免误删加粗遗留的标记
+	// 注意：正则需要避免误删加粗遗留的标记和 URL 中的下划线
 	if (clearItalic) {
+		// 清理星号斜体 *text*
 		result = result.replace(/([^\*]|^)\*([^\*]+)\*([^\*]|$)/g, "$1$2$3");
-		result = result.replace(/([^_]|^)_([^_]+)_([^_]|$)/g, "$1$2$3");
+
+		// 清理下划线斜体 _text_
+		// 需要排除占位符中的下划线（占位符格式：【MTT_URL_0】或【MTT_LINK_0】）
+		// 使用更简单可靠的方法：先找到所有占位符的位置，然后只处理不在占位符内的下划线
+		const placeholderRanges: Array<{ start: number; end: number }> = [];
+
+		// 找到所有占位符的位置
+		const placeholderPattern = /【MTT[^】]*】/g;
+		let match;
+		while ((match = placeholderPattern.exec(result)) !== null) {
+			placeholderRanges.push({
+				start: match.index,
+				end: match.index + match[0].length,
+			});
+		}
+
+		// 检查位置是否在占位符内
+		const isInPlaceholder = (pos: number): boolean => {
+			return placeholderRanges.some(
+				(range) => pos >= range.start && pos < range.end
+			);
+		};
+
+		// 清理下划线斜体，但跳过占位符内的
+		result = result.replace(
+			/([^_]|^)_([^_]+)_([^_]|$)/g,
+			(match, before, content, after, offset) => {
+				// 检查匹配的开始位置是否在占位符内
+				if (isInPlaceholder(offset)) {
+					return match;
+				}
+				// 检查匹配的结束位置是否在占位符内
+				if (isInPlaceholder(offset + match.length - 1)) {
+					return match;
+				}
+				// 检查匹配的中间部分是否在占位符内
+				for (let i = offset; i < offset + match.length; i++) {
+					if (isInPlaceholder(i)) {
+						return match;
+					}
+				}
+				// 否则正常清理斜体
+				return before + content + after;
+			}
+		);
 	}
 
 	// 3. 清理高亮 (==text==)
@@ -627,6 +709,47 @@ function processClearFormat(
 		result = result.replace(/\[(.*?)\]\(.*?\)/g, "$1");
 	}
 
+	// 恢复 URL 占位符（必须在所有格式清理完成后恢复）
+	// 先恢复链接（按索引倒序恢复，避免索引冲突）
+	if (clearItalic && linkPlaceholders.length > 0) {
+		for (let i = linkPlaceholders.length - 1; i >= 0; i--) {
+			const placeholder = `${LINK_PLACEHOLDER_PREFIX}${i}${LINK_PLACEHOLDER_SUFFIX}`;
+			const originalLink = linkPlaceholders[i];
+			if (originalLink && result.includes(placeholder)) {
+				// 使用全局替换，确保所有匹配的占位符都被替换
+				result = result.split(placeholder).join(originalLink);
+			}
+		}
+	}
+
+	// 再恢复独立的 URL（按索引倒序恢复）
+	if (clearItalic && urlPlaceholders.length > 0) {
+		for (let i = urlPlaceholders.length - 1; i >= 0; i--) {
+			const placeholder = `${URL_PLACEHOLDER_PREFIX}${i}${URL_PLACEHOLDER_SUFFIX}`;
+			const originalUrl = urlPlaceholders[i];
+			if (originalUrl) {
+				// 首先尝试精确匹配标准格式 【MTT_URL_0】
+				if (result.includes(placeholder)) {
+					result = result.split(placeholder).join(originalUrl);
+				} else {
+					// 如果标准格式不存在，尝试匹配可能的变体格式
+					// 匹配格式：【MTTURL0】或【MTT-URL-0】等（下划线可能被删除）
+					const variantPatterns = [
+						new RegExp(`【MTT[_-]?URL[_-]?${i}】`, "g"),
+						new RegExp(`【MTTURL${i}】`, "g"),
+						new RegExp(`【MTT_URL${i}】`, "g"),
+					];
+
+					for (const pattern of variantPatterns) {
+						if (pattern.test(result)) {
+							result = result.replace(pattern, originalUrl);
+							break; // 找到一个匹配就停止
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return result;
 }
-
