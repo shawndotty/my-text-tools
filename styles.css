@@ -109,6 +109,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .mtt-settings-content label {
@@ -326,4 +327,16 @@ input[type="number"].mtt-small-input {
     text-transform: uppercase;
     margin: 15px 0 5px 0;
     letter-spacing: 1px;
+}
+
+.mtt-footer-btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* 适配窄屏幕时自动换行 */
+}
+
+/* 可以给复制按钮一个特定的 Hover 效果 */
+.mtt-secondary-btn:active {
+    background-color: var(--background-modifier-pressed);
+    transform: translateY(1px);
 }

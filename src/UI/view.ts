@@ -53,6 +53,8 @@ export class MyTextToolsView extends ItemView {
 		lbTrigger: "", // 触发内容（字符或正则）
 		lbAction: "add-after", // 执行的操作
 		lbRegex: false, // 是否启用正则
+		preserveFrontmatter: true, // 默认开启保护
+		preserveHeader: false, // 默认不开启，用户按需勾选
 	};
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any) {
@@ -272,6 +274,23 @@ export class MyTextToolsView extends ItemView {
 		// 按钮组容器，方便设置间距
 		const btnGroup = footer.createDiv({ cls: "mtt-footer-btn-group" });
 
+		// 1. 复制到剪贴板按钮
+		const copyClipboardBtn = btnGroup.createEl("button", {
+			text: "复制到剪贴板",
+			cls: "mtt-secondary-btn", // 可以复用次要按钮样式
+		});
+		// 增加一个小图标增强视觉
+		// setIcon(copyClipboardBtn.createSpan(), "copy");
+
+		copyClipboardBtn.onclick = async () => {
+			try {
+				await navigator.clipboard.writeText(this.content);
+				new Notice("✅ 已成功复制到剪贴板");
+			} catch (err) {
+				new Notice("❌ 复制失败，请检查权限");
+			}
+		};
+
 		// 按钮 1：存为新笔记
 		const saveNewBtn = btnGroup.createEl("button", {
 			text: t("BTN_SAVE_NEW"),
@@ -291,6 +310,37 @@ export class MyTextToolsView extends ItemView {
 
 	// 右侧设置面板 (核心逻辑)
 	renderSettings(parent: HTMLElement) {
+		parent.createEl("h3", { text: "全局配置", cls: "mtt-panel-title" });
+		const globalSettings = parent.createDiv({
+			cls: "mtt-settings-content",
+		});
+
+		// Frontmatter 保护开关
+		const fmLabel = globalSettings.createEl("label", {
+			cls: "mtt-checkbox-label",
+		});
+		const fmCheck = fmLabel.createEl("input", { type: "checkbox" });
+		fmCheck.checked = this.settingsState.preserveFrontmatter;
+		fmCheck.onchange = (e) =>
+			(this.settingsState.preserveFrontmatter = (
+				e.target as HTMLInputElement
+			).checked);
+		fmLabel.appendText(" 保护 Frontmatter (不处理开头YAML)");
+
+		// 首行保护
+		const headerLabel = globalSettings.createEl("label", {
+			cls: "mtt-checkbox-label",
+		});
+		const headerCheck = headerLabel.createEl("input", { type: "checkbox" });
+		headerCheck.checked = this.settingsState.preserveHeader;
+		headerCheck.onchange = (e) =>
+			(this.settingsState.preserveHeader = (
+				e.target as HTMLInputElement
+			).checked);
+		headerLabel.appendText(" 保护首行 (标题行)");
+
+		parent.createEl("hr"); // 分隔线
+
 		parent.createEl("h3", {
 			text: t("SETTINGS_TITLE"),
 			cls: "mtt-panel-title",
@@ -824,22 +874,48 @@ export class MyTextToolsView extends ItemView {
 
 	// 统一处理文本逻辑
 	processText(type: string) {
-		this.pushToHistory(); // 执行处理前，先记录当前状态
-		let lines = this.content.split("\n");
+		this.pushToHistory();
+
+		let textToProcess = this.content;
+		let extractedFrontmatter = "";
+		let extractedHeader = "";
+
+		// --- 第一层：保护 Frontmatter ---
+		if (this.settingsState.preserveFrontmatter) {
+			const fmMatch = textToProcess.match(
+				/^---\n([\s\S]*?)\n---(?:\n|$)/
+			);
+			if (fmMatch) {
+				extractedFrontmatter = fmMatch[0];
+				textToProcess = textToProcess.substring(
+					extractedFrontmatter.length
+				);
+			}
+		}
+
+		// --- 第二层：保护首行 ---
+		let lines = textToProcess.split("\n");
+		if (this.settingsState.preserveHeader && lines.length > 0) {
+			extractedHeader = lines[0] + "\n"; // 提取第一行并保留换行符
+			lines = lines.slice(1); // 剩下的参与处理
+		}
+
+		// --- 执行具体的工具逻辑 ---
+		let processedBody = "";
 
 		switch (type) {
 			case "dedupe":
-				this.content = Array.from(new Set(lines)).join("\n");
+				processedBody = Array.from(new Set(lines)).join("\n");
 				new Notice(t("NOTICE_DEDUPE"));
 				break;
 			case "empty-line":
-				this.content = lines.filter((l) => l.trim() !== "").join("\n");
+				processedBody = lines.filter((l) => l.trim() !== "").join("\n");
 				new Notice(t("NOTICE_EMPTY_LINE"));
 				break;
 			case "regex":
 				try {
 					const regex = new RegExp(this.settingsState.findText, "g");
-					this.content = this.content.replace(
+					processedBody = textToProcess.replace(
 						regex,
 						this.settingsState.replaceText
 					);
@@ -851,7 +927,7 @@ export class MyTextToolsView extends ItemView {
 			case "add-wrap":
 				const { prefix, suffix } = this.settingsState;
 
-				this.content = lines
+				processedBody = lines
 					.map((line) => {
 						// 只有当行不为空时才处理，或者根据需要处理所有行
 						return `${prefix || ""}${line}${suffix || ""}`;
@@ -869,7 +945,7 @@ export class MyTextToolsView extends ItemView {
 					return;
 				}
 
-				this.content = lines
+				processedBody = lines
 					.filter((line) => {
 						let isMatch = false;
 
@@ -915,7 +991,7 @@ export class MyTextToolsView extends ItemView {
 				}
 
 				const colIndex = columnNumber - 1; // 转为数组索引
-				this.content = lines
+				processedBody = lines
 					.map((line) => {
 						const parts = line.split(actualDelim);
 						// 如果该行有这一列，返回内容；否则返回空字符串
@@ -950,7 +1026,7 @@ export class MyTextToolsView extends ItemView {
 				const idx1 = swapCol1 - 1;
 				const idx2 = swapCol2 - 1;
 
-				this.content = lines
+				processedBody = lines
 					.map((line) => {
 						const parts = line.split(delim);
 						// 只有当这一行拥有足够的列时才执行交换
@@ -979,7 +1055,7 @@ export class MyTextToolsView extends ItemView {
 				const regex = includeNumbers
 					? /[^a-zA-Z0-9\u4e00-\u9fa5]+/g
 					: /[^a-zA-Z\u4e00-\u9fa5]+/g;
-				const words = this.content
+				const words = textToProcess
 					.replace(regex, " ")
 					.split(/\s+/)
 					.filter((word) => word.length >= minWordLength);
@@ -999,7 +1075,7 @@ export class MyTextToolsView extends ItemView {
 				});
 
 				// 4. 输出格式：词 (次数)
-				this.content = sortedWords
+				processedBody = sortedWords
 					.map(([word, count]) => `${word} (${count})`)
 					.join("\n");
 
@@ -1012,7 +1088,7 @@ export class MyTextToolsView extends ItemView {
 					this.settingsState;
 				let currentNum = startNumber;
 
-				this.content = lines
+				processedBody = lines
 					.map((line, index) => {
 						// 如果该行完全为空，我们可以选择跳过不编号，也可以编号。原版通常是全部编号。
 						const numberedLine = `${listPrefix}${currentNum}${listSeparator}${line}`;
@@ -1054,7 +1130,7 @@ export class MyTextToolsView extends ItemView {
 					const matches: string[] = [];
 					let match;
 					// 在全文中循环查找所有匹配项
-					while ((match = pattern.exec(this.content)) !== null) {
+					while ((match = pattern.exec(textToProcess)) !== null) {
 						// match[1] 是括号中的捕获组内容
 						if (match[1] !== undefined) {
 							matches.push(match[1]);
@@ -1062,7 +1138,7 @@ export class MyTextToolsView extends ItemView {
 					}
 
 					if (matches.length > 0) {
-						this.content = matches.join("\n");
+						processedBody = matches.join("\n");
 						new Notice(
 							t("NOTICE_EXTRACT_DONE", [
 								matches.length.toString(),
@@ -1078,7 +1154,7 @@ export class MyTextToolsView extends ItemView {
 			case "remove-whitespace":
 				const { wsCompress, wsTrim, wsAll, wsTabs } =
 					this.settingsState;
-				let result = this.content;
+				let result = textToProcess;
 
 				// 1. 先处理制表符
 				if (wsTabs) {
@@ -1104,7 +1180,7 @@ export class MyTextToolsView extends ItemView {
 					}
 				}
 
-				this.content = result;
+				processedBody = result;
 				new Notice(t("NOTICE_WS_DONE"));
 				break;
 			case "line-break-tools":
@@ -1148,17 +1224,20 @@ export class MyTextToolsView extends ItemView {
 
 					// 执行替换
 					if (lbAction.startsWith("add")) {
-						this.content = this.content.replace(
+						processedBody = textToProcess.replace(
 							regex!,
 							replacement
 						);
 					} else {
 						// 移除操作时，由于正则已经包含了 \n，直接替换为匹配项中除换行外的部分
-						this.content = this.content.replace(regex!, (match) => {
-							return lbAction === "remove-after"
-								? match.replace(/\n$/, "")
-								: match.replace(/^\n/, "");
-						});
+						processedBody = textToProcess.replace(
+							regex!,
+							(match) => {
+								return lbAction === "remove-after"
+									? match.replace(/\n$/, "")
+									: match.replace(/^\n/, "");
+							}
+						);
 					}
 
 					new Notice(t("NOTICE_LB_DONE"));
@@ -1167,8 +1246,23 @@ export class MyTextToolsView extends ItemView {
 				}
 				this.render();
 				break;
+			default:
+				// 默认情况下，将处理后的行重新合并
+				processedBody = lines.join("\n");
 		}
-		this.render(); // 刷新 UI 显示新内容
+		// --- 最终三段式拼合 ---
+		this.content = extractedFrontmatter + extractedHeader + processedBody;
+
+		this.render();
+
+		// 动态通知提示
+		let noticeMsg = "处理完成";
+		if (extractedFrontmatter && extractedHeader)
+			noticeMsg = "已跳过元数据及首行标题";
+		else if (extractedFrontmatter) noticeMsg = "已跳过元数据区";
+		else if (extractedHeader) noticeMsg = "已跳过首行标题";
+
+		new Notice(noticeMsg);
 	}
 
 	// 保存回原笔记
