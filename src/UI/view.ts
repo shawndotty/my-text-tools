@@ -276,7 +276,7 @@ export class MyTextToolsView extends ItemView {
 
 		// 1. 复制到剪贴板按钮
 		const copyClipboardBtn = btnGroup.createEl("button", {
-			text: "复制到剪贴板",
+			text: t("BTN_COPY_CLIPBOARD"),
 			cls: "mtt-secondary-btn", // 可以复用次要按钮样式
 		});
 		// 增加一个小图标增强视觉
@@ -285,9 +285,9 @@ export class MyTextToolsView extends ItemView {
 		copyClipboardBtn.onclick = async () => {
 			try {
 				await navigator.clipboard.writeText(this.content);
-				new Notice("✅ 已成功复制到剪贴板");
+				new Notice(t("NOTICE_COPY_CLIPBOARD_SUCCESS"));
 			} catch (err) {
-				new Notice("❌ 复制失败，请检查权限");
+				new Notice(t("NOTICE_COPY_CLIPBOARD_ERROR"));
 			}
 		};
 
@@ -310,7 +310,10 @@ export class MyTextToolsView extends ItemView {
 
 	// 右侧设置面板 (核心逻辑)
 	renderSettings(parent: HTMLElement) {
-		parent.createEl("h3", { text: "全局配置", cls: "mtt-panel-title" });
+		parent.createEl("h3", {
+			text: t("SETTINGS_GLOBAL_TITLE"),
+			cls: "mtt-panel-title",
+		});
 		const globalSettings = parent.createDiv({
 			cls: "mtt-settings-content",
 		});
@@ -325,7 +328,7 @@ export class MyTextToolsView extends ItemView {
 			(this.settingsState.preserveFrontmatter = (
 				e.target as HTMLInputElement
 			).checked);
-		fmLabel.appendText(" 保护 Frontmatter (不处理开头YAML)");
+		fmLabel.appendText(t("CHECKBOX_PRESERVE_FRONTMATTER"));
 
 		// 首行保护
 		const headerLabel = globalSettings.createEl("label", {
@@ -337,7 +340,7 @@ export class MyTextToolsView extends ItemView {
 			(this.settingsState.preserveHeader = (
 				e.target as HTMLInputElement
 			).checked);
-		headerLabel.appendText(" 保护首行 (标题行)");
+		headerLabel.appendText(t("CHECKBOX_PRESERVE_HEADER"));
 
 		parent.createEl("hr"); // 分隔线
 
@@ -1256,11 +1259,11 @@ export class MyTextToolsView extends ItemView {
 		this.render();
 
 		// 动态通知提示
-		let noticeMsg = "处理完成";
+		let noticeMsg = t("NOTICE_PROCESS_DONE");
 		if (extractedFrontmatter && extractedHeader)
-			noticeMsg = "已跳过元数据及首行标题";
-		else if (extractedFrontmatter) noticeMsg = "已跳过元数据区";
-		else if (extractedHeader) noticeMsg = "已跳过首行标题";
+			noticeMsg = t("NOTICE_SKIP_FM_AND_HEADER");
+		else if (extractedFrontmatter) noticeMsg = t("NOTICE_SKIP_FRONTMATTER");
+		else if (extractedHeader) noticeMsg = t("NOTICE_SKIP_HEADER");
 
 		new Notice(noticeMsg);
 	}

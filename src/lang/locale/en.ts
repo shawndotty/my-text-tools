@@ -132,4 +132,15 @@ export default {
 	NOTICE_COPY_CREATED: "✅ Copy created: {0}",
 	NOTICE_COPY_ERROR: "❌ Failed to create new note",
 	DEFAULT_FILENAME: "Untitled",
+	BTN_COPY_CLIPBOARD: "Copy to Clipboard",
+	NOTICE_COPY_CLIPBOARD_SUCCESS: "✅ Successfully copied to clipboard",
+	NOTICE_COPY_CLIPBOARD_ERROR: "❌ Copy failed, please check permissions",
+	SETTINGS_GLOBAL_TITLE: "Global Settings",
+	CHECKBOX_PRESERVE_FRONTMATTER:
+		" Preserve Frontmatter (do not process YAML header)",
+	CHECKBOX_PRESERVE_HEADER: " Preserve first line (header)",
+	NOTICE_PROCESS_DONE: "Processing completed",
+	NOTICE_SKIP_FM_AND_HEADER: "Skipped frontmatter and header",
+	NOTICE_SKIP_FRONTMATTER: "Skipped frontmatter section",
+	NOTICE_SKIP_HEADER: "Skipped header line",
 };
