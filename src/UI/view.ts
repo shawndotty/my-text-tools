@@ -1406,7 +1406,7 @@ export class MyTextToolsView extends ItemView {
 					clearCode,
 					clearLinks,
 				} = this.settingsState;
-				let text = this.content;
+				let text = textToProcess;
 
 				// 1. 清理加粗 (**text** 或 __text__)
 				if (clearBold) {
