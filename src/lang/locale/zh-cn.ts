@@ -21,6 +21,9 @@ export default {
 	TOOL_CLEAR_FORMAT: "去除 Markdown 格式",
 
 	EDITOR_HEADER: "临时编辑区 (不会自动保存到原笔记)",
+	EDITOR_PREVIEW: "效果预览",
+	MODE_PREVIEW: "预览模式",
+	MODE_SOURCE: "源码模式",
 	BTN_UNDO: "撤销 (Ctrl+Z)",
 	BTN_REDO: "重做 (Ctrl+Y)",
 	EDITOR_PLACEHOLDER: "在此输入或处理文本...",

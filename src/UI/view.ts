@@ -5,6 +5,8 @@ import {
 	setIcon,
 	TFile,
 	normalizePath,
+	MarkdownRenderer,
+	Component,
 } from "obsidian";
 import { t } from "../lang/helpers";
 
@@ -12,6 +14,7 @@ export const MY_TEXT_TOOLS_VIEW = "my-text-tools-view";
 
 export class MyTextToolsView extends ItemView {
 	content: string = ""; // 存储中间窗口的临时文本内容
+	editMode: "source" | "preview" = "source"; // 默认源码模式
 	history: string[] = []; // 用于存储历史记录的栈
 	redoHistory: string[] = []; // 重做栈 (Redo Stack)
 	maxHistorySize: number = 20; // 限制撤销步数，防止内存占用过高
@@ -242,7 +245,12 @@ export class MyTextToolsView extends ItemView {
 	// 中间编辑器
 	renderMainEditor(parent: HTMLElement) {
 		const header = parent.createDiv({ cls: "mtt-center-header" });
-		header.createEl("span", { text: t("EDITOR_HEADER") });
+		header.createEl("span", {
+			text:
+				this.editMode === "source"
+					? t("EDITOR_HEADER")
+					: t("EDITOR_PREVIEW"),
+		});
 
 		// 按钮容器
 		const actionGroup = header.createDiv({ cls: "mtt-action-group" });
@@ -270,15 +278,52 @@ export class MyTextToolsView extends ItemView {
 			undoBtn.addClass("is-disabled");
 		}
 
-		const textArea = parent.createEl("textarea", {
-			cls: "mtt-textarea",
-			attr: { placeholder: t("EDITOR_PLACEHOLDER") },
+		// --- 模式切换按钮 ---
+		const modeBtn = actionGroup.createEl("button", {
+			cls: "mtt-icon-btn",
+			attr: {
+				"aria-label":
+					this.editMode === "source"
+						? t("MODE_PREVIEW")
+						: t("MODE_SOURCE"),
+			},
 		});
-		textArea.value = this.content;
-
-		textArea.oninput = (e) => {
-			this.content = (e.target as HTMLTextAreaElement).value;
+		setIcon(modeBtn, this.editMode === "source" ? "eye" : "code");
+		modeBtn.onclick = () => {
+			this.editMode = this.editMode === "source" ? "preview" : "source";
+			this.render(); // 重新渲染以切换视图
 		};
+
+		// --- 内容区域 ---
+		const editorContainer = parent.createDiv({
+			cls: "mtt-editor-container",
+		});
+
+		if (this.editMode === "source") {
+			// 源码模式：使用 textarea 处理
+			console.dir(this.content);
+			const ta = editorContainer.createEl("textarea", {
+				cls: "mtt-textarea mtt-monospace",
+			});
+			// 显式设置值，防止属性注入失败
+			ta.value = this.content;
+			ta.oninput = (e) => {
+				this.content = (e.target as HTMLTextAreaElement).value;
+			};
+		} else {
+			// 预览模式：使用 Obsidian 原生渲染器
+			const previewEl = editorContainer.createDiv({
+				cls: "mtt-preview-area markdown-rendered",
+			});
+			// 核心渲染逻辑
+			MarkdownRenderer.render(
+				this.app,
+				this.content,
+				previewEl,
+				"/",
+				new Component()
+			);
+		}
 
 		const footer = parent.createDiv({ cls: "mtt-center-footer" });
 

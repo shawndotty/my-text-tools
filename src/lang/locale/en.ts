@@ -21,6 +21,9 @@ export default {
 	TOOL_CLEAR_FORMAT: "Remove Markdown Formatting",
 
 	EDITOR_HEADER: "Temporary Editor (Will not auto-save to original note)",
+	EDITOR_PREVIEW: "Preview",
+	MODE_PREVIEW: "Preview Mode",
+	MODE_SOURCE: "Source Mode",
 	BTN_UNDO: "Undo (Ctrl+Z)",
 	BTN_REDO: "Redo (Ctrl+Y)",
 	EDITOR_PLACEHOLDER: "Enter or process text here...",
