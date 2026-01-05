@@ -99,6 +99,31 @@ export function getToolGroups(): ToolGroup[] {
 				},
 			],
 		},
+		{
+			name: t("GROUP_AI"),
+			tools: [
+				{
+					id: "ai-extract-keypoints",
+					name: t("TOOL_AI_EXTRACT_KEYPOINTS"),
+					icon: "sparkles",
+				},
+				{
+					id: "ai-summarize",
+					name: t("TOOL_AI_SUMMARIZE"),
+					icon: "file-text",
+				},
+				{
+					id: "ai-translate",
+					name: t("TOOL_AI_TRANSLATE"),
+					icon: "languages",
+				},
+				{
+					id: "ai-polish",
+					name: t("TOOL_AI_POLISH"),
+					icon: "wand",
+				},
+			],
+		},
 	];
 }
 

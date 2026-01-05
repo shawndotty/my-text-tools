@@ -112,5 +112,9 @@ export type ToolType =
 	| "extract-column"
 	| "swap-columns"
 	| "extract-between"
-	| "word-frequency";
+	| "word-frequency"
+	| "ai-extract-keypoints"
+	| "ai-summarize"
+	| "ai-translate"
+	| "ai-polish";
 

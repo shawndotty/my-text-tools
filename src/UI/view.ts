@@ -4,6 +4,8 @@ import { SettingsState, DEFAULT_SETTINGS_STATE, ToolType } from "../types";
 import { HistoryManager } from "../utils/historyManager";
 import { processText } from "../utils/textProcessors";
 import { saveToOriginal, saveToNewFile } from "../utils/fileOperations";
+import { AIService } from "../utils/aiService";
+import MyTextTools from "../main";
 import { renderToolsPanel } from "./components/ToolsPanel";
 import {
 	renderEditorPanel,
@@ -24,10 +26,12 @@ export class MyTextToolsView extends ItemView {
 	originalEditor: any = null; // 对原笔记编辑器的引用
 	activeTool: ToolType | "" = ""; // 当前选中的工具 ID
 	settingsState: SettingsState = { ...DEFAULT_SETTINGS_STATE };
+	plugin: MyTextTools; // 插件实例引用
 
-	constructor(leaf: WorkspaceLeaf, originalEditor: any) {
+	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
 		super(leaf);
 		this.originalEditor = originalEditor;
+		this.plugin = plugin;
 		if (originalEditor) {
 			this.content = originalEditor.getValue();
 		}
@@ -118,8 +122,8 @@ export class MyTextToolsView extends ItemView {
 			onSettingsChange: (key: string, value: any) => {
 				(this.settingsState as any)[key] = value;
 			},
-			onRun: (toolId: ToolType) => {
-				this.processText(toolId);
+			onRun: async (toolId: ToolType) => {
+				await this.processText(toolId);
 			},
 		};
 		renderGlobalSettings(rightPanel, this.settingsState, settingsCallbacks);
@@ -132,7 +136,19 @@ export class MyTextToolsView extends ItemView {
 	}
 
 	// 统一处理文本逻辑
-	processText(type: ToolType) {
+	async processText(type: ToolType) {
+		// 检查是否是 AI 工具
+		if (
+			type === "ai-extract-keypoints" ||
+			type === "ai-summarize" ||
+			type === "ai-translate" ||
+			type === "ai-polish"
+		) {
+			await this.processAITool(type);
+			return;
+		}
+
+		// 普通工具处理
 		this.historyManager.pushToHistory(this.content);
 
 		const processedContent = processText(
@@ -143,6 +159,87 @@ export class MyTextToolsView extends ItemView {
 		this.content = processedContent;
 
 		this.render();
+	}
+
+	// 处理 AI 工具
+	async processAITool(type: ToolType) {
+		// 检查 AI 配置
+		const aiService = new AIService(this.plugin.settings);
+		if (!aiService.isConfigured()) {
+			new Notice("❌ AI 配置不完整，请在设置中配置 API Key");
+			return;
+		}
+
+		// 保存历史
+		this.historyManager.pushToHistory(this.content);
+
+		// 提取要处理的文本（排除 frontmatter 和 header）
+		let textToProcess = this.content;
+		const fmMatch = textToProcess.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
+		if (fmMatch && this.settingsState.preserveFrontmatter) {
+			textToProcess = textToProcess.substring(fmMatch[0].length);
+		}
+		const lines = textToProcess.split("\n");
+		if (this.settingsState.preserveHeader && lines.length > 0) {
+			textToProcess = lines.slice(1).join("\n");
+		}
+
+		if (!textToProcess.trim()) {
+			new Notice("❌ 没有可处理的文本内容");
+			return;
+		}
+
+		// 显示处理中提示
+		new Notice("🤖 AI 处理中，请稍候...");
+
+		let result: { content: string; error?: string };
+
+		try {
+			// 根据工具类型调用不同的 AI 方法
+			switch (type) {
+				case "ai-extract-keypoints":
+					result = await aiService.extractKeyPoints(textToProcess);
+					break;
+				case "ai-summarize":
+					result = await aiService.summarize(textToProcess);
+					break;
+				case "ai-translate":
+					// 翻译功能可以后续扩展，暂时使用默认英文
+					result = await aiService.translate(textToProcess, "英文");
+					break;
+				case "ai-polish":
+					result = await aiService.polish(textToProcess);
+					break;
+				default:
+					result = { content: "", error: "未知的 AI 工具类型" };
+			}
+
+			if (result.error) {
+				new Notice(`❌ ${result.error}`);
+				return;
+			}
+
+			// 合并结果：保留 frontmatter 和 header，替换正文
+			let finalContent = result.content;
+			if (fmMatch && this.settingsState.preserveFrontmatter) {
+				finalContent = fmMatch[0] + finalContent;
+			}
+			if (
+				this.settingsState.preserveHeader &&
+				lines.length > 0 &&
+				lines[0].trim()
+			) {
+				finalContent = lines[0] + "\n" + finalContent;
+			}
+
+			this.content = finalContent;
+			new Notice("✅ AI 处理完成");
+			this.render();
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : "未知错误";
+			new Notice(`❌ AI 处理失败: ${errorMessage}`);
+		}
 	}
 
 	// 保存回原笔记

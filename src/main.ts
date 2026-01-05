@@ -21,13 +21,17 @@ export default class MyTextTools extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+
+		// 0. 注册设置标签页
+		this.addSettingTab(new MyTextToolsSettingTab(this.app, this));
+
 		// 1. 注册视图类型
 		this.registerView(MY_TEXT_TOOLS_VIEW, (leaf) => {
-			// 获取当前活动的编辑器作为“原笔记”引用
+			// 获取当前活动的编辑器作为"原笔记"引用
 			const activeView =
 				this.app.workspace.getActiveViewOfType(MarkdownView);
 			const editor = activeView ? activeView.editor : null;
-			return new MyTextToolsView(leaf, editor);
+			return new MyTextToolsView(leaf, editor, this);
 		});
 
 		// 2. 添加触发命令

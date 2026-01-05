@@ -3,7 +3,7 @@ import { SettingsState, ToolType } from "../../types";
 
 export interface SettingsPanelCallbacks {
 	onSettingsChange: (key: string, value: any) => void;
-	onRun: (toolId: ToolType) => void;
+	onRun: (toolId: ToolType) => void | Promise<void>;
 }
 
 /**
@@ -116,6 +116,12 @@ export function renderToolSettings(
 			break;
 		case "clear-format":
 			renderClearFormatSettings(settingsContent, settings, callbacks);
+			break;
+		case "ai-extract-keypoints":
+		case "ai-summarize":
+		case "ai-translate":
+		case "ai-polish":
+			renderAISettings(settingsContent, activeTool, callbacks);
 			break;
 		default:
 			settingsContent.createEl("p", {
@@ -823,5 +829,50 @@ function renderClearFormatSettings(
 		cls: "mtt-run-btn",
 	});
 	runBtn.onclick = () => callbacks.onRun("clear-format");
+}
+
+function renderAISettings(
+	parent: HTMLElement,
+	activeTool: ToolType,
+	callbacks: SettingsPanelCallbacks
+): void {
+	const aiContent = parent.createDiv({
+		cls: "mtt-settings-content",
+	});
+
+	// 显示工具说明
+	let toolDescriptionKey = "";
+	switch (activeTool) {
+		case "ai-extract-keypoints":
+			toolDescriptionKey = "AI_DESCRIPTION_EXTRACT";
+			break;
+		case "ai-summarize":
+			toolDescriptionKey = "AI_DESCRIPTION_SUMMARIZE";
+			break;
+		case "ai-translate":
+			toolDescriptionKey = "AI_DESCRIPTION_TRANSLATE";
+			break;
+		case "ai-polish":
+			toolDescriptionKey = "AI_DESCRIPTION_POLISH";
+			break;
+	}
+
+	if (toolDescriptionKey) {
+		aiContent.createEl("p", {
+			text: t(toolDescriptionKey),
+			cls: "mtt-ai-description",
+		});
+	}
+
+	aiContent.createEl("p", {
+		text: t("AI_HINT"),
+		cls: "mtt-ai-hint",
+	});
+
+	const runBtn = aiContent.createEl("button", {
+		text: t("BTN_RUN_AI"),
+		cls: "mtt-run-btn",
+	});
+	runBtn.onclick = () => callbacks.onRun(activeTool);
 }
 
