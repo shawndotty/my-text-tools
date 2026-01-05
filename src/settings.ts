@@ -139,21 +139,5 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
-
-		containerEl.createEl("hr");
-
-		// 保留原有的设置
-		new Setting(containerEl)
-			.setName("Settings #1")
-			.setDesc("It's a secret")
-			.addText((text) =>
-				text
-					.setPlaceholder("Enter your secret")
-					.setValue(this.plugin.settings.mySetting)
-					.onChange(async (value) => {
-						this.plugin.settings.mySetting = value;
-						await this.plugin.saveSettings();
-					})
-			);
 	}
 }
