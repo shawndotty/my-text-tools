@@ -18,6 +18,7 @@ export default {
 	TOOL_SWAP_COL: "交換列",
 	TOOL_EXTRACT_BETWEEN: "內容提取",
 	TOOL_WORD_FREQ: "詞頻分析",
+	TOOL_CLEAR_FORMAT: "去除 Markdown 格式",
 
 	EDITOR_HEADER: "臨時編輯區 (不會自動保存到原筆記)",
 	BTN_UNDO: "撤銷 (Ctrl+Z)",
@@ -148,4 +149,12 @@ export default {
 	OPTION_EMPTY_LINE_MERGE: "合併連續空行為一個",
 	BTN_RUN_EMPTY_LINE: "立即執行",
 	NOTICE_EMPTY_LINE_MERGED: "已合併連續空行",
+	SETTING_CLEAR_FORMAT_BOLD: "去除加粗 (**text**)",
+	SETTING_CLEAR_FORMAT_ITALIC: "去除斜體 (*text*)",
+	SETTING_CLEAR_FORMAT_HIGHLIGHT: "去除高亮 (==text==)",
+	SETTING_CLEAR_FORMAT_STRIKE: "去除刪除線 (~~text~~)",
+	SETTING_CLEAR_FORMAT_CODE: "去除行內程式碼 (`code`)",
+	SETTING_CLEAR_FORMAT_LINKS: "去除連結 (保留文字)",
+	BTN_RUN_CLEAR_FORMAT: "執行清理",
+	NOTICE_CLEAR_FORMAT_DONE: "Markdown 格式清理完成",
 };

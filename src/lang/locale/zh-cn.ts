@@ -18,6 +18,7 @@ export default {
 	TOOL_SWAP_COL: "交换列",
 	TOOL_EXTRACT_BETWEEN: "内容提取",
 	TOOL_WORD_FREQ: "词频分析",
+	TOOL_CLEAR_FORMAT: "去除 Markdown 格式",
 
 	EDITOR_HEADER: "临时编辑区 (不会自动保存到原笔记)",
 	BTN_UNDO: "撤销 (Ctrl+Z)",
@@ -148,4 +149,12 @@ export default {
 	OPTION_EMPTY_LINE_MERGE: "合并连续空行为一个",
 	BTN_RUN_EMPTY_LINE: "立即执行",
 	NOTICE_EMPTY_LINE_MERGED: "已合并连续空行",
+	SETTING_CLEAR_FORMAT_BOLD: "去除加粗 (**text**)",
+	SETTING_CLEAR_FORMAT_ITALIC: "去除斜体 (*text*)",
+	SETTING_CLEAR_FORMAT_HIGHLIGHT: "去除高亮 (==text==)",
+	SETTING_CLEAR_FORMAT_STRIKE: "去除删除线 (~~text~~)",
+	SETTING_CLEAR_FORMAT_CODE: "去除行内代码 (`code`)",
+	SETTING_CLEAR_FORMAT_LINKS: "去除链接 (保留文字)",
+	BTN_RUN_CLEAR_FORMAT: "执行清理",
+	NOTICE_CLEAR_FORMAT_DONE: "Markdown 格式清理完成",
 };

@@ -57,6 +57,12 @@ export class MyTextToolsView extends ItemView {
 		preserveHeader: false, // 默认不开启，用户按需勾选
 		dedupeIncludeEmpty: false, // 默认不包含空行，即：空行不参与去重，原样保留
 		emptyLineMode: "all", // "all" 为删除所有空行，"merge" 为合并相邻空行为一个
+		clearBold: true, // 清理加粗 ** 或 __
+		clearItalic: true, // 清理斜体 * 或 _
+		clearHighlight: true, // 清理高亮 ==
+		clearStrikethrough: true, // 清理删除线 ~~
+		clearCode: false, // 清理行内代码 `
+		clearLinks: false, // 清理链接 [text](url) -> text
 	};
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any) {
@@ -133,6 +139,11 @@ export class MyTextToolsView extends ItemView {
 						id: "remove-whitespace",
 						name: t("TOOL_WHITESPACE"),
 						icon: "brush-cleaning",
+					},
+					{
+						id: "clear-format",
+						name: t("TOOL_CLEAR_FORMAT"),
+						icon: "eraser",
 					},
 				],
 			},
@@ -920,6 +931,36 @@ export class MyTextToolsView extends ItemView {
 				cls: "mtt-run-btn",
 			});
 			runBtn.onclick = () => this.processText("empty-line");
+		} else if (this.activeTool === "clear-format") {
+			const cfContent = settingsContent.createDiv({
+				cls: "mtt-settings-content",
+			});
+
+			const createCheck = (label: string, key: string) => {
+				const lbl = cfContent.createEl("label", {
+					cls: "mtt-checkbox-label",
+				});
+				const chk = lbl.createEl("input", { type: "checkbox" });
+				chk.checked = this.settingsState[key];
+				chk.onchange = (e) =>
+					(this.settingsState[key] = (
+						e.target as HTMLInputElement
+					).checked);
+				lbl.appendText(` ${label}`);
+			};
+
+			createCheck(t("SETTING_CLEAR_FORMAT_BOLD"), "clearBold");
+			createCheck(t("SETTING_CLEAR_FORMAT_ITALIC"), "clearItalic");
+			createCheck(t("SETTING_CLEAR_FORMAT_HIGHLIGHT"), "clearHighlight");
+			createCheck(t("SETTING_CLEAR_FORMAT_STRIKE"), "clearStrikethrough");
+			createCheck(t("SETTING_CLEAR_FORMAT_CODE"), "clearCode");
+			createCheck(t("SETTING_CLEAR_FORMAT_LINKS"), "clearLinks");
+
+			const runBtn = settingsContent.createEl("button", {
+				text: t("BTN_RUN_CLEAR_FORMAT"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => this.processText("clear-format");
 		} else {
 			settingsContent.createEl("p", {
 				text: t("SETTINGS_NO_CONFIG"),
@@ -1355,6 +1396,60 @@ export class MyTextToolsView extends ItemView {
 				}
 				this.render();
 				break;
+
+			case "clear-format":
+				const {
+					clearBold,
+					clearItalic,
+					clearHighlight,
+					clearStrikethrough,
+					clearCode,
+					clearLinks,
+				} = this.settingsState;
+				let text = this.content;
+
+				// 1. 清理加粗 (**text** 或 __text__)
+				if (clearBold) {
+					text = text.replace(/(\*\*|__)(.*?)\1/g, "$2");
+				}
+
+				// 2. 清理斜体 (*text* 或 _text_)
+				// 注意：正则需要避免误删加粗遗留的标记
+				if (clearItalic) {
+					text = text.replace(
+						/([^\*]|^)\*([^\*]+)\*([^\*]|$)/g,
+						"$1$2$3"
+					);
+					text = text.replace(
+						/([^Leaf]|^)_([^_]+)_([^Leaf]|$)/g,
+						"$1$2$3"
+					);
+				}
+
+				// 3. 清理高亮 (==text==)
+				if (clearHighlight) {
+					text = text.replace(/==(.*?)==/g, "$1");
+				}
+
+				// 4. 清理删除线 (~~text~~)
+				if (clearStrikethrough) {
+					text = text.replace(/~~(.*?)~~/g, "$1");
+				}
+
+				// 5. 清理行内代码 (`code`)
+				if (clearCode) {
+					text = text.replace(/`(.*?)`/g, "$1");
+				}
+
+				// 6. 清理链接 [文字](链接) -> 仅保留文字
+				if (clearLinks) {
+					text = text.replace(/\[(.*?)\]\(.*?\)/g, "$1");
+				}
+
+				processedBody = text;
+				new Notice(t("NOTICE_CLEAR_FORMAT_DONE"));
+				break;
+
 			default:
 				// 默认情况下，将处理后的行重新合并
 				processedBody = lines.join("\n");
