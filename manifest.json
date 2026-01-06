@@ -1,7 +1,7 @@
 {
 	"id": "my-text-tools",
 	"name": "My Text Tools",
-	"version": "1.0.8",
+	"version": "1.0.9",
 	"minAppVersion": "0.15.0",
 	"description": "An advanced text processing workbench for Obsidian, inspired by mytexttools.com",
 	"author": "JohnnyLearns",
