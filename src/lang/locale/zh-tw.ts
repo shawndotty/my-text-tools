@@ -170,5 +170,9 @@ export default {
 	AI_DESCRIPTION_TRANSLATE: "使用 AI 翻譯文字（預設翻譯為英文）",
 	AI_DESCRIPTION_POLISH: "使用 AI 潤色文字，使其更加流暢、專業",
 	AI_HINT: "提示：使用前請在插件設置中配置 AI API Key",
-	BTN_RUN_AI: "執行 AI 處理",
+	BTN_RUN_AI: "運行 AI 分析",
+
+	// New Keys
+	NOTICE_LOAD_SELECTION: "已加載編輯器選中的文本",
+	NOTICE_SAVE_SELECTION_SUCCESS: "選中的文本已更新到原筆記",
 };

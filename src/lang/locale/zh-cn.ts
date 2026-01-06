@@ -171,4 +171,8 @@ export default {
 	AI_DESCRIPTION_POLISH: "使用 AI 润色文本，使其更加流畅、专业",
 	AI_HINT: "提示：使用前请在插件设置中配置 AI API Key",
 	BTN_RUN_AI: "执行 AI 处理",
+
+	// New Keys
+	NOTICE_LOAD_SELECTION: "已加载编辑器选中的文本",
+	NOTICE_SAVE_SELECTION_SUCCESS: "选中的文本已更新到原笔记",
 };

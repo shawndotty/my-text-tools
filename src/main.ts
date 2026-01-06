@@ -69,6 +69,15 @@ export default class MyTextTools extends Plugin {
 		}
 
 		workspace.revealLeaf(leaf);
+
+		// 激活视图时，更新内容
+		const activeView = workspace.getActiveViewOfType(MarkdownView);
+		if (activeView && activeView.editor) {
+			const view = leaf.view as MyTextToolsView;
+			if (view) {
+				view.updateInput(activeView.editor);
+			}
+		}
 	}
 
 	onunload() {}

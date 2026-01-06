@@ -168,10 +168,18 @@ export default {
 	TOOL_AI_SUMMARIZE: "AI Summarize",
 	TOOL_AI_TRANSLATE: "AI Translate",
 	TOOL_AI_POLISH: "AI Polish",
-	AI_DESCRIPTION_EXTRACT: "Use AI to extract key points from text, output as a list",
-	AI_DESCRIPTION_SUMMARIZE: "Use AI to summarize text and generate a concise summary",
+	AI_DESCRIPTION_EXTRACT:
+		"Use AI to extract key points from text, output as a list",
+	AI_DESCRIPTION_SUMMARIZE:
+		"Use AI to summarize text and generate a concise summary",
 	AI_DESCRIPTION_TRANSLATE: "Use AI to translate text (default: English)",
-	AI_DESCRIPTION_POLISH: "Use AI to polish text, making it more fluent and professional",
+	AI_DESCRIPTION_POLISH:
+		"Use AI to polish text, making it more fluent and professional",
 	AI_HINT: "Hint: Please configure AI API Key in plugin settings before use",
-	BTN_RUN_AI: "Run AI Processing",
+	BTN_RUN_AI: "Run AI Analysis",
+
+	// New Keys
+	NOTICE_LOAD_SELECTION: "Loaded selected text from editor",
+	NOTICE_SAVE_SELECTION_SUCCESS:
+		"Selected text has been updated in the original note",
 };

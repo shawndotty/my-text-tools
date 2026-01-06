@@ -1,4 +1,10 @@
-import { ItemView, WorkspaceLeaf, Notice } from "obsidian";
+import {
+	ItemView,
+	WorkspaceLeaf,
+	Notice,
+	Editor,
+	EditorPosition,
+} from "obsidian";
 import { t } from "../lang/helpers";
 import { SettingsState, DEFAULT_SETTINGS_STATE, ToolType } from "../types";
 import { HistoryManager } from "../utils/historyManager";
@@ -19,22 +25,51 @@ import {
 
 export const MY_TEXT_TOOLS_VIEW = "my-text-tools-view";
 
+interface SelectionRange {
+	start: EditorPosition;
+	end: EditorPosition;
+}
+
 export class MyTextToolsView extends ItemView {
 	content: string = ""; // 存储中间窗口的临时文本内容
 	editMode: "source" | "preview" = "source"; // 默认源码模式
 	historyManager: HistoryManager = new HistoryManager();
-	originalEditor: any = null; // 对原笔记编辑器的引用
+	originalEditor: Editor | null = null; // 对原笔记编辑器的引用
+	selectionRange: SelectionRange | null = null; // 选区范围
 	activeTool: ToolType | "" = ""; // 当前选中的工具 ID
 	settingsState: SettingsState = { ...DEFAULT_SETTINGS_STATE };
 	plugin: MyTextTools; // 插件实例引用
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
 		super(leaf);
-		this.originalEditor = originalEditor;
 		this.plugin = plugin;
+		// 初始加载逻辑将由 updateInput 接管，这里仅做基本初始化
 		if (originalEditor) {
-			this.content = originalEditor.getValue();
+			this.updateInput(originalEditor);
 		}
+	}
+
+	/**
+	 * 更新输入内容（支持选区模式）
+	 */
+	updateInput(editor: Editor) {
+		this.originalEditor = editor;
+
+		if (editor.somethingSelected()) {
+			this.content = editor.getSelection();
+			this.selectionRange = {
+				start: editor.getCursor("from"),
+				end: editor.getCursor("to"),
+			};
+			new Notice(t("NOTICE_LOAD_SELECTION"));
+		} else {
+			this.content = editor.getValue();
+			this.selectionRange = null;
+		}
+
+		// 重置历史记录，因为这是新的上下文
+		this.historyManager = new HistoryManager();
+		this.render();
 	}
 
 	getViewType() {
@@ -112,6 +147,7 @@ export class MyTextToolsView extends ItemView {
 			this.historyManager.canUndo(),
 			this.historyManager.canRedo(),
 			!!this.originalEditor,
+			!!this.selectionRange, // 传递是否为选区模式
 			editorCallbacks,
 			this.app
 		);

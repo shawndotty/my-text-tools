@@ -1,9 +1,4 @@
-import {
-	Notice,
-	setIcon,
-	MarkdownRenderer,
-	Component,
-} from "obsidian";
+import { Notice, setIcon, MarkdownRenderer, Component } from "obsidian";
 import { t } from "../../lang/helpers";
 
 export interface EditorPanelCallbacks {
@@ -26,16 +21,27 @@ export function renderEditorPanel(
 	canUndo: boolean,
 	canRedo: boolean,
 	hasOriginalEditor: boolean,
+	isSelectionMode: boolean, // 新增参数
 	callbacks: EditorPanelCallbacks,
 	app: any
 ): void {
 	const header = parent.createDiv({ cls: "mtt-center-header" });
-	header.createEl("span", {
-		text:
-			editMode === "source"
-				? t("EDITOR_HEADER")
-				: t("EDITOR_PREVIEW"),
+
+	const titleContainer = header.createDiv({ cls: "mtt-header-title" });
+	titleContainer.createEl("span", {
+		text: editMode === "source" ? t("EDITOR_HEADER") : t("EDITOR_PREVIEW"),
 	});
+
+	if (isSelectionMode) {
+		const badge = titleContainer.createSpan({ cls: "mtt-badge" });
+		badge.setText("Selection Mode");
+		badge.style.marginLeft = "8px";
+		badge.style.fontSize = "0.8em";
+		badge.style.backgroundColor = "var(--interactive-accent)";
+		badge.style.color = "var(--text-on-accent)";
+		badge.style.padding = "2px 6px";
+		badge.style.borderRadius = "4px";
+	}
 
 	// 按钮容器
 	const actionGroup = header.createDiv({ cls: "mtt-action-group" });
@@ -63,9 +69,7 @@ export function renderEditorPanel(
 		cls: "mtt-icon-btn",
 		attr: {
 			"aria-label":
-				editMode === "source"
-					? t("MODE_PREVIEW")
-					: t("MODE_SOURCE"),
+				editMode === "source" ? t("MODE_PREVIEW") : t("MODE_SOURCE"),
 		},
 	});
 	setIcon(modeBtn, editMode === "source" ? "eye" : "code");
@@ -96,13 +100,7 @@ export function renderEditorPanel(
 			cls: "mtt-preview-area markdown-rendered",
 		});
 		// 核心渲染逻辑
-		MarkdownRenderer.render(
-			app,
-			content,
-			previewEl,
-			"/",
-			new Component()
-		);
+		MarkdownRenderer.render(app, content, previewEl, "/", new Component());
 	}
 
 	const footer = parent.createDiv({ cls: "mtt-center-footer" });
@@ -141,4 +139,3 @@ export function renderEditorPanel(
 		saveOverBtn.onclick = () => callbacks.onSaveOriginal();
 	}
 }
-
