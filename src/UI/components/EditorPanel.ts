@@ -12,6 +12,10 @@ export interface EditorPanelCallbacks {
 	onProcessSelection?: (text: string) => string | null;
 }
 
+export interface EditorPanelHandle {
+	updateHistoryButtons: (canUndo: boolean, canRedo: boolean) => void;
+}
+
 /**
  * 渲染编辑器面板
  */
@@ -25,7 +29,7 @@ export function renderEditorPanel(
 	isSelectionMode: boolean, // 新增参数
 	callbacks: EditorPanelCallbacks,
 	app: any
-): void {
+): EditorPanelHandle {
 	const header = parent.createDiv({ cls: "mtt-center-header" });
 
 	const titleContainer = header.createDiv({ cls: "mtt-header-title" });
@@ -64,6 +68,12 @@ export function renderEditorPanel(
 	setIcon(redoBtn, "redo-2");
 	redoBtn.toggleClass("is-disabled", !canRedo);
 	redoBtn.onclick = () => callbacks.onRedo();
+
+	// 定义更新按钮状态的函数
+	const updateHistoryButtons = (newCanUndo: boolean, newCanRedo: boolean) => {
+		undoBtn.toggleClass("is-disabled", !newCanUndo);
+		redoBtn.toggleClass("is-disabled", !newCanRedo);
+	};
 
 	// 模式切换按钮
 	const modeBtn = actionGroup.createEl("button", {
@@ -169,4 +179,6 @@ export function renderEditorPanel(
 		});
 		saveOverBtn.onclick = () => callbacks.onSaveOriginal();
 	}
+
+	return { updateHistoryButtons };
 }

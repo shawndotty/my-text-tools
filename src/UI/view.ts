@@ -17,6 +17,7 @@ import { renderToolsPanel } from "./components/ToolsPanel";
 import {
 	renderEditorPanel,
 	EditorPanelCallbacks,
+	EditorPanelHandle,
 } from "./components/EditorPanel";
 import {
 	renderGlobalSettings,
@@ -41,6 +42,7 @@ export class MyTextToolsView extends ItemView {
 	settingsState: SettingsState = { ...DEFAULT_SETTINGS_STATE };
 	plugin: MyTextTools; // 插件实例引用
 	private loadingEl: HTMLElement | null = null;
+	private editorPanelHandle: EditorPanelHandle | null = null;
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
 		super(leaf);
@@ -177,7 +179,7 @@ export class MyTextToolsView extends ItemView {
 			},
 			onProcessSelection: (text: string) => this.processOnSelect(text),
 		};
-		renderEditorPanel(
+		this.editorPanelHandle = renderEditorPanel(
 			centerPanel,
 			this.content,
 			this.editMode,
@@ -227,6 +229,13 @@ export class MyTextToolsView extends ItemView {
 
 		// 保存历史状态以便撤销
 		this.historyManager.pushToHistory(this.content);
+		// 立即更新 Undo/Redo 按钮状态
+		if (this.editorPanelHandle) {
+			this.editorPanelHandle.updateHistoryButtons(
+				this.historyManager.canUndo(),
+				this.historyManager.canRedo()
+			);
+		}
 
 		const s = this.settingsState;
 		let result = text;
