@@ -841,7 +841,7 @@ function renderAISettings(
 	});
 
 	// 显示工具说明
-	let toolDescriptionKey = "";
+	let toolDescriptionKey: any = "";
 	switch (activeTool) {
 		case "ai-extract-keypoints":
 			toolDescriptionKey = "AI_DESCRIPTION_EXTRACT";
