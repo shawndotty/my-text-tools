@@ -14,11 +14,13 @@ import {
 } from "./settings";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
 import { t } from "./lang/helpers";
+import { AIService } from "./utils/aiService";
 
 // Remember to rename these classes and interfaces!
 
 export default class MyTextTools extends Plugin {
 	settings: MyTextToolsSettings;
+	private customRibbonEls: HTMLElement[] = [];
 
 	async onload() {
 		await this.loadSettings();
@@ -52,6 +54,8 @@ export default class MyTextTools extends Plugin {
 				this.activateView();
 			}
 		);
+
+		// 自定义卡片入口改为工作台左侧工具栏展示，不再添加到 Obsidian 全局侧栏
 
 		// 4. 添加右键菜单
 		this.registerEvent(
@@ -106,6 +110,159 @@ export default class MyTextTools extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	// 兼容：保留方法但不执行任何行为
+	refreshCustomRibbons() {}
+
+	// 执行自定义 AI 动作
+	async runCustomAIAction(actionId: string) {
+		const action =
+			this.settings.customActions?.find((a) => a.id === actionId) || null;
+		if (!action) {
+			new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
+			return;
+		}
+
+		const mttLeaf =
+			this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
+		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+		// 合并设置
+		const merged: MyTextToolsSettings = {
+			...this.settings,
+			aiProvider: action.overrideProvider ?? this.settings.aiProvider,
+			aiApiUrl: action.overrideApiUrl ?? this.settings.aiApiUrl,
+			aiApiKey: action.overrideApiKey ?? this.settings.aiApiKey,
+			aiModel: action.overrideModel ?? this.settings.aiModel,
+			aiMaxTokens: action.overrideMaxTokens ?? this.settings.aiMaxTokens,
+			aiTemperature:
+				action.overrideTemperature ?? this.settings.aiTemperature,
+		};
+
+		const aiService = new AIService(merged);
+		// 情况一：优先工作台视图，支持保护与历史
+		if (
+			mttLeaf &&
+			mttLeaf.view &&
+			mttLeaf.view instanceof MyTextToolsView
+		) {
+			const view = mttLeaf.view as MyTextToolsView;
+			view.showLoading("AI 正在处理…");
+			const src = view.content || "";
+			if (!src.trim()) {
+				new Notice(t("NOTICE_NO_TEXT"));
+				view.hideLoading();
+				return;
+			}
+			view.historyManager.pushToHistory(view.content);
+
+			let textToProcess = src;
+			const fmMatch = textToProcess.match(
+				/^---\n([\s\S]*?)\n---(?:\n|$)/
+			);
+			if (fmMatch && (view.settingsState as any).preserveFrontmatter) {
+				textToProcess = textToProcess.substring(fmMatch[0].length);
+			}
+			const lines = textToProcess.split("\n");
+			if (
+				(view.settingsState as any).preserveHeader &&
+				lines.length > 0
+			) {
+				textToProcess = lines.slice(1).join("\n");
+			}
+
+			const result = await aiService.processText(
+				action.prompt || "",
+				textToProcess,
+				action.systemPrompt || ""
+			);
+			if (result.error) {
+				new Notice(`❌ ${result.error}`);
+				view.hideLoading();
+				return;
+			}
+			let finalContent = result.content;
+			if (fmMatch && (view.settingsState as any).preserveFrontmatter) {
+				finalContent = fmMatch[0] + finalContent;
+			}
+			if (
+				(view.settingsState as any).preserveHeader &&
+				lines.length > 0 &&
+				lines[0]?.trim()
+			) {
+				finalContent = lines[0] + "\n" + finalContent;
+			}
+			view.content = finalContent;
+			view.render();
+			view.hideLoading();
+			new Notice(t("NOTICE_AI_DONE"));
+			return;
+		}
+
+		// 情况二：活动的 Markdown 编辑器
+		if (activeView && activeView.editor) {
+			const editor = activeView.editor;
+			const selection = editor.getSelection();
+			const useSelection =
+				action.applyToSelection && selection && selection.length > 0;
+			if (useSelection) {
+				if (!selection.trim()) {
+					new Notice(t("NOTICE_NO_TEXT"));
+					return;
+				}
+				const result = await aiService.processText(
+					action.prompt || "",
+					selection,
+					action.systemPrompt || ""
+				);
+				if (result.error) {
+					new Notice(`❌ ${result.error}`);
+					return;
+				}
+				editor.replaceSelection(result.content);
+				new Notice(t("NOTICE_AI_DONE"));
+				return;
+			}
+			const fullText = editor.getValue();
+			if (!fullText.trim()) {
+				new Notice(t("NOTICE_NO_TEXT"));
+				return;
+			}
+			let textToProcess = fullText;
+			const fmMatch = textToProcess.match(
+				/^---\n([\s\S]*?)\n---(?:\n|$)/
+			);
+			if (fmMatch) {
+				textToProcess = textToProcess.substring(fmMatch[0].length);
+			}
+			const lines = textToProcess.split("\n");
+			if (lines.length > 0) {
+				textToProcess = lines.slice(1).join("\n");
+			}
+			const result = await aiService.processText(
+				action.prompt || "",
+				textToProcess,
+				action.systemPrompt || ""
+			);
+			if (result.error) {
+				new Notice(`❌ ${result.error}`);
+				return;
+			}
+			let finalContent = result.content;
+			if (fmMatch) {
+				finalContent = fmMatch[0] + finalContent;
+			}
+			if (lines.length > 0 && lines[0]?.trim()) {
+				finalContent = lines[0] + "\n" + finalContent;
+			}
+			editor.setValue(finalContent);
+			new Notice(t("NOTICE_AI_DONE"));
+			return;
+		}
+
+		// 情况三：均不可用
+		new Notice(t("NOTICE_NO_EDITOR"));
 	}
 }
 

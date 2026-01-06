@@ -1,9 +1,9 @@
 import { t } from "../../lang/helpers";
-import { SettingsState, ToolType } from "../../types";
+import { SettingsState } from "../../types";
 
 export interface SettingsPanelCallbacks {
 	onSettingsChange: (key: string, value: any) => void;
-	onRun: (toolId: ToolType) => void | Promise<void>;
+	onRun: (toolId: string) => void | Promise<void>;
 }
 
 /**
@@ -54,7 +54,7 @@ export function renderGlobalSettings(
  */
 export function renderToolSettings(
 	parent: HTMLElement,
-	activeTool: ToolType | "",
+	activeTool: string | "",
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks
 ): void {
@@ -76,6 +76,20 @@ export function renderToolSettings(
 	const settingsContent = parent.createDiv({
 		cls: "mtt-settings-content",
 	});
+
+	// 自定义 AI 卡片
+	if (activeTool.startsWith("custom-ai:")) {
+		settingsContent.createEl("p", {
+			text: t("AI_HINT"),
+			cls: "mtt-ai-hint",
+		});
+		const runBtn = settingsContent.createEl("button", {
+			text: t("BTN_RUN_AI"),
+			cls: "mtt-run-btn",
+		});
+		runBtn.onclick = () => callbacks.onRun(activeTool);
+		return;
+	}
 
 	switch (activeTool) {
 		case "remove-string":
@@ -833,7 +847,7 @@ function renderClearFormatSettings(
 
 function renderAISettings(
 	parent: HTMLElement,
-	activeTool: ToolType,
+	activeTool: string,
 	callbacks: SettingsPanelCallbacks
 ): void {
 	const aiContent = parent.createDiv({
@@ -875,4 +889,3 @@ function renderAISettings(
 	});
 	runBtn.onclick = () => callbacks.onRun(activeTool);
 }
-

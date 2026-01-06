@@ -36,9 +36,10 @@ export class MyTextToolsView extends ItemView {
 	historyManager: HistoryManager = new HistoryManager();
 	originalEditor: Editor | null = null; // 对原笔记编辑器的引用
 	selectionRange: SelectionRange | null = null; // 选区范围
-	activeTool: ToolType | "" = ""; // 当前选中的工具 ID
+	activeTool: string | "" = ""; // 当前选中的工具 ID
 	settingsState: SettingsState = { ...DEFAULT_SETTINGS_STATE };
 	plugin: MyTextTools; // 插件实例引用
+	private loadingEl: HTMLElement | null = null;
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
 		super(leaf);
@@ -70,6 +71,24 @@ export class MyTextToolsView extends ItemView {
 		// 重置历史记录，因为这是新的上下文
 		this.historyManager = new HistoryManager();
 		this.render();
+	}
+
+	showLoading(text: string = "AI 正在处理…") {
+		if (this.loadingEl) return;
+		const overlay = this.contentEl.createDiv({
+			cls: "mtt-loading-overlay",
+		});
+		const box = overlay.createDiv({ cls: "mtt-loading-box" });
+		box.createDiv({ cls: "mtt-spinner" });
+		box.createDiv({ cls: "mtt-loading-text", text });
+		this.loadingEl = overlay;
+	}
+
+	hideLoading() {
+		if (this.loadingEl) {
+			this.loadingEl.detach();
+			this.loadingEl = null;
+		}
 	}
 
 	getViewType() {
@@ -111,10 +130,15 @@ export class MyTextToolsView extends ItemView {
 
 		// --- 1. 左侧：工具导航栏 ---
 		const leftPanel = container.createDiv({ cls: "mtt-left-panel" });
-		renderToolsPanel(leftPanel, this.activeTool, (toolId) => {
-			this.activeTool = toolId;
-			this.render(); // 重新渲染以更新 UI 状态
-		});
+		renderToolsPanel(
+			leftPanel,
+			this.activeTool,
+			(toolId) => {
+				this.activeTool = toolId;
+				this.render(); // 重新渲染以更新 UI 状态
+			},
+			this.plugin.settings.customActions
+		);
 
 		// --- 2. 中间：主编辑区域 ---
 		const centerPanel = container.createDiv({ cls: "mtt-center-panel" });
@@ -158,7 +182,12 @@ export class MyTextToolsView extends ItemView {
 			onSettingsChange: (key: string, value: any) => {
 				(this.settingsState as any)[key] = value;
 			},
-			onRun: async (toolId: ToolType) => {
+			onRun: async (toolId: string) => {
+				if (toolId.startsWith("custom-ai:")) {
+					const id = toolId.split(":")[1]!;
+					await this.plugin.runCustomAIAction(id);
+					return;
+				}
 				await this.processText(toolId);
 			},
 		};
@@ -172,7 +201,7 @@ export class MyTextToolsView extends ItemView {
 	}
 
 	// 统一处理文本逻辑
-	async processText(type: ToolType) {
+	async processText(type: string) {
 		// 检查是否是 AI 工具
 		if (
 			type === "ai-extract-keypoints" ||
@@ -188,7 +217,7 @@ export class MyTextToolsView extends ItemView {
 		this.historyManager.pushToHistory(this.content);
 
 		const processedContent = processText(
-			type,
+			type as ToolType,
 			this.content,
 			this.settingsState
 		);
@@ -198,11 +227,13 @@ export class MyTextToolsView extends ItemView {
 	}
 
 	// 处理 AI 工具
-	async processAITool(type: ToolType) {
+	async processAITool(type: string) {
+		this.showLoading(t("AI_HINT"));
 		// 检查 AI 配置
 		const aiService = new AIService(this.plugin.settings);
 		if (!aiService.isConfigured()) {
 			new Notice("❌ AI 配置不完整，请在设置中配置 API Key");
+			this.hideLoading();
 			return;
 		}
 
@@ -222,11 +253,9 @@ export class MyTextToolsView extends ItemView {
 
 		if (!textToProcess.trim()) {
 			new Notice("❌ 没有可处理的文本内容");
+			this.hideLoading();
 			return;
 		}
-
-		// 显示处理中提示
-		new Notice("🤖 AI 处理中，请稍候...");
 
 		let result: { content: string; error?: string };
 
@@ -271,10 +300,12 @@ export class MyTextToolsView extends ItemView {
 			this.content = finalContent;
 			new Notice("✅ AI 处理完成");
 			this.render();
+			this.hideLoading();
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : "未知错误";
 			new Notice(`❌ AI 处理失败: ${errorMessage}`);
+			this.hideLoading();
 		}
 	}
 

@@ -3,6 +3,24 @@ import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
 
+export interface CustomAIAction {
+	id: string;
+	name: string;
+	icon?: string;
+	showInRibbon: boolean;
+	prompt: string;
+	systemPrompt?: string;
+	applyToSelection: boolean;
+	// 可选覆盖全局 AI 参数
+	overrideEnabled?: boolean;
+	overrideProvider?: "deepseek" | "openai" | "custom";
+	overrideApiKey?: string;
+	overrideApiUrl?: string;
+	overrideModel?: string;
+	overrideMaxTokens?: number;
+	overrideTemperature?: number;
+}
+
 export interface MyTextToolsSettings {
 	mySetting: string;
 	// AI 配置
@@ -12,6 +30,8 @@ export interface MyTextToolsSettings {
 	aiModel: string; // 模型名称，如 deepseek-chat
 	aiMaxTokens: number; // 最大 token 数
 	aiTemperature: number; // 温度参数 0-1
+	// 自定义 AI 动作卡片
+	customActions: CustomAIAction[];
 }
 
 export const DEFAULT_SETTINGS: MyTextToolsSettings = {
@@ -22,6 +42,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	aiModel: "deepseek-chat",
 	aiMaxTokens: 2000,
 	aiTemperature: 0.7,
+	customActions: [],
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {
@@ -60,13 +81,13 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 	private renderAISettings(containerEl: HTMLElement) {
 		// AI 服务提供商选择
 		new Setting(containerEl)
-			.setName("AI 服务提供商")
-			.setDesc("选择要使用的 AI 服务")
+			.setName(t("AI_PROVIDER_LABEL"))
+			.setDesc(t("AI_PROVIDER_DESC"))
 			.addDropdown((dropdown) =>
 				dropdown
 					.addOption("deepseek", "Deepseek")
 					.addOption("openai", "OpenAI")
-					.addOption("custom", "自定义")
+					.addOption("custom", t("PROVIDER_OPTION_CUSTOM"))
 					.setValue(this.plugin.settings.aiProvider)
 					.onChange(async (value) => {
 						this.plugin.settings.aiProvider = value as any;
@@ -87,8 +108,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		// API Key
 		new Setting(containerEl)
-			.setName("API Key")
-			.setDesc("输入您的 AI 服务 API Key")
+			.setName(t("API_KEY_LABEL"))
+			.setDesc(t("API_KEY_DESC"))
 			.addText((text) => {
 				text.setValue(this.plugin.settings.aiApiKey);
 				text.inputEl.type = "password";
@@ -102,13 +123,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 		// API URL（仅自定义提供商显示）
 		if (this.plugin.settings.aiProvider === "custom") {
 			new Setting(containerEl)
-				.setName("API URL")
-				.setDesc("自定义 API 端点地址")
+				.setName(t("API_URL_LABEL"))
+				.setDesc(t("API_URL_DESC"))
 				.addText((text) =>
 					text
-						.setPlaceholder(
-							"https://api.example.com/v1/chat/completions"
-						)
+						.setPlaceholder(t("API_URL_PLACEHOLDER"))
 						.setValue(this.plugin.settings.aiApiUrl)
 						.onChange(async (value) => {
 							this.plugin.settings.aiApiUrl = value;
@@ -119,11 +138,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		// 模型名称
 		new Setting(containerEl)
-			.setName("模型名称")
-			.setDesc("要使用的模型名称")
+			.setName(t("MODEL_LABEL"))
+			.setDesc(t("MODEL_DESC"))
 			.addText((text) =>
 				text
-					.setPlaceholder("deepseek-chat")
+					.setPlaceholder(t("MODEL_PLACEHOLDER"))
 					.setValue(this.plugin.settings.aiModel)
 					.onChange(async (value) => {
 						this.plugin.settings.aiModel = value;
@@ -133,8 +152,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		// 最大 Token 数
 		new Setting(containerEl)
-			.setName("最大 Token 数")
-			.setDesc("生成内容的最大 token 数量")
+			.setName(t("MAX_TOKENS_LABEL"))
+			.setDesc(t("MAX_TOKENS_DESC"))
 			.addSlider((slider) =>
 				slider
 					.setLimits(500, 4000, 100)
@@ -148,8 +167,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		// 温度参数
 		new Setting(containerEl)
-			.setName("温度参数")
-			.setDesc("控制输出的随机性 (0-1，值越大越随机)")
+			.setName(t("TEMPERATURE_LABEL"))
+			.setDesc(t("TEMPERATURE_DESC"))
 			.addSlider((slider) =>
 				slider
 					.setLimits(0, 1, 0.1)
@@ -162,5 +181,266 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			);
 	}
 
-	private renderUserPromptsSettings(containerEl: HTMLElement) {}
+	private renderUserPromptsSettings(containerEl: HTMLElement) {
+		const header = containerEl.createEl("h3", {
+			text: t("CUSTOM_PROMPTS_TITLE"),
+		});
+
+		// 新增卡片按钮
+		new Setting(containerEl)
+			.setName(t("CUSTOM_PROMPTS_MANAGE"))
+			.setDesc(t("CUSTOM_PROMPTS_DESC"))
+			.addButton((btn) =>
+				btn.setButtonText(t("BTN_ADD_PROMPT")).onClick(async () => {
+					const nextIndex =
+						(this.plugin.settings.customActions?.length || 0) + 1;
+					const newCard: CustomAIAction = {
+						id: `${Date.now()}`,
+						name: `${t("PROMPT_GROUP_NAME")} ${nextIndex}`,
+						icon: "sparkles",
+						showInRibbon: true,
+						prompt: "",
+						systemPrompt: "",
+						applyToSelection: true,
+						overrideEnabled: false,
+					};
+					this.plugin.settings.customActions.push(newCard);
+					await this.plugin.saveSettings();
+					// 重建左侧工具栏
+					(this.plugin as any).refreshCustomRibbons?.();
+					// 仅重绘当前标签页内容，避免回到第一个标签
+					containerEl.empty();
+					this.renderUserPromptsSettings(containerEl);
+				})
+			);
+
+		// 渲染现有卡片
+		this.plugin.settings.customActions.forEach((card, idx) => {
+			const cardContainer = containerEl.createDiv({
+				cls: "mtt-custom-card",
+			});
+
+			new Setting(cardContainer)
+				.setName(`${t("PROMPT_GROUP_NAME")} ${idx + 1}`)
+				.setDesc(t("PROMPT_NAME_AND_ICON"))
+				.addText((text) =>
+					text
+						.setPlaceholder(t("PROMPT_NAME_PLACEHOLDER"))
+						.setValue(card.name)
+						.onChange(async (value) => {
+							card.name = value;
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addText((text) =>
+					text
+						.setPlaceholder(t("ICON_PLACEHOLDER"))
+						.setValue(card.icon || "sparkles")
+						.onChange(async (value) => {
+							card.icon = value || "sparkles";
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addToggle((toggle) =>
+					toggle
+						.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
+						.setValue(card.showInRibbon)
+						.onChange(async (value) => {
+							card.showInRibbon = value;
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addExtraButton((btn) =>
+					btn
+						.setIcon("trash")
+						.setTooltip(t("TOOLTIP_DELETE_PROMPT"))
+						.onClick(async () => {
+							this.plugin.settings.customActions =
+								this.plugin.settings.customActions.filter(
+									(c) => c.id !== card.id
+								);
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+							containerEl.empty();
+							this.renderUserPromptsSettings(containerEl);
+						})
+				);
+
+			new Setting(cardContainer)
+				.setName(t("PROMPT_FIELD_LABEL"))
+				.setDesc(t("PROMPT_FIELD_DESC"))
+				.addTextArea((ta) => {
+					ta.inputEl.rows = 4;
+					ta.setPlaceholder(t("PROMPT_PLACEHOLDER"));
+					ta.setValue(card.prompt || "");
+					ta.onChange(async (value) => {
+						card.prompt = value;
+						await this.plugin.saveSettings();
+					});
+				});
+
+			new Setting(cardContainer)
+				.setName(t("SYSTEM_PROMPT_LABEL"))
+				.setDesc(t("SYSTEM_PROMPT_DESC"))
+				.addTextArea((ta) => {
+					ta.inputEl.rows = 3;
+					ta.setPlaceholder(t("SYSTEM_PROMPT_PLACEHOLDER"));
+					ta.setValue(card.systemPrompt || "");
+					ta.onChange(async (value) => {
+						card.systemPrompt = value;
+						await this.plugin.saveSettings();
+					});
+				});
+
+			new Setting(cardContainer)
+				.setName(t("APPLY_SCOPE_LABEL"))
+				.setDesc(t("APPLY_SCOPE_DESC"))
+				.addToggle((toggle) =>
+					toggle
+						.setValue(card.applyToSelection)
+						.onChange(async (value) => {
+							card.applyToSelection = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			// 覆盖参数开关
+			let useOverride =
+				!!card.overrideEnabled ||
+				!!card.overrideProvider ||
+				!!card.overrideApiUrl ||
+				!!card.overrideApiKey ||
+				!!card.overrideModel ||
+				card.overrideMaxTokens !== undefined ||
+				card.overrideTemperature !== undefined;
+			new Setting(cardContainer)
+				.setName(t("OVERRIDE_SWITCH_LABEL"))
+				.setDesc(t("OVERRIDE_SWITCH_DESC"))
+				.addToggle((toggle) =>
+					toggle.setValue(useOverride).onChange(async (value) => {
+						card.overrideEnabled = value;
+						if (!value) {
+							card.overrideProvider = undefined;
+							card.overrideApiUrl = undefined;
+							card.overrideApiKey = undefined;
+							card.overrideModel = undefined;
+							card.overrideMaxTokens = undefined;
+							card.overrideTemperature = undefined;
+							await this.plugin.saveSettings();
+							containerEl.empty();
+							this.renderUserPromptsSettings(containerEl);
+						} else {
+							await this.plugin.saveSettings();
+							containerEl.empty();
+							this.renderUserPromptsSettings(containerEl);
+						}
+					})
+				);
+
+			if (useOverride) {
+				new Setting(cardContainer)
+					.setName(t("PROVIDER_LABEL"))
+					.addDropdown((dropdown) =>
+						dropdown
+							.addOption("deepseek", "Deepseek")
+							.addOption("openai", "OpenAI")
+							.addOption("custom", t("PROVIDER_OPTION_CUSTOM"))
+							.setValue(
+								card.overrideProvider ||
+									this.plugin.settings.aiProvider
+							)
+							.onChange(async (value) => {
+								card.overrideProvider = value as any;
+								if (value === "deepseek") {
+									card.overrideApiUrl =
+										"https://api.deepseek.com/v1/chat/completions";
+									card.overrideModel = "deepseek-chat";
+								} else if (value === "openai") {
+									card.overrideApiUrl =
+										"https://api.openai.com/v1/chat/completions";
+									card.overrideModel = "gpt-3.5-turbo";
+								}
+								await this.plugin.saveSettings();
+							})
+					);
+
+				new Setting(cardContainer)
+					.setName(t("API_KEY_LABEL"))
+					.addText((text) => {
+						text.inputEl.type = "password";
+						text.setPlaceholder("sk-...")
+							.setValue(card.overrideApiKey || "")
+							.onChange(async (value) => {
+								card.overrideApiKey = value;
+								await this.plugin.saveSettings();
+							});
+					});
+
+				new Setting(cardContainer)
+					.setName(t("API_URL_LABEL"))
+					.addText((text) =>
+						text
+							.setPlaceholder(t("API_URL_PLACEHOLDER"))
+							.setValue(
+								card.overrideApiUrl ||
+									this.plugin.settings.aiApiUrl
+							)
+							.onChange(async (value) => {
+								card.overrideApiUrl = value;
+								await this.plugin.saveSettings();
+							})
+					);
+
+				new Setting(cardContainer)
+					.setName(t("MODEL_LABEL"))
+					.addText((text) =>
+						text
+							.setPlaceholder(t("MODEL_PLACEHOLDER"))
+							.setValue(
+								card.overrideModel ||
+									this.plugin.settings.aiModel
+							)
+							.onChange(async (value) => {
+								card.overrideModel = value;
+								await this.plugin.saveSettings();
+							})
+					);
+
+				new Setting(cardContainer)
+					.setName(t("MAX_TOKENS_LABEL"))
+					.addSlider((slider) =>
+						slider
+							.setLimits(500, 4000, 100)
+							.setValue(
+								card.overrideMaxTokens ??
+									this.plugin.settings.aiMaxTokens
+							)
+							.setDynamicTooltip()
+							.onChange(async (value) => {
+								card.overrideMaxTokens = value;
+								await this.plugin.saveSettings();
+							})
+					);
+
+				new Setting(cardContainer)
+					.setName(t("TEMPERATURE_LABEL"))
+					.addSlider((slider) =>
+						slider
+							.setLimits(0, 1, 0.1)
+							.setValue(
+								card.overrideTemperature ??
+									this.plugin.settings.aiTemperature
+							)
+							.setDynamicTooltip()
+							.onChange(async (value) => {
+								card.overrideTemperature = value;
+								await this.plugin.saveSettings();
+							})
+					);
+			}
+		});
+	}
 }

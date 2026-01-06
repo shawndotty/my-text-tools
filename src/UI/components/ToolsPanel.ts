@@ -1,6 +1,5 @@
 import { setIcon } from "obsidian";
 import { t } from "../../lang/helpers";
-import { ToolType } from "../../types";
 
 export interface ToolGroup {
 	name: string;
@@ -8,15 +7,24 @@ export interface ToolGroup {
 }
 
 export interface Tool {
-	id: ToolType;
+	id: string;
 	name: string;
 	icon: string;
+}
+
+export interface CustomActionBrief {
+	id: string;
+	name: string;
+	icon?: string;
+	showInRibbon?: boolean;
 }
 
 /**
  * 获取工具组配置
  */
-export function getToolGroups(): ToolGroup[] {
+export function getToolGroups(
+	customActions: CustomActionBrief[] = []
+): ToolGroup[] {
 	return [
 		{
 			name: t("GROUP_BASIC"),
@@ -102,6 +110,15 @@ export function getToolGroups(): ToolGroup[] {
 		{
 			name: t("GROUP_AI"),
 			tools: [
+				// 先显示自定义提示词
+				...customActions
+					.filter((a) => a.showInRibbon)
+					.map((a) => ({
+						id: `custom-ai:${a.id}`,
+						name: a.name || t("CUSTOM_PROMPT_DEFAULT_NAME"),
+						icon: a.icon || "sparkles",
+					})),
+				// 再显示内置 AI 工具
 				{
 					id: "ai-extract-keypoints",
 					name: t("TOOL_AI_EXTRACT_KEYPOINTS"),
@@ -133,14 +150,15 @@ export function getToolGroups(): ToolGroup[] {
 export function renderToolsPanel(
 	parent: HTMLElement,
 	activeTool: string,
-	onToolSelect: (toolId: ToolType) => void
+	onToolSelect: (toolId: string) => void,
+	customActions: CustomActionBrief[] = []
 ): void {
 	parent.createEl("h4", {
 		text: t("TEXT_TOOLS"),
 		cls: "mtt-panel-title",
 	});
 
-	const groups = getToolGroups();
+	const groups = getToolGroups(customActions);
 
 	groups.forEach((group) => {
 		parent.createEl("h6", {
@@ -149,7 +167,9 @@ export function renderToolsPanel(
 		});
 		group.tools.forEach((tool) => {
 			const btn = parent.createDiv({
-				cls: `mtt-tool-item ${activeTool === tool.id ? "is-active" : ""}`,
+				cls: `mtt-tool-item ${
+					activeTool === tool.id ? "is-active" : ""
+				}`,
 			});
 			const iconSpan = btn.createSpan({ cls: "mtt-tool-icon" });
 			setIcon(iconSpan, tool.icon); // 设置内置图标
@@ -161,4 +181,3 @@ export function renderToolsPanel(
 		});
 	});
 }
-
