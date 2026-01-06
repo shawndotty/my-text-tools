@@ -180,6 +180,9 @@ export default {
 	NOTICE_SAVE_SELECTION_SUCCESS: "选中的文本已更新到原笔记",
 	SelectionMode: "选区模式",
 
+	BasicSettings: "基本设置",
+	BasicSettingsDesc:
+		"在此控制 MyTextTools 工作台左侧工具栏中默认工具的显示/隐藏状态。",
 	AISettings: "AI服务设置",
 	DefaultPromptsSettings: "默认提示词设置",
 	UserPromptsSettings: "用户提示词设置",

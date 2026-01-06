@@ -102,19 +102,44 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 export type ToolType =
 	| "regex"
 	| "remove-whitespace"
-	| "clear-format"
 	| "dedupe"
-	| "empty-line"
-	| "line-break-tools"
-	| "add-wrap"
-	| "remove-string"
-	| "number-list"
 	| "extract-column"
 	| "swap-columns"
 	| "extract-between"
 	| "word-frequency"
+	| "number-list"
+	| "add-wrap"
+	| "remove-string"
+	| "empty-line"
+	| "clear-format"
+	| "line-break-tools"
 	| "ai-extract-keypoints"
 	| "ai-summarize"
 	| "ai-translate"
 	| "ai-polish";
+
+export interface ToolInfo {
+	id: string;
+	nameKey: string;
+}
+
+export const BUILTIN_TOOLS: ToolInfo[] = [
+	{ id: "ai-extract-keypoints", nameKey: "TOOL_AI_EXTRACT_KEYPOINTS" },
+	{ id: "ai-summarize", nameKey: "TOOL_AI_SUMMARIZE" },
+	{ id: "ai-translate", nameKey: "TOOL_AI_TRANSLATE" },
+	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH" },
+	{ id: "regex", nameKey: "TOOL_REGEX" },
+	{ id: "remove-whitespace", nameKey: "TOOL_WHITESPACE" },
+	{ id: "clear-format", nameKey: "TOOL_CLEAR_FORMAT" },
+	{ id: "dedupe", nameKey: "TOOL_DEDUPE" },
+	{ id: "empty-line", nameKey: "TOOL_EMPTY_LINE" },
+	{ id: "line-break-tools", nameKey: "TOOL_LINE_BREAK" },
+	{ id: "add-wrap", nameKey: "TOOL_WRAP" },
+	{ id: "remove-string", nameKey: "TOOL_FILTER" },
+	{ id: "number-list", nameKey: "TOOL_NUMBER_LIST" },
+	{ id: "extract-column", nameKey: "TOOL_EXTRACT_COL" },
+	{ id: "swap-columns", nameKey: "TOOL_SWAP_COL" },
+	{ id: "extract-between", nameKey: "TOOL_EXTRACT_BETWEEN" },
+	{ id: "word-frequency", nameKey: "TOOL_WORD_FREQ" },
+];
 

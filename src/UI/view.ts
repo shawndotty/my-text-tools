@@ -143,7 +143,8 @@ export class MyTextToolsView extends ItemView {
 				this.activeTool = toolId;
 				this.render(); // 重新渲染以更新 UI 状态
 			},
-			this.plugin.settings.customActions
+			this.plugin.settings.customActions,
+			this.plugin.settings.enabledTools
 		);
 
 		// 恢复左侧面板的滚动位置

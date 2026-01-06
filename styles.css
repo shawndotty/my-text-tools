@@ -1,4 +1,9 @@
 
+/* ==========================================================================
+   全局设置 & 布局容器 (Global & Layout)
+   ========================================================================== */
+
+/* 设置标签页 */
 .settings-tabs {
 	display: flex;
 	border-bottom: 1px solid var(--background-modifier-border);
@@ -19,6 +24,7 @@
 .settings-tab:hover {
 	color: var(--text-accent);
 }
+
 /* 整体容器布局 */
 .mtt-layout-container {
 	display: flex;
@@ -38,7 +44,11 @@
 	margin: 0.5em 0;
 }
 
-/* 左侧栏：工具导航 */
+
+/* ==========================================================================
+   左侧栏：工具导航 (Left Panel: Tool Navigation)
+   ========================================================================== */
+
 .mtt-left-panel {
 	flex: 0 0 220px;
 	background-color: var(--background-secondary);
@@ -48,8 +58,18 @@
 	flex-direction: column;
 	gap: 2px;
 	overflow: auto;
+    border-radius: 8px;
 }
 
+/* 分组标题 */
+.mtt-group-label {
+	font-weight: bold;
+	text-transform: uppercase;
+	margin: 15px 0 5px 0;
+	letter-spacing: 1px;
+}
+
+/* 工具项 */
 .mtt-tool-item {
 	display: flex;
 	align-items: center;
@@ -78,7 +98,11 @@
 	opacity: 0.8;
 }
 
-/* 中间栏：编辑器区域 */
+
+/* ==========================================================================
+   中间栏：编辑器区域 (Center Panel: Editor Area)
+   ========================================================================== */
+
 .mtt-center-panel {
 	flex: 1;
 	display: flex;
@@ -88,88 +112,7 @@
 	gap: 1rem;
 }
 
-.mtt-center-header {
-	font-size: 0.8rem;
-	color: var(--text-muted);
-}
-
-.mtt-textarea {
-	flex: 1;
-	width: 100%;
-	padding: 1rem;
-	font-family: var(--font-monospace);
-	font-size: 0.95rem;
-	line-height: 1.5;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 8px;
-	background-color: var(--background-primary);
-	color: var(--text-normal);
-	resize: none;
-	outline: none;
-	transition: border-color 0.2s;
-}
-
-.mtt-textarea:focus {
-	border-color: var(--interactive-accent);
-	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
-}
-
-.mtt-center-footer {
-	display: flex;
-	justify-content: flex-end;
-}
-
-/* 右侧栏：设置区域 */
-.mtt-right-panel {
-	flex: 0 0 280px;
-	background-color: var(--background-secondary);
-	border-left: 1px solid var(--background-modifier-border);
-	padding: 1.5rem;
-    overflow: auto;
-}
-
-.mtt-settings-content {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	margin-bottom: 1rem;
-}
-
-.mtt-settings-content label {
-	font-size: 0.8rem;
-	font-weight: 500;
-	color: var(--text-normal);
-	margin-bottom: -0.5rem;
-}
-
-.mtt-settings-content input {
-	width: 100%;
-	padding: 6px 10px;
-	border-radius: 4px;
-	border: 1px solid var(--background-modifier-border);
-	background: var(--background-primary);
-}
-
-.mtt-run-btn {
-	margin-top: 1rem;
-	width: 100%;
-	background-color: var(--interactive-accent);
-	color: var(--text-on-accent);
-	border: none;
-	font-weight: 500;
-}
-
-.mtt-run-btn:hover {
-	filter: brightness(1.1);
-}
-
-.mtt-empty-state {
-	font-style: italic;
-	color: var(--text-faint);
-	text-align: center;
-	margin-top: 2rem;
-}
-
+/* 编辑器头部（包含撤销重做等按钮） */
 .mtt-center-header {
 	display: flex;
 	justify-content: space-between;
@@ -178,38 +121,72 @@
 	color: var(--text-muted);
 }
 
-.mtt-undo-btn {
-	background: transparent;
-	border: none;
-	box-shadow: none;
-	cursor: pointer;
-	color: var(--text-muted);
-	padding: 4px;
-	display: flex;
-	align-items: center;
-	transition: color 0.2s;
-}
-
-.mtt-undo-btn:hover {
-	color: var(--text-normal);
-	background: var(--background-modifier-hover);
-}
-
-.mtt-undo-btn.is-disabled {
-	opacity: 0.3;
-	cursor: not-allowed;
-}
-
-.mtt-undo-btn svg {
-	width: 16px;
-	height: 16px;
-}
-
 .mtt-action-group {
 	display: flex;
 	gap: 4px;
 }
 
+/* 编辑器容器 */
+.mtt-editor-container {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+}
+
+/* 文本编辑区域 */
+.mtt-textarea {
+	flex: 1;
+	width: 100%;
+	padding: 1rem;
+	font-family: var(--font-monospace);
+	font-size: 0.95rem;
+	line-height: 1.5;
+	border: 1px solid var(--background-modifier-border); /* 这里可能被父容器遮挡，视具体结构而定 */
+	border: none; /* 如果在 editor-container 内部，通常不需要边框 */
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+	resize: none;
+	outline: none;
+	transition: border-color 0.2s;
+}
+
+/* 预览区域 */
+.mtt-preview-area {
+	padding: 24px;
+	overflow-y: auto;
+	height: 100%;
+	user-select: text;
+	background-color: var(--background-primary);
+}
+
+/* 源码等宽字体 */
+.mtt-monospace {
+	font-family: var(--font-monospace);
+	font-size: var(--font-editor-size);
+}
+
+/* 编辑器底部（保存、复制等按钮） */
+.mtt-center-footer {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.mtt-footer-btn-group {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap; /* 适配窄屏幕时自动换行 */
+}
+
+
+/* ==========================================================================
+   按钮组件 (Buttons & Icons)
+   ========================================================================== */
+
+/* 图标按钮通用样式 */
 .mtt-icon-btn {
 	background: transparent;
 	border: none;
@@ -238,40 +215,35 @@
 	height: 18px;
 }
 
-.mtt-setting-row {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	margin-top: 10px;
-}
-
-.mtt-setting-row select {
-	padding: 6px;
-	border-radius: 4px;
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	color: var(--text-normal);
-}
-
-.mtt-checkbox-label {
+/* 撤销重做按钮特化 (如果与 icon-btn 完全一致可合并，但此处保留原类名以防差异) */
+.mtt-undo-btn {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	cursor: pointer;
+	color: var(--text-muted);
+	padding: 4px;
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	font-size: 0.85rem;
-	cursor: pointer;
-	margin-top: 5px;
+	transition: color 0.2s;
 }
 
-.mtt-checkbox-label input {
-	width: auto !important; /* 覆盖之前的 100% 宽度 */
+.mtt-undo-btn:hover {
+	color: var(--text-normal);
+	background: var(--background-modifier-hover);
 }
 
-.mtt-footer-btn-group {
-	display: flex;
-	gap: 12px; /* 按钮之间的间距 */
+.mtt-undo-btn.is-disabled {
+	opacity: 0.3;
+	cursor: not-allowed;
 }
 
-/* 次要按钮样式（保存副本） */
+.mtt-undo-btn svg {
+	width: 16px;
+	height: 16px;
+}
+
+/* 次要按钮（如保存副本） */
 .mtt-secondary-btn {
 	background-color: var(--background-modifier-border);
 	color: var(--text-normal);
@@ -286,108 +258,32 @@
 	background-color: var(--background-modifier-hover);
 }
 
-/* 覆盖原笔记按钮（强调色） */
-button.mod-cta {
-	background-color: var(--interactive-accent);
-	color: var(--text-on-accent);
-	/* Obsidian 默认 mod-cta 已经有样式，这里可以根据需要微调 */
-}
-
-.mtt-select {
-	width: 100%;
-	margin-bottom: 8px;
-}
-
-.mtt-small-input {
-	margin-bottom: 10px;
-}
-
-input[type="number"].mtt-small-input {
-	width: 60px;
-}
-
-.mtt-setting-row-inline {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	font-size: 0.9rem;
-	margin: 10px 0;
-}
-
-.mtt-number-input {
-	width: 50px !important;
-	padding: 4px !important;
-	text-align: center;
-}
-
-.mtt-checkbox-label {
-	display: flex;
-	align-items: center;
-	padding: 6px 0;
-	font-size: 0.9rem;
-	cursor: pointer;
-	border-bottom: 1px solid var(--background-modifier-border-soft);
-}
-
-.mtt-checkbox-label:last-child {
-	border-bottom: none;
-}
-
-.mtt-checkbox-label input[type="checkbox"] {
-	/* margin-right: 12px; */
-	transform: scale(1.1);
-}
-
-.mtt-checkbox-label input[type="checkbox"]:checked::after {
-	left: 3px !important;
-}
-
-.mtt-group-label {
-	font-weight: bold;
-	text-transform: uppercase;
-	margin: 15px 0 5px 0;
-	letter-spacing: 1px;
-}
-
-.mtt-footer-btn-group {
-	display: flex;
-	gap: 10px;
-	flex-wrap: wrap; /* 适配窄屏幕时自动换行 */
-}
-
-/* 可以给复制按钮一个特定的 Hover 效果 */
 .mtt-secondary-btn:active {
 	background-color: var(--background-modifier-pressed);
 	transform: translateY(1px);
 }
 
-/* 编辑器容器，确保填满中间 */
-.mtt-editor-container {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-	background-color: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
+/* 运行按钮（主操作） */
+.mtt-run-btn {
+	margin-top: 1rem;
+	width: 100%;
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border: none;
+	font-weight: 500;
 }
 
-/* 预览区域样式 */
-.mtt-preview-area {
-	padding: 24px;
-	overflow-y: auto;
-	height: 100%;
-	user-select: text;
-	background-color: var(--background-primary);
+.mtt-run-btn:hover {
+	filter: brightness(1.1);
 }
 
-/* 强制使用等宽字体处理源码 */
-.mtt-monospace {
-	font-family: var(--font-monospace);
-	font-size: var(--font-editor-size);
+/* Obsidian 默认 mod-cta 覆盖 */
+button.mod-cta {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
 }
 
-/* 按钮悬停提示优化 */
+/* 按钮悬停提示 (Tooltip) */
 .mtt-icon-btn[aria-label]:hover:after {
 	content: attr(aria-label);
 	position: absolute;
@@ -399,8 +295,129 @@ input[type="number"].mtt-small-input {
 	border-radius: 4px;
 	font-size: 11px;
 	white-space: nowrap;
+	z-index: 100; /* 确保提示层级较高 */
 }
 
+
+/* ==========================================================================
+   右侧栏：设置区域 (Right Panel: Settings)
+   ========================================================================== */
+
+.mtt-right-panel {
+	flex: 0 0 280px;
+	background-color: var(--background-secondary);
+	border-left: 1px solid var(--background-modifier-border);
+	padding: 1.5rem;
+    overflow: auto;
+    border-radius: 8px;
+}
+
+.mtt-settings-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+/* 设置项标签 */
+.mtt-settings-content label {
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: var(--text-normal);
+	margin-bottom: -0.5rem;
+}
+
+/* 通用输入框 */
+.mtt-settings-content input {
+	width: 100%;
+	padding: 6px 10px;
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+}
+
+/* 空状态提示 */
+.mtt-empty-state {
+	font-style: italic;
+	color: var(--text-faint);
+	text-align: center;
+	margin-top: 2rem;
+}
+
+/* 设置行布局 */
+.mtt-setting-row {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.mtt-setting-row-inline {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.9rem;
+	margin: 10px 0;
+}
+
+/* 选择框样式 */
+.mtt-setting-row select,
+.mtt-select {
+	padding: 6px;
+	border-radius: 4px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	color: var(--text-normal);
+	width: 100%;
+}
+
+.mtt-select {
+	margin-bottom: 8px;
+}
+
+/* 小型输入框 */
+.mtt-small-input {
+	margin-bottom: 10px;
+}
+
+input[type="number"].mtt-small-input {
+	width: 60px;
+}
+
+.mtt-number-input {
+	width: 50px !important;
+	padding: 4px !important;
+	text-align: center;
+}
+
+/* 复选框样式 */
+.mtt-checkbox-label {
+	display: flex;
+	align-items: center;
+	padding: 6px 0;
+	font-size: 0.9rem;
+	cursor: pointer;
+	border-bottom: 1px solid var(--background-modifier-border-soft);
+	gap: 8px; /* 统一间距 */
+}
+
+.mtt-checkbox-label:last-child {
+	border-bottom: none;
+}
+
+.mtt-checkbox-label input {
+	width: auto !important;
+}
+
+.mtt-checkbox-label input[type="checkbox"] {
+	transform: scale(1.1);
+}
+
+.mtt-checkbox-label input[type="checkbox"]:checked::after {
+	left: 3px !important;
+}
+
+/* 自定义卡片样式（如 AI 工具配置卡片） */
 .mtt-custom-card {
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 8px;
@@ -419,6 +436,11 @@ input[type="number"].mtt-small-input {
 .mtt-custom-card .setting-item-control select {
 	width: 100%;
 }
+
+
+/* ==========================================================================
+   加载状态 (Loading State)
+   ========================================================================== */
 
 .mtt-loading-overlay {
 	position: absolute;

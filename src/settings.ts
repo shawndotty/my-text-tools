@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
+import { BUILTIN_TOOLS } from "./types";
 
 export interface CustomAIAction {
 	id: string;
@@ -23,6 +24,8 @@ export interface CustomAIAction {
 
 export interface MyTextToolsSettings {
 	mySetting: string;
+	// 工具可见性配置
+	enabledTools: Record<string, boolean>;
 	// AI 配置
 	aiProvider: "deepseek" | "openai" | "custom";
 	aiApiKey: string;
@@ -44,6 +47,10 @@ export interface AIToolConfig {
 
 export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	mySetting: "default",
+	enabledTools: BUILTIN_TOOLS.reduce((acc, tool) => {
+		acc[tool.id] = true;
+		return acc;
+	}, {} as Record<string, boolean>),
 	aiProvider: "deepseek",
 	aiApiKey: "",
 	aiApiUrl: "https://api.deepseek.com/v1/chat/completions",
@@ -71,6 +78,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		const tabConfigs = [
 			{
+				title: "BasicSettings",
+				renderMethod: (content: HTMLElement) =>
+					this.renderBasicSettings(content),
+			},
+			{
 				title: "AISettings",
 				renderMethod: (content: HTMLElement) =>
 					this.renderAISettings(content),
@@ -89,6 +101,33 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		tabConfigs.forEach((config) => {
 			tabbedSettings.addTab(t(config.title as any), config.renderMethod);
+		});
+	}
+
+	private renderBasicSettings(containerEl: HTMLElement) {
+		containerEl.createEl("p", {
+			text: t("BasicSettingsDesc" as any),
+			cls: "setting-item-description",
+		});
+
+		BUILTIN_TOOLS.forEach((tool) => {
+			new Setting(containerEl)
+				.setName(t(tool.nameKey as any))
+				.addToggle((toggle) =>
+					toggle
+						.setValue(
+							this.plugin.settings.enabledTools?.[tool.id] ?? true
+						)
+						.onChange(async (value) => {
+							if (!this.plugin.settings.enabledTools) {
+								this.plugin.settings.enabledTools = {};
+							}
+							this.plugin.settings.enabledTools[tool.id] = value;
+							await this.plugin.saveSettings();
+							// 触发视图更新
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				);
 		});
 	}
 

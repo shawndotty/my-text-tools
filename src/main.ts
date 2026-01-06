@@ -112,8 +112,15 @@ export default class MyTextTools extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	// 兼容：保留方法但不执行任何行为
-	refreshCustomRibbons() {}
+	// 刷新视图
+	refreshCustomRibbons() {
+		const leaves = this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW);
+		leaves.forEach((leaf) => {
+			if (leaf.view instanceof MyTextToolsView) {
+				leaf.view.render();
+			}
+		});
+	}
 
 	// 执行自定义 AI 动作
 	async runCustomAIAction(actionId: string) {

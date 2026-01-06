@@ -23,9 +23,12 @@ export interface CustomActionBrief {
  * 获取工具组配置
  */
 export function getToolGroups(
-	customActions: CustomActionBrief[] = []
+	customActions: CustomActionBrief[] = [],
+	enabledTools?: Record<string, boolean>
 ): ToolGroup[] {
-	return [
+	const isEnabled = (id: string) => enabledTools?.[id] ?? true;
+
+	const groups: ToolGroup[] = [
 		{
 			name: t("GROUP_AI"),
 			tools: [
@@ -142,6 +145,14 @@ export function getToolGroups(
 			],
 		},
 	];
+
+	// Filter tools based on visibility
+	return groups
+		.map((group) => ({
+			...group,
+			tools: group.tools.filter((t) => isEnabled(t.id)),
+		}))
+		.filter((group) => group.tools.length > 0);
 }
 
 /**
@@ -151,14 +162,15 @@ export function renderToolsPanel(
 	parent: HTMLElement,
 	activeTool: string,
 	onToolSelect: (toolId: string) => void,
-	customActions: CustomActionBrief[] = []
+	customActions: CustomActionBrief[] = [],
+	enabledTools?: Record<string, boolean>
 ): void {
 	parent.createEl("h4", {
 		text: t("TEXT_TOOLS"),
 		cls: "mtt-panel-title",
 	});
 
-	const groups = getToolGroups(customActions);
+	const groups = getToolGroups(customActions, enabledTools);
 
 	groups.forEach((group) => {
 		parent.createEl("h6", {
