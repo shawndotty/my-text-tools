@@ -1,5 +1,7 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import MyTextTools from "./main";
+import { TabbedSettings } from "UI/tabbed-settings";
+import { t } from "lang/helpers";
 
 export interface MyTextToolsSettings {
 	mySetting: string;
@@ -35,6 +37,27 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		const tabbedSettings = new TabbedSettings(containerEl);
+
+		const tabConfigs = [
+			{
+				title: "AISetting",
+				renderMethod: (content: HTMLElement) =>
+					this.renderAISettings(content),
+			},
+			{
+				title: "UserPromptsSettings",
+				renderMethod: (content: HTMLElement) =>
+					this.renderUserPromptsSettings(content),
+			},
+		];
+
+		tabConfigs.forEach((config) => {
+			tabbedSettings.addTab(t(config.title as any), config.renderMethod);
+		});
+	}
+
+	private renderAISettings(containerEl: HTMLElement) {
 		containerEl.createEl("h2", { text: "AI 配置" });
 
 		// AI 服务提供商选择
@@ -140,4 +163,6 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					})
 			);
 	}
+
+	private renderUserPromptsSettings(containerEl: HTMLElement) {}
 }
