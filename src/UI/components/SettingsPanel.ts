@@ -1,10 +1,34 @@
 import { t } from "../../lang/helpers";
 import { SettingsState } from "../../types";
+import { AIToolConfig } from "../../settings";
 
 export interface SettingsPanelCallbacks {
 	onSettingsChange: (key: string, value: any) => void;
 	onRun: (toolId: string) => void | Promise<void>;
+	onSaveAISettings?: (
+		toolId: string,
+		config: AIToolConfig
+	) => void | Promise<void>;
 }
+
+const DEFAULT_AI_KEYS: Record<string, { prompt: string; system: string }> = {
+	"ai-extract-keypoints": {
+		prompt: "PROMPT_EXTRACT_KEYPOINTS",
+		system: "SYSTEM_PROMPT_EXTRACT",
+	},
+	"ai-summarize": {
+		prompt: "PROMPT_SUMMARIZE",
+		system: "SYSTEM_PROMPT_SUMMARIZE",
+	},
+	"ai-translate": {
+		prompt: "PROMPT_TRANSLATE",
+		system: "SYSTEM_PROMPT_TRANSLATE",
+	},
+	"ai-polish": {
+		prompt: "PROMPT_POLISH",
+		system: "SYSTEM_PROMPT_POLISH",
+	},
+};
 
 /**
  * 渲染全局设置
@@ -56,7 +80,8 @@ export function renderToolSettings(
 	parent: HTMLElement,
 	activeTool: string | "",
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
+	aiToolsConfig?: Record<string, AIToolConfig>
 ): void {
 	parent.createEl("hr"); // 分隔线
 
@@ -135,7 +160,12 @@ export function renderToolSettings(
 		case "ai-summarize":
 		case "ai-translate":
 		case "ai-polish":
-			renderAISettings(settingsContent, activeTool, callbacks);
+			renderAISettings(
+				settingsContent,
+				activeTool,
+				callbacks,
+				aiToolsConfig?.[activeTool]
+			);
 			break;
 		default:
 			settingsContent.createEl("p", {
@@ -848,7 +878,8 @@ function renderClearFormatSettings(
 function renderAISettings(
 	parent: HTMLElement,
 	activeTool: string,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
+	config?: AIToolConfig
 ): void {
 	const aiContent = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -877,6 +908,64 @@ function renderAISettings(
 			cls: "mtt-ai-description",
 		});
 	}
+
+	const defaults = DEFAULT_AI_KEYS[activeTool];
+
+	if (activeTool === "ai-translate") {
+		aiContent.createEl("label", { text: t("SETTING_TARGET_LANG") });
+		const langInput = aiContent.createEl("input", {
+			type: "text",
+			placeholder: "English",
+			value: config?.targetLanguage ?? "English",
+		});
+		langInput.onchange = (e) => {
+			const val = (e.target as HTMLInputElement).value;
+			if (callbacks.onSaveAISettings) {
+				callbacks.onSaveAISettings(activeTool, {
+					...config,
+					targetLanguage: val,
+				});
+			}
+		};
+	}
+
+	aiContent.createEl("label", { text: t("SETTING_PROMPT") });
+	const promptArea = aiContent.createEl("textarea", {
+		cls: "mtt-textarea",
+		placeholder: defaults ? t(defaults.prompt as any) : "",
+		attr: { rows: 3 },
+	});
+	promptArea.value =
+		config?.prompt ??
+		(defaults ? (t(defaults.prompt as any) as string) : "");
+	promptArea.onchange = (e) => {
+		const val = (e.target as HTMLTextAreaElement).value;
+		if (callbacks.onSaveAISettings) {
+			callbacks.onSaveAISettings(activeTool, {
+				...config,
+				prompt: val,
+			});
+		}
+	};
+
+	aiContent.createEl("label", { text: t("SETTING_SYSTEM_PROMPT") });
+	const sysArea = aiContent.createEl("textarea", {
+		cls: "mtt-textarea",
+		placeholder: defaults ? t(defaults.system as any) : "",
+		attr: { rows: 3 },
+	});
+	sysArea.value =
+		config?.systemPrompt ??
+		(defaults ? (t(defaults.system as any) as string) : "");
+	sysArea.onchange = (e) => {
+		const val = (e.target as HTMLTextAreaElement).value;
+		if (callbacks.onSaveAISettings) {
+			callbacks.onSaveAISettings(activeTool, {
+				...config,
+				systemPrompt: val,
+			});
+		}
+	};
 
 	aiContent.createEl("p", {
 		text: t("AI_HINT"),

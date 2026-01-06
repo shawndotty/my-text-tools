@@ -12,6 +12,7 @@ import { processText } from "../utils/textProcessors";
 import { saveToOriginal, saveToNewFile } from "../utils/fileOperations";
 import { AIService } from "../utils/aiService";
 import MyTextTools from "../main";
+import { AIToolConfig } from "../settings";
 import { renderToolsPanel } from "./components/ToolsPanel";
 import {
 	renderEditorPanel,
@@ -200,13 +201,21 @@ export class MyTextToolsView extends ItemView {
 				}
 				await this.processText(toolId);
 			},
+			onSaveAISettings: async (toolId: string, config: AIToolConfig) => {
+				if (!this.plugin.settings.aiTools) {
+					this.plugin.settings.aiTools = {};
+				}
+				this.plugin.settings.aiTools[toolId] = config;
+				await this.plugin.saveSettings();
+			},
 		};
 		renderGlobalSettings(rightPanel, this.settingsState, settingsCallbacks);
 		renderToolSettings(
 			rightPanel,
 			this.activeTool,
 			this.settingsState,
-			settingsCallbacks
+			settingsCallbacks,
+			this.plugin.settings.aiTools
 		);
 	}
 
@@ -242,7 +251,7 @@ export class MyTextToolsView extends ItemView {
 		// 检查 AI 配置
 		const aiService = new AIService(this.plugin.settings);
 		if (!aiService.isConfigured()) {
-			new Notice("❌ AI 配置不完整，请在设置中配置 API Key");
+			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
 			this.hideLoading();
 			return;
 		}
@@ -262,7 +271,7 @@ export class MyTextToolsView extends ItemView {
 		}
 
 		if (!textToProcess.trim()) {
-			new Notice("❌ 没有可处理的文本内容");
+			new Notice("❌ " + t("NOTICE_NO_TEXT"));
 			this.hideLoading();
 			return;
 		}
@@ -280,13 +289,16 @@ export class MyTextToolsView extends ItemView {
 					break;
 				case "ai-translate":
 					// 翻译功能可以后续扩展，暂时使用默认英文
-					result = await aiService.translate(textToProcess, "英文");
+					result = await aiService.translate(textToProcess);
 					break;
 				case "ai-polish":
 					result = await aiService.polish(textToProcess);
 					break;
 				default:
-					result = { content: "", error: "未知的 AI 工具类型" };
+					result = {
+						content: "",
+						error: t("NOTICE_UNKNOWN_AI_TOOL"),
+					};
 			}
 
 			if (result.error) {
@@ -308,13 +320,13 @@ export class MyTextToolsView extends ItemView {
 			}
 
 			this.content = finalContent;
-			new Notice("✅ AI 处理完成");
+			new Notice("✅ " + t("NOTICE_AI_DONE"));
 			this.render();
 			this.hideLoading();
 		} catch (error) {
 			const errorMessage =
-				error instanceof Error ? error.message : "未知错误";
-			new Notice(`❌ AI 处理失败: ${errorMessage}`);
+				error instanceof Error ? error.message : t("AI_UNKNOWN_ERROR");
+			new Notice("❌ " + t("NOTICE_AI_ERROR", [errorMessage]));
 			this.hideLoading();
 		}
 	}
@@ -322,7 +334,7 @@ export class MyTextToolsView extends ItemView {
 	// 保存回原笔记
 	handleSaveToOriginal() {
 		if (!this.originalEditor) {
-			new Notice("❌ 无法找到原笔记编辑器");
+			new Notice("❌ " + t("NOTICE_NO_EDITOR"));
 			return;
 		}
 

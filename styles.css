@@ -125,6 +125,7 @@
 	background-color: var(--background-secondary);
 	border-left: 1px solid var(--background-modifier-border);
 	padding: 1.5rem;
+    overflow: auto;
 }
 
 .mtt-settings-content {

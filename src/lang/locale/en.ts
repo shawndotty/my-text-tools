@@ -1,5 +1,6 @@
 export default {
 	WORKBENCH_TITLE: "MyTextTools Workbench",
+	COMMAND_OPEN_WORKBENCH: "Open MyTextTools Workbench",
 	TEXT_TOOLS: "Text Tools",
 	GROUP_BASIC: "Basic Tools",
 	GROUP_LINES: "Line Tools",
@@ -186,7 +187,8 @@ export default {
 		"Selected text has been updated in the original note",
 	SelectionMode: "Selection Mode",
 
-	AISettings: "AI Settings",
+	AISettings: "AI Provider Settings",
+	DefaultPromptsSettings: "Default Prompts Settings",
 	UserPromptsSettings: "User Prompts Settings",
 	CUSTOM_PROMPTS_TITLE: "Custom AI Prompts",
 	CUSTOM_PROMPTS_MANAGE: "Manage Custom Prompts",
@@ -231,13 +233,20 @@ export default {
 	NOTICE_NO_TEXT: "No text to process",
 	NOTICE_AI_DONE: "AI processing completed",
 
-	// AI Service Messages & Prompts
+	SETTING_TARGET_LANG: "Target Language:",
+	SETTING_PROMPT: "Prompt:",
+	SETTING_SYSTEM_PROMPT: "System Prompt:",
+
+	// Error Messages
 	AI_CONFIG_INCOMPLETE:
 		"AI configuration is incomplete. Please configure API Key and model in settings.",
 	AI_API_ERROR: "API Request Failed: {0} {1}",
 	AI_EMPTY_RESPONSE: "AI returned empty content",
 	AI_UNKNOWN_ERROR: "Unknown error",
 	AI_NETWORK_ERROR: "Network Request Failed: {0}",
+	NOTICE_UNKNOWN_AI_TOOL: "Unknown AI tool type",
+	NOTICE_AI_ERROR: "AI processing failed: {0}",
+	AI_CONTENT_LABEL: "Content to process:",
 
 	PROMPT_EXTRACT_KEYPOINTS:
 		"Please extract the key points from the following text, output as a list, one point per line:",

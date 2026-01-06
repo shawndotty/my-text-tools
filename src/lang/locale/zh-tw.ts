@@ -1,5 +1,6 @@
 export default {
 	WORKBENCH_TITLE: "MyTextTools 工作台",
+	COMMAND_OPEN_WORKBENCH: "開啟 MyTextTools 增強工作台",
 	TEXT_TOOLS: "文字工具",
 	GROUP_BASIC: "基礎工具",
 	GROUP_LINES: "行處理工具",
@@ -179,7 +180,8 @@ export default {
 	NOTICE_SAVE_SELECTION_SUCCESS: "選中的文本已更新到原筆記",
 	SelectionMode: "選區模式",
 
-	AISettings: "AI設定",
+	AISettings: "AI服務設置",
+	DefaultPromptsSettings: "預設提示詞設置",
 	UserPromptsSettings: "用戶提示詞設定",
 	CUSTOM_PROMPTS_TITLE: "自定義 AI 提示詞",
 	CUSTOM_PROMPTS_MANAGE: "管理自定義提示詞",
@@ -191,6 +193,11 @@ export default {
 	ICON_PLACEHOLDER: "圖示，如 sparkles",
 	TOGGLE_SHOW_IN_LEFT: "顯示在左側工具欄",
 	TOOLTIP_DELETE_PROMPT: "刪除提示詞",
+
+	SETTING_TARGET_LANG: "目標語言：",
+	SETTING_PROMPT: "提示詞：",
+	SETTING_SYSTEM_PROMPT: "系統提示詞：",
+
 	PROMPT_FIELD_LABEL: "提示器",
 	PROMPT_FIELD_DESC: "用於指導模型的 Prompt",
 	PROMPT_PLACEHOLDER: "請對以下文字進行處理...",
@@ -230,6 +237,9 @@ export default {
 	AI_EMPTY_RESPONSE: "AI 返回了空內容",
 	AI_UNKNOWN_ERROR: "未知錯誤",
 	AI_NETWORK_ERROR: "網絡請求失敗: {0}",
+	NOTICE_UNKNOWN_AI_TOOL: "未知的 AI 工具類型",
+	NOTICE_AI_ERROR: "AI 處理失敗: {0}",
+	AI_CONTENT_LABEL: "待處理文本：",
 
 	PROMPT_EXTRACT_KEYPOINTS:
 		"請提取以下文本的要點，以列表形式輸出，每個要點一行：",

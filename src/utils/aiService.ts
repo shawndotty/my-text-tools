@@ -60,7 +60,7 @@ export class AIService {
 
 		// 添加用户消息
 		const userMessage = prompt
-			? `${prompt}\n\n待处理文本：\n${userText}`
+			? `${prompt}\n\n${t("AI_CONTENT_LABEL")}\n${userText}`
 			: userText;
 		messages.push({
 			role: "user",
@@ -123,8 +123,9 @@ export class AIService {
 	 * 提取要点
 	 */
 	async extractKeyPoints(text: string): Promise<AIResponse> {
-		const prompt = t("PROMPT_EXTRACT_KEYPOINTS");
-		const systemPrompt = t("SYSTEM_PROMPT_EXTRACT");
+		const config = this.settings.aiTools?.["ai-extract-keypoints"];
+		const prompt = config?.prompt || t("PROMPT_EXTRACT_KEYPOINTS");
+		const systemPrompt = config?.systemPrompt || t("SYSTEM_PROMPT_EXTRACT");
 		return this.processText(prompt, text, systemPrompt);
 	}
 
@@ -132,8 +133,10 @@ export class AIService {
 	 * 总结文本
 	 */
 	async summarize(text: string): Promise<AIResponse> {
-		const prompt = t("PROMPT_SUMMARIZE");
-		const systemPrompt = t("SYSTEM_PROMPT_SUMMARIZE");
+		const config = this.settings.aiTools?.["ai-summarize"];
+		const prompt = config?.prompt || t("PROMPT_SUMMARIZE");
+		const systemPrompt =
+			config?.systemPrompt || t("SYSTEM_PROMPT_SUMMARIZE");
 		return this.processText(prompt, text, systemPrompt);
 	}
 
@@ -142,10 +145,17 @@ export class AIService {
 	 */
 	async translate(
 		text: string,
-		targetLanguage: string = "英文"
+		targetLanguage?: string
 	): Promise<AIResponse> {
-		const prompt = t("PROMPT_TRANSLATE", [targetLanguage]);
-		const systemPrompt = t("SYSTEM_PROMPT_TRANSLATE");
+		const config = this.settings.aiTools?.["ai-translate"];
+		const lang = config?.targetLanguage || targetLanguage || "English";
+
+		const promptTemplate = config?.prompt || t("PROMPT_TRANSLATE");
+		// Replace {0} with target language
+		const prompt = promptTemplate.replace(/\{0\}/g, lang);
+
+		const systemPrompt =
+			config?.systemPrompt || t("SYSTEM_PROMPT_TRANSLATE");
 		return this.processText(prompt, text, systemPrompt);
 	}
 
@@ -153,8 +163,9 @@ export class AIService {
 	 * 润色文本
 	 */
 	async polish(text: string): Promise<AIResponse> {
-		const prompt = t("PROMPT_POLISH");
-		const systemPrompt = t("SYSTEM_PROMPT_POLISH");
+		const config = this.settings.aiTools?.["ai-polish"];
+		const prompt = config?.prompt || t("PROMPT_POLISH");
+		const systemPrompt = config?.systemPrompt || t("SYSTEM_PROMPT_POLISH");
 		return this.processText(prompt, text, systemPrompt);
 	}
 }

@@ -40,7 +40,7 @@ export default class MyTextTools extends Plugin {
 		// 2. 添加触发命令
 		this.addCommand({
 			id: "open-mytexttools-workspace",
-			name: "开启 MyTextTools 增强工作台",
+			name: t("COMMAND_OPEN_WORKBENCH"),
 			callback: () => {
 				this.activateView();
 			},
@@ -49,7 +49,7 @@ export default class MyTextTools extends Plugin {
 		// 3. 添加 ribbon icon 触发命令
 		this.addRibbonIcon(
 			"remove-formatting",
-			"开启 MyTextTools 增强工作台",
+			t("COMMAND_OPEN_WORKBENCH"),
 			() => {
 				this.activateView();
 			}
@@ -148,7 +148,7 @@ export default class MyTextTools extends Plugin {
 			mttLeaf.view instanceof MyTextToolsView
 		) {
 			const view = mttLeaf.view as MyTextToolsView;
-			view.showLoading("AI 正在处理…");
+			view.showLoading(t("NOTICE_AI_PROCESSING"));
 			const src = view.content || "";
 			if (!src.trim()) {
 				new Notice(t("NOTICE_NO_TEXT"));
@@ -196,7 +196,7 @@ export default class MyTextTools extends Plugin {
 			view.content = finalContent;
 			view.render();
 			view.hideLoading();
-			new Notice(t("NOTICE_AI_DONE"));
+			new Notice("✅ " + t("NOTICE_AI_DONE"));
 			return;
 		}
 
