@@ -334,6 +334,7 @@ button.mod-cta {
 	border-radius: 4px;
 	border: 1px solid var(--background-modifier-border);
 	background: var(--background-primary);
+    margin: 0.5em 0;
 }
 
 /* 空状态提示 */
@@ -415,6 +416,12 @@ input[type="number"].mtt-small-input {
 
 .mtt-checkbox-label input[type="checkbox"]:checked::after {
 	left: 3px !important;
+}
+
+/* SubSetting */
+
+.mtt-sub-settings label {
+    margin: 0.5em 0;
 }
 
 /* 自定义卡片样式（如 AI 工具配置卡片） */

@@ -45,6 +45,23 @@ export interface SettingsState {
 	clearStrikethrough: boolean; // 清理删除线 ~~
 	clearCode: boolean; // 清理行内代码 `
 	clearLinks: boolean; // 清理链接 [text](url) -> text
+
+	// On-select tool settings
+	onSelectEnabled: boolean;
+	onSelectAction:
+		| "wrap"
+		| "regex"
+		| "replace-all"
+		| "delete"
+		| "html-entity"
+		| "lowercase"
+		| "uppercase";
+	onSelectFind: string;
+	onSelectReplace: string;
+	onSelectPrefix: string;
+	onSelectSuffix: string;
+	onSelectCaseInsensitive: boolean;
+	onSelectRegex: boolean;
 }
 
 /**
@@ -94,6 +111,16 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	clearStrikethrough: true,
 	clearCode: false,
 	clearLinks: false,
+
+	// On-select defaults
+	onSelectEnabled: false,
+	onSelectAction: "wrap",
+	onSelectFind: "",
+	onSelectReplace: "",
+	onSelectPrefix: "",
+	onSelectSuffix: "",
+	onSelectCaseInsensitive: false,
+	onSelectRegex: false,
 };
 
 /**
@@ -128,6 +155,7 @@ export const BUILTIN_TOOLS: ToolInfo[] = [
 	{ id: "ai-summarize", nameKey: "TOOL_AI_SUMMARIZE" },
 	{ id: "ai-translate", nameKey: "TOOL_AI_TRANSLATE" },
 	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH" },
+	{ id: "on-select", nameKey: "TOOL_ON_SELECT" },
 	{ id: "regex", nameKey: "TOOL_REGEX" },
 	{ id: "remove-whitespace", nameKey: "TOOL_WHITESPACE" },
 	{ id: "clear-format", nameKey: "TOOL_CLEAR_FORMAT" },

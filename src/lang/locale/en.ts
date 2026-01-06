@@ -171,6 +171,22 @@ export default {
 	TOOL_AI_SUMMARIZE: "AI Summarize",
 	TOOL_AI_TRANSLATE: "AI Translate",
 	TOOL_AI_POLISH: "AI Polish",
+	TOOL_ON_SELECT: "On-select Tool",
+
+	// On-select Tool
+	ON_SELECT_DESC: "Process text instantly upon selection (Enable first)",
+	SETTING_ON_SELECT_ENABLE: "Enable On-select Processing",
+	SETTING_ON_SELECT_ACTION: "Action:",
+	ACTION_WRAP: "Wrap Prefix/Suffix",
+	ACTION_REGEX: "Find & Replace (Regex)",
+	ACTION_REPLACE_ALL: "Replace With",
+	ACTION_DELETE: "Delete Selection",
+	ACTION_HTML_ENTITY: "Convert to HTML Entities",
+	ACTION_LOWERCASE: "To Lowercase",
+	ACTION_UPPERCASE: "To Uppercase",
+	PLACEHOLDER_REPLACE_ALL: "Replace with...",
+	ON_SELECT_NOTICE_PROCESSED: "Selected text processed automatically",
+
 	AI_DESCRIPTION_EXTRACT:
 		"Use AI to extract key points from text, output as a list",
 	AI_DESCRIPTION_SUMMARIZE:

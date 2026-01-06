@@ -66,6 +66,11 @@ export function getToolGroups(
 		{
 			name: t("GROUP_BASIC"),
 			tools: [
+				{
+					id: "on-select",
+					name: t("TOOL_ON_SELECT"),
+					icon: "mouse-pointer-click",
+				},
 				{ id: "regex", name: t("TOOL_REGEX"), icon: "search" },
 				{
 					id: "remove-whitespace",

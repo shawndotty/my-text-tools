@@ -168,6 +168,7 @@ export default {
 	TOOL_AI_SUMMARIZE: "AI 總結",
 	TOOL_AI_TRANSLATE: "AI 翻譯",
 	TOOL_AI_POLISH: "AI 潤色",
+	TOOL_ON_SELECT: "即時處理",
 	AI_DESCRIPTION_EXTRACT: "使用 AI 提取文字的核心要點，以列表形式輸出",
 	AI_DESCRIPTION_SUMMARIZE: "使用 AI 對文字進行總結，生成簡潔的摘要",
 	AI_DESCRIPTION_TRANSLATE: "使用 AI 翻譯文字（預設翻譯為英文）",

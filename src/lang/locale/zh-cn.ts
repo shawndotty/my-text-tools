@@ -168,6 +168,22 @@ export default {
 	TOOL_AI_SUMMARIZE: "AI 总结",
 	TOOL_AI_TRANSLATE: "AI 翻译",
 	TOOL_AI_POLISH: "AI 润色",
+	TOOL_ON_SELECT: "即时处理",
+
+	// On-select Tool
+	ON_SELECT_DESC: "选中文字时立即执行操作 (请先启用)",
+	SETTING_ON_SELECT_ENABLE: "启用即时处理",
+	SETTING_ON_SELECT_ACTION: "选择操作:",
+	ACTION_WRAP: "添加前后缀",
+	ACTION_REGEX: "正则查找替换",
+	ACTION_REPLACE_ALL: "全部替换为",
+	ACTION_DELETE: "删除选中内容",
+	ACTION_HTML_ENTITY: "转为 HTML 实体",
+	ACTION_LOWERCASE: "转为小写",
+	ACTION_UPPERCASE: "转为大写",
+	PLACEHOLDER_REPLACE_ALL: "替换成这段文字...",
+	ON_SELECT_NOTICE_PROCESSED: "已自动处理选中内容",
+
 	AI_DESCRIPTION_EXTRACT: "使用 AI 提取文本的核心要点，以列表形式输出",
 	AI_DESCRIPTION_SUMMARIZE: "使用 AI 对文本进行总结，生成简洁的摘要",
 	AI_DESCRIPTION_TRANSLATE: "使用 AI 翻译文本（默认翻译为英文）",

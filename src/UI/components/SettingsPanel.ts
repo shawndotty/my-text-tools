@@ -167,6 +167,9 @@ export function renderToolSettings(
 				aiToolsConfig?.[activeTool]
 			);
 			break;
+		case "on-select":
+			renderOnSelectSettings(settingsContent, settings, callbacks);
+			break;
 		default:
 			settingsContent.createEl("p", {
 				text: t("SETTINGS_NO_CONFIG"),
@@ -807,12 +810,12 @@ function renderEmptyLineSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks
 ): void {
-	const elContent = parent.createDiv({
+	const content = parent.createDiv({
 		cls: "mtt-settings-content",
 	});
 
-	elContent.createEl("label", { text: t("SETTING_EMPTY_LINE_MODE") });
-	const modeSelect = elContent.createEl("select", {
+	content.createEl("label", { text: t("SETTING_FILTER_MODE") });
+	const modeSelect = content.createEl("select", {
 		cls: "mtt-select",
 	});
 	modeSelect.createEl("option", {
@@ -823,7 +826,6 @@ function renderEmptyLineSettings(
 		text: t("OPTION_EMPTY_LINE_MERGE"),
 		value: "merge",
 	});
-
 	modeSelect.value = settings.emptyLineMode;
 	modeSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
@@ -831,7 +833,7 @@ function renderEmptyLineSettings(
 			(e.target as HTMLSelectElement).value
 		);
 
-	const runBtn = elContent.createEl("button", {
+	const runBtn = content.createEl("button", {
 		text: t("BTN_RUN_EMPTY_LINE"),
 		cls: "mtt-run-btn",
 	});
@@ -843,12 +845,12 @@ function renderClearFormatSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks
 ): void {
-	const cfContent = parent.createDiv({
+	const content = parent.createDiv({
 		cls: "mtt-settings-content",
 	});
 
 	const createCheck = (label: string, key: string) => {
-		const lbl = cfContent.createEl("label", {
+		const lbl = content.createEl("label", {
 			cls: "mtt-checkbox-label",
 		});
 		const chk = lbl.createEl("input", { type: "checkbox" });
@@ -868,7 +870,7 @@ function renderClearFormatSettings(
 	createCheck(t("SETTING_CLEAR_FORMAT_CODE"), "clearCode");
 	createCheck(t("SETTING_CLEAR_FORMAT_LINKS"), "clearLinks");
 
-	const runBtn = parent.createEl("button", {
+	const runBtn = content.createEl("button", {
 		text: t("BTN_RUN_CLEAR_FORMAT"),
 		cls: "mtt-run-btn",
 	});
@@ -877,104 +879,284 @@ function renderClearFormatSettings(
 
 function renderAISettings(
 	parent: HTMLElement,
-	activeTool: string,
+	toolId: string,
 	callbacks: SettingsPanelCallbacks,
 	config?: AIToolConfig
 ): void {
-	const aiContent = parent.createDiv({
+	const content = parent.createDiv({
 		cls: "mtt-settings-content",
 	});
 
-	// 显示工具说明
-	let toolDescriptionKey: any = "";
-	switch (activeTool) {
+	// 显示工具描述
+	let descText = "";
+	switch (toolId) {
 		case "ai-extract-keypoints":
-			toolDescriptionKey = "AI_DESCRIPTION_EXTRACT";
+			descText = t("AI_DESCRIPTION_EXTRACT");
 			break;
 		case "ai-summarize":
-			toolDescriptionKey = "AI_DESCRIPTION_SUMMARIZE";
+			descText = t("AI_DESCRIPTION_SUMMARIZE");
 			break;
 		case "ai-translate":
-			toolDescriptionKey = "AI_DESCRIPTION_TRANSLATE";
+			descText = t("AI_DESCRIPTION_TRANSLATE");
 			break;
 		case "ai-polish":
-			toolDescriptionKey = "AI_DESCRIPTION_POLISH";
+			descText = t("AI_DESCRIPTION_POLISH");
 			break;
 	}
 
-	if (toolDescriptionKey) {
-		aiContent.createEl("p", {
-			text: t(toolDescriptionKey),
-			cls: "mtt-ai-description",
-		});
-	}
-
-	const defaults = DEFAULT_AI_KEYS[activeTool];
-
-	if (activeTool === "ai-translate") {
-		aiContent.createEl("label", { text: t("SETTING_TARGET_LANG") });
-		const langInput = aiContent.createEl("input", {
-			type: "text",
-			placeholder: "English",
-			value: config?.targetLanguage ?? "English",
-		});
-		langInput.onchange = (e) => {
-			const val = (e.target as HTMLInputElement).value;
-			if (callbacks.onSaveAISettings) {
-				callbacks.onSaveAISettings(activeTool, {
-					...config,
-					targetLanguage: val,
-				});
-			}
-		};
-	}
-
-	aiContent.createEl("label", { text: t("SETTING_PROMPT") });
-	const promptArea = aiContent.createEl("textarea", {
-		cls: "mtt-textarea",
-		placeholder: defaults ? t(defaults.prompt as any) : "",
-		attr: { rows: 3 },
+	content.createEl("p", {
+		text: descText,
+		cls: "mtt-ai-desc",
 	});
-	promptArea.value =
-		config?.prompt ??
-		(defaults ? (t(defaults.prompt as any) as string) : "");
-	promptArea.onchange = (e) => {
-		const val = (e.target as HTMLTextAreaElement).value;
+
+	// 如果没有配置，使用默认值
+	const defaultKeys = DEFAULT_AI_KEYS[toolId];
+	const currentConfig = config || {
+		prompt: defaultKeys ? t(defaultKeys.prompt as any) : "",
+		systemPrompt: defaultKeys ? t(defaultKeys.system as any) : "",
+		overrideGlobal: false,
+	};
+
+	// 1. 提示词设置
+	content.createEl("label", { text: t("SETTING_PROMPT") });
+	const promptArea = content.createEl("textarea", {
+		cls: "mtt-textarea-small",
+		text: currentConfig.prompt,
+	});
+	promptArea.onchange = async (e) => {
+		const newVal = (e.target as HTMLTextAreaElement).value;
+		currentConfig.prompt = newVal;
 		if (callbacks.onSaveAISettings) {
-			callbacks.onSaveAISettings(activeTool, {
-				...config,
-				prompt: val,
-			});
+			await callbacks.onSaveAISettings(toolId, currentConfig);
 		}
 	};
 
-	aiContent.createEl("label", { text: t("SETTING_SYSTEM_PROMPT") });
-	const sysArea = aiContent.createEl("textarea", {
-		cls: "mtt-textarea",
-		placeholder: defaults ? t(defaults.system as any) : "",
-		attr: { rows: 3 },
+	// 2. 系统提示词设置
+	content.createEl("label", { text: t("SETTING_SYSTEM_PROMPT") });
+	const sysPromptArea = content.createEl("textarea", {
+		cls: "mtt-textarea-small",
+		text: currentConfig.systemPrompt,
 	});
-	sysArea.value =
-		config?.systemPrompt ??
-		(defaults ? (t(defaults.system as any) as string) : "");
-	sysArea.onchange = (e) => {
-		const val = (e.target as HTMLTextAreaElement).value;
+	sysPromptArea.onchange = async (e) => {
+		const newVal = (e.target as HTMLTextAreaElement).value;
+		currentConfig.systemPrompt = newVal;
 		if (callbacks.onSaveAISettings) {
-			callbacks.onSaveAISettings(activeTool, {
-				...config,
-				systemPrompt: val,
-			});
+			await callbacks.onSaveAISettings(toolId, currentConfig);
 		}
 	};
 
-	aiContent.createEl("p", {
-		text: t("AI_HINT"),
-		cls: "mtt-ai-hint",
+	// 3. 覆盖全局设置开关
+	const overrideLabel = content.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	overrideLabel.style.marginTop = "10px";
+	const overrideCheck = overrideLabel.createEl("input", { type: "checkbox" });
+	overrideCheck.checked = (currentConfig as any).overrideGlobal || false;
+	overrideCheck.onchange = async (e) => {
+		(currentConfig as any).overrideGlobal = (
+			e.target as HTMLInputElement
+		).checked;
+		if (callbacks.onSaveAISettings) {
+			await callbacks.onSaveAISettings(toolId, currentConfig);
+		}
+		// 刷新显示
+		modelSection.style.display = (currentConfig as any).overrideGlobal
+			? "block"
+			: "none";
+	};
+	overrideLabel.appendText(t("OVERRIDE_SWITCH_LABEL"));
+
+	// 4. 单独的模型配置区域
+	const modelSection = content.createDiv({
+		cls: "mtt-ai-override-section",
+	});
+	modelSection.style.display = (currentConfig as any).overrideGlobal
+		? "block"
+		: "none";
+	modelSection.createEl("p", {
+		text: t("OVERRIDE_SWITCH_DESC"),
+		cls: "mtt-setting-desc",
 	});
 
-	const runBtn = aiContent.createEl("button", {
+	// ... 这里可以继续添加 model, apiKey 等输入框，逻辑同 SettingsTab
+	// 暂时为了简洁，仅保留 prompt 修改
+
+	content.createEl("hr");
+
+	const runBtn = content.createEl("button", {
 		text: t("BTN_RUN_AI"),
 		cls: "mtt-run-btn",
 	});
-	runBtn.onclick = () => callbacks.onRun(activeTool);
+	runBtn.onclick = () => callbacks.onRun(toolId);
+}
+
+function renderOnSelectSettings(
+	parent: HTMLElement,
+	settings: SettingsState,
+	callbacks: SettingsPanelCallbacks
+): void {
+	const content = parent.createDiv({
+		cls: "mtt-settings-content",
+	});
+
+	// Description
+	content.createEl("p", {
+		text: t("ON_SELECT_DESC"),
+		cls: "mtt-setting-desc",
+	});
+
+	// Enable Toggle
+	const enableLabel = content.createEl("label", {
+		cls: "mtt-checkbox-label mtt-highlight-label",
+	});
+	const enableCheck = enableLabel.createEl("input", { type: "checkbox" });
+	enableCheck.checked = settings.onSelectEnabled;
+	enableCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectEnabled",
+			(e.target as HTMLInputElement).checked
+		);
+	enableLabel.appendText(" " + t("SETTING_ON_SELECT_ENABLE"));
+
+	// Action Select
+	const actionLabel = content.createEl("label", {
+		text: t("SETTING_ON_SELECT_ACTION"),
+	});
+	actionLabel.style.marginTop = "10px";
+	actionLabel.style.display = "block";
+	const actionSelect = content.createEl("select", {
+		cls: "mtt-select",
+	});
+	const actions = [
+		{ value: "wrap", label: t("ACTION_WRAP") },
+		{ value: "regex", label: t("ACTION_REGEX") },
+		{ value: "replace-all", label: t("ACTION_REPLACE_ALL") },
+		{ value: "delete", label: t("ACTION_DELETE") },
+		{ value: "html-entity", label: t("ACTION_HTML_ENTITY") },
+		{ value: "lowercase", label: t("ACTION_LOWERCASE") },
+		{ value: "uppercase", label: t("ACTION_UPPERCASE") },
+	];
+
+	actions.forEach((act) => {
+		actionSelect.createEl("option", {
+			value: act.value,
+			text: act.label,
+		});
+	});
+	actionSelect.value = settings.onSelectAction;
+	actionSelect.onchange = (e) => {
+		callbacks.onSettingsChange(
+			"onSelectAction",
+			(e.target as HTMLSelectElement).value
+		);
+		// Force re-render to show/hide relevant inputs?
+		// Or just manually toggle visibility here.
+		updateVisibility();
+	};
+
+	// Dynamic Input Container
+	const paramsContainer = content.createDiv({ cls: "mtt-params-container" });
+
+	// --- Inputs for Wrap ---
+	const wrapDiv = paramsContainer.createDiv({ cls: "mtt-sub-settings" });
+	wrapDiv.createEl("label", { text: t("SETTING_PREFIX") });
+	const preInput = wrapDiv.createEl("input", {
+		type: "text",
+		placeholder: t("PLACEHOLDER_PREFIX"),
+		value: settings.onSelectPrefix,
+	});
+	preInput.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectPrefix",
+			(e.target as HTMLInputElement).value
+		);
+
+	wrapDiv.createEl("label", { text: t("SETTING_SUFFIX") });
+	const sufInput = wrapDiv.createEl("input", {
+		type: "text",
+		placeholder: t("PLACEHOLDER_SUFFIX"),
+		value: settings.onSelectSuffix,
+	});
+	sufInput.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectSuffix",
+			(e.target as HTMLInputElement).value
+		);
+
+	// --- Inputs for Regex ---
+	const regexDiv = paramsContainer.createDiv({ cls: "mtt-sub-settings" });
+	regexDiv.createEl("label", { text: t("SETTING_FIND") });
+	const findInput = regexDiv.createEl("input", {
+		type: "text",
+		value: settings.onSelectFind,
+	});
+	findInput.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectFind",
+			(e.target as HTMLInputElement).value
+		);
+
+	regexDiv.createEl("label", { text: t("SETTING_REPLACE") });
+	const replaceInput = regexDiv.createEl("input", {
+		type: "text",
+		value: settings.onSelectReplace,
+	});
+	replaceInput.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectReplace",
+			(e.target as HTMLInputElement).value
+		);
+
+	const regexOpts = regexDiv.createDiv({ cls: "mtt-setting-row" });
+	// Case
+	const caseLabel = regexOpts.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
+	caseCheck.checked = settings.onSelectCaseInsensitive;
+	caseCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectCaseInsensitive",
+			(e.target as HTMLInputElement).checked
+		);
+	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
+	// Regex
+	const regLabel = regexOpts.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const regCheck = regLabel.createEl("input", { type: "checkbox" });
+	regCheck.checked = settings.onSelectRegex;
+	regCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectRegex",
+			(e.target as HTMLInputElement).checked
+		);
+	regLabel.appendText(" " + t("CHECKBOX_REGEX"));
+
+	// --- Inputs for Replace All ---
+	const replaceAllDiv = paramsContainer.createDiv({
+		cls: "mtt-sub-settings",
+	});
+	replaceAllDiv.createEl("label", { text: t("ACTION_REPLACE_ALL") });
+	const replaceAllInput = replaceAllDiv.createEl("input", {
+		type: "text",
+		placeholder: t("PLACEHOLDER_REPLACE_ALL"),
+		value: settings.onSelectReplace, // Reuse replaceText
+	});
+	replaceAllInput.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"onSelectReplace",
+			(e.target as HTMLInputElement).value
+		);
+
+	// Visibility Logic
+	const updateVisibility = () => {
+		const action = actionSelect.value;
+		wrapDiv.style.display = action === "wrap" ? "block" : "none";
+		regexDiv.style.display = action === "regex" ? "block" : "none";
+		replaceAllDiv.style.display =
+			action === "replace-all" ? "block" : "none";
+	};
+
+	updateVisibility();
 }

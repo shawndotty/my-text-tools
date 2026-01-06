@@ -175,6 +175,7 @@ export class MyTextToolsView extends ItemView {
 			onContentChange: (content: string) => {
 				this.content = content;
 			},
+			onProcessSelection: (text: string) => this.processOnSelect(text),
 		};
 		renderEditorPanel(
 			centerPanel,
@@ -218,6 +219,83 @@ export class MyTextToolsView extends ItemView {
 			settingsCallbacks,
 			this.plugin.settings.aiTools
 		);
+	}
+
+	// On-select 处理逻辑
+	processOnSelect(text: string): string | null {
+		if (!this.settingsState.onSelectEnabled) return null;
+
+		// 保存历史状态以便撤销
+		this.historyManager.pushToHistory(this.content);
+
+		const s = this.settingsState;
+		let result = text;
+
+		try {
+			switch (s.onSelectAction) {
+				case "wrap":
+					result = `${s.onSelectPrefix}${text}${s.onSelectSuffix}`;
+					break;
+				case "regex":
+					const flags = s.onSelectCaseInsensitive ? "gi" : "g";
+					if (s.onSelectRegex) {
+						try {
+							const re = new RegExp(s.onSelectFind, flags);
+							result = text.replace(re, s.onSelectReplace);
+						} catch (e) {
+							new Notice(t("NOTICE_REGEX_ERROR"));
+							return null;
+						}
+					} else {
+						// 普通查找替换 (转义正则字符)
+						const escapeRegExp = (str: string) =>
+							str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+						const re = new RegExp(
+							escapeRegExp(s.onSelectFind),
+							flags
+						);
+						result = text.replace(re, s.onSelectReplace);
+					}
+					break;
+				case "replace-all":
+					result = s.onSelectReplace;
+					break;
+				case "delete":
+					result = "";
+					break;
+				case "html-entity":
+					result = text.replace(/[<>&"']/g, (c) => {
+						switch (c) {
+							case "<":
+								return "&lt;";
+							case ">":
+								return "&gt;";
+							case "&":
+								return "&amp;";
+							case '"':
+								return "&quot;";
+							case "'":
+								return "&#39;";
+							default:
+								return c;
+						}
+					});
+					break;
+				case "lowercase":
+					result = text.toLowerCase();
+					break;
+				case "uppercase":
+					result = text.toUpperCase();
+					break;
+				default:
+					return null;
+			}
+			new Notice(t("ON_SELECT_NOTICE_PROCESSED"));
+			return result;
+		} catch (e) {
+			console.error("On-select processing error:", e);
+			return null;
+		}
 	}
 
 	// 统一处理文本逻辑

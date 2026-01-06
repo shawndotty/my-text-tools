@@ -9,6 +9,7 @@ export interface EditorPanelCallbacks {
 	onSaveNew: () => void;
 	onSaveOriginal: () => void;
 	onContentChange?: (content: string) => void;
+	onProcessSelection?: (text: string) => string | null;
 }
 
 /**
@@ -92,6 +93,34 @@ export function renderEditorPanel(
 			const newContent = (e.target as HTMLTextAreaElement).value;
 			if (callbacks.onContentChange) {
 				callbacks.onContentChange(newContent);
+			}
+		};
+
+		// On-select 处理逻辑
+		const handleSelection = () => {
+			if (!callbacks.onProcessSelection) return;
+			const start = ta.selectionStart;
+			const end = ta.selectionEnd;
+			if (start === end) return; // 没有选中
+
+			const selectedText = ta.value.substring(start, end);
+			const processed = callbacks.onProcessSelection(selectedText);
+
+			if (processed !== null && processed !== selectedText) {
+				// 替换选区
+				ta.setRangeText(processed, start, end, "select");
+				// 更新内容
+				if (callbacks.onContentChange) {
+					callbacks.onContentChange(ta.value);
+				}
+			}
+		};
+
+		ta.onmouseup = handleSelection;
+		ta.onkeyup = (e) => {
+			// 仅在 Shift+方向键或其他可能改变选区的键释放时检查
+			if (e.shiftKey || e.key === "Shift") {
+				handleSelection();
 			}
 		};
 	} else {
