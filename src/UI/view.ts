@@ -227,7 +227,7 @@ export class MyTextToolsView extends ItemView {
 			if (
 				this.settingsState.preserveHeader &&
 				lines.length > 0 &&
-				lines[0].trim()
+				lines[0]?.trim()
 			) {
 				finalContent = lines[0] + "\n" + finalContent;
 			}
