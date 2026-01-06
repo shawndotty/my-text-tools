@@ -5,7 +5,7 @@
 export class HistoryManager {
 	private history: string[] = [];
 	private redoHistory: string[] = [];
-	private maxHistorySize: number = 20;
+	private maxHistorySize: number = 50;
 
 	/**
 	 * 将当前内容推入历史记录
@@ -81,4 +81,3 @@ export class HistoryManager {
 		this.redoHistory = [];
 	}
 }
-
