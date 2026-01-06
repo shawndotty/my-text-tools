@@ -28,7 +28,9 @@ export default {
 	BTN_REDO: "Redo (Ctrl+Y)",
 	EDITOR_PLACEHOLDER: "Enter or process text here...",
 	BTN_SAVE_NEW: "Save as New Note",
-	BTN_SAVE_ORIGINAL: "Apply to Original Note",
+	BTN_UPDATE_SELECTION: "Update Selection",
+	BTN_SAVE_ORIGINAL: "Apply & Overwrite Original",
+	MENU_OPEN_PLUGIN: "Open in MyTextTools",
 
 	SETTINGS_TITLE: "Settings",
 	SETTINGS_EMPTY: "Select a tool from the left to start processing",
@@ -182,4 +184,5 @@ export default {
 	NOTICE_LOAD_SELECTION: "Loaded selected text from editor",
 	NOTICE_SAVE_SELECTION_SUCCESS:
 		"Selected text has been updated in the original note",
+	SelectionMode: "Selection Mode",
 };

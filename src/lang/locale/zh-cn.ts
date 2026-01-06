@@ -27,8 +27,10 @@ export default {
 	BTN_UNDO: "撤销 (Ctrl+Z)",
 	BTN_REDO: "重做 (Ctrl+Y)",
 	EDITOR_PLACEHOLDER: "在此输入或处理文本...",
-	BTN_SAVE_NEW: "保存为新笔记",
+	BTN_SAVE_NEW: "存为新笔记",
+	BTN_UPDATE_SELECTION: "更新选区",
 	BTN_SAVE_ORIGINAL: "应用并覆盖原笔记",
+	MENU_OPEN_PLUGIN: "在 MyTextTools 中编辑",
 
 	SETTINGS_TITLE: "参数设置",
 	SETTINGS_EMPTY: "在左侧选择一个工具开始处理",
@@ -175,4 +177,5 @@ export default {
 	// New Keys
 	NOTICE_LOAD_SELECTION: "已加载编辑器选中的文本",
 	NOTICE_SAVE_SELECTION_SUCCESS: "选中的文本已更新到原笔记",
+	SelectionMode: "选区模式",
 };

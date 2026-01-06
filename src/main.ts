@@ -13,6 +13,7 @@ import {
 	MyTextToolsSettingTab,
 } from "./settings";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
+import { t } from "./lang/helpers";
 
 // Remember to rename these classes and interfaces!
 
@@ -50,6 +51,19 @@ export default class MyTextTools extends Plugin {
 			() => {
 				this.activateView();
 			}
+		);
+
+		// 4. 添加右键菜单
+		this.registerEvent(
+			this.app.workspace.on("editor-menu", (menu, editor, view) => {
+				menu.addItem((item) => {
+					item.setTitle(t("MENU_OPEN_PLUGIN"))
+						.setIcon("remove-formatting")
+						.onClick(async () => {
+							await this.activateView();
+						});
+				});
+			})
 		);
 	}
 

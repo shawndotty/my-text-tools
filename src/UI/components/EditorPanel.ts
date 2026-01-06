@@ -34,7 +34,7 @@ export function renderEditorPanel(
 
 	if (isSelectionMode) {
 		const badge = titleContainer.createSpan({ cls: "mtt-badge" });
-		badge.setText("Selection Mode");
+		badge.setText(t("SelectionMode"));
 		badge.style.marginLeft = "8px";
 		badge.style.fontSize = "0.8em";
 		badge.style.backgroundColor = "var(--interactive-accent)";
@@ -133,7 +133,9 @@ export function renderEditorPanel(
 	// 按钮 2：覆盖原笔记
 	if (hasOriginalEditor) {
 		const saveOverBtn = btnGroup.createEl("button", {
-			text: t("BTN_SAVE_ORIGINAL"),
+			text: isSelectionMode
+				? t("BTN_UPDATE_SELECTION" as any)
+				: t("BTN_SAVE_ORIGINAL"),
 			cls: "mod-cta",
 		});
 		saveOverBtn.onclick = () => callbacks.onSaveOriginal();

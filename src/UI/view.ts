@@ -135,7 +135,7 @@ export class MyTextToolsView extends ItemView {
 				}
 			},
 			onSaveNew: () => this.saveToNewFile(),
-			onSaveOriginal: () => this.saveToOriginal(),
+			onSaveOriginal: () => this.handleSaveToOriginal(),
 			onContentChange: (content: string) => {
 				this.content = content;
 			},
@@ -279,8 +279,41 @@ export class MyTextToolsView extends ItemView {
 	}
 
 	// 保存回原笔记
-	saveToOriginal() {
-		saveToOriginal(this.content, this.originalEditor);
+	handleSaveToOriginal() {
+		if (!this.originalEditor) {
+			new Notice("❌ 无法找到原笔记编辑器");
+			return;
+		}
+
+		console.log("MyTextTools: Saving...", {
+			isSelectionMode: !!this.selectionRange,
+			range: this.selectionRange,
+			contentLength: this.content.length,
+		});
+
+		const range = this.selectionRange;
+		if (range) {
+			// 选区模式：只替换选中的内容
+			this.originalEditor.replaceRange(
+				this.content,
+				range.start,
+				range.end
+			);
+			new Notice(t("NOTICE_SAVE_SELECTION_SUCCESS"));
+
+			// 重新计算 end 坐标
+			const lines = this.content.split("\n");
+			const lastLineLength = lines[lines.length - 1]!.length;
+			const endLine = range!.start.line + lines.length - 1;
+			const endCh =
+				(lines.length === 1 ? range!.start.ch : 0) + lastLineLength;
+
+			// 更新选区终点
+			this.selectionRange!.end = { line: endLine, ch: endCh };
+		} else {
+			// 全文模式：覆盖整个文件
+			saveToOriginal(this.content, this.originalEditor);
+		}
 	}
 
 	async onClose() {
