@@ -185,4 +185,7 @@ export default {
 	NOTICE_SAVE_SELECTION_SUCCESS:
 		"Selected text has been updated in the original note",
 	SelectionMode: "Selection Mode",
+
+	AISettings: "AI Settings",
+	UserPromptsSettings: "User Prompts Settings",
 };

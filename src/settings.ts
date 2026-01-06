@@ -41,7 +41,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 		const tabConfigs = [
 			{
-				title: "AISetting",
+				title: "AISettings",
 				renderMethod: (content: HTMLElement) =>
 					this.renderAISettings(content),
 			},
@@ -58,8 +58,6 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 	}
 
 	private renderAISettings(containerEl: HTMLElement) {
-		containerEl.createEl("h2", { text: "AI 配置" });
-
 		// AI 服务提供商选择
 		new Setting(containerEl)
 			.setName("AI 服务提供商")
