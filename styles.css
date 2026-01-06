@@ -35,7 +35,7 @@
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	color: var(--text-muted);
-	margin-bottom: 1.5rem;
+	margin: 0;
 }
 
 /* 左侧栏：工具导航 */
