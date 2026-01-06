@@ -125,6 +125,11 @@ export class MyTextToolsView extends ItemView {
 
 	render() {
 		const container = this.contentEl;
+
+		// 保存左侧面板的滚动位置
+		const oldLeftPanel = container.querySelector(".mtt-left-panel");
+		const savedScrollTop = oldLeftPanel ? oldLeftPanel.scrollTop : 0;
+
 		container.empty();
 		container.addClass("mtt-layout-container");
 
@@ -139,6 +144,11 @@ export class MyTextToolsView extends ItemView {
 			},
 			this.plugin.settings.customActions
 		);
+
+		// 恢复左侧面板的滚动位置
+		if (savedScrollTop > 0) {
+			leftPanel.scrollTop = savedScrollTop;
+		}
 
 		// --- 2. 中间：主编辑区域 ---
 		const centerPanel = container.createDiv({ cls: "mtt-center-panel" });

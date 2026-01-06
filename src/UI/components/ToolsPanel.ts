@@ -27,6 +27,40 @@ export function getToolGroups(
 ): ToolGroup[] {
 	return [
 		{
+			name: t("GROUP_AI"),
+			tools: [
+				// 先显示自定义提示词
+				...customActions
+					.filter((a) => a.showInRibbon)
+					.map((a) => ({
+						id: `custom-ai:${a.id}`,
+						name: a.name || t("CUSTOM_PROMPT_DEFAULT_NAME"),
+						icon: a.icon || "sparkles",
+					})),
+				// 再显示内置 AI 工具
+				{
+					id: "ai-extract-keypoints",
+					name: t("TOOL_AI_EXTRACT_KEYPOINTS"),
+					icon: "sparkles",
+				},
+				{
+					id: "ai-summarize",
+					name: t("TOOL_AI_SUMMARIZE"),
+					icon: "file-text",
+				},
+				{
+					id: "ai-translate",
+					name: t("TOOL_AI_TRANSLATE"),
+					icon: "languages",
+				},
+				{
+					id: "ai-polish",
+					name: t("TOOL_AI_POLISH"),
+					icon: "wand",
+				},
+			],
+		},
+		{
 			name: t("GROUP_BASIC"),
 			tools: [
 				{ id: "regex", name: t("TOOL_REGEX"), icon: "search" },
@@ -104,40 +138,6 @@ export function getToolGroups(
 					id: "word-frequency",
 					name: t("TOOL_WORD_FREQ"),
 					icon: "bar-chart",
-				},
-			],
-		},
-		{
-			name: t("GROUP_AI"),
-			tools: [
-				// 先显示自定义提示词
-				...customActions
-					.filter((a) => a.showInRibbon)
-					.map((a) => ({
-						id: `custom-ai:${a.id}`,
-						name: a.name || t("CUSTOM_PROMPT_DEFAULT_NAME"),
-						icon: a.icon || "sparkles",
-					})),
-				// 再显示内置 AI 工具
-				{
-					id: "ai-extract-keypoints",
-					name: t("TOOL_AI_EXTRACT_KEYPOINTS"),
-					icon: "sparkles",
-				},
-				{
-					id: "ai-summarize",
-					name: t("TOOL_AI_SUMMARIZE"),
-					icon: "file-text",
-				},
-				{
-					id: "ai-translate",
-					name: t("TOOL_AI_TRANSLATE"),
-					icon: "languages",
-				},
-				{
-					id: "ai-polish",
-					name: t("TOOL_AI_POLISH"),
-					icon: "wand",
 				},
 			],
 		},
