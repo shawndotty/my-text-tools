@@ -223,4 +223,28 @@ export default {
 	NOTICE_AI_PROCESSING: "AI 正在處理…",
 	NOTICE_NO_TEXT: "沒有可處理的文字內容",
 	NOTICE_AI_DONE: "AI 處理完成",
+
+	// AI Service Messages & Prompts
+	AI_CONFIG_INCOMPLETE: "AI 配置不完整，請在設定中配置 API Key 和模型",
+	AI_API_ERROR: "API 請求失敗: {0} {1}",
+	AI_EMPTY_RESPONSE: "AI 返回了空內容",
+	AI_UNKNOWN_ERROR: "未知錯誤",
+	AI_NETWORK_ERROR: "網絡請求失敗: {0}",
+
+	PROMPT_EXTRACT_KEYPOINTS:
+		"請提取以下文本的要點，以列表形式輸出，每個要點一行：",
+	SYSTEM_PROMPT_EXTRACT:
+		"你是一個專業的文本分析助手，擅長提取文本的核心要點。請用簡潔、準確的語言概括要點。",
+
+	PROMPT_SUMMARIZE: "請對以下文本進行總結，要求簡潔明瞭：",
+	SYSTEM_PROMPT_SUMMARIZE:
+		"你是一個專業的文本總結助手，擅長用簡潔的語言概括文本的主要內容。",
+
+	PROMPT_TRANSLATE: "請將以下文本翻譯成{0}：",
+	SYSTEM_PROMPT_TRANSLATE:
+		"你是一個專業的翻譯助手，請準確、流暢地翻譯文本，保持原文的語氣和風格。",
+
+	PROMPT_POLISH: "請對以下文本進行潤色，使其更加流暢、專業，但保持原意不變：",
+	SYSTEM_PROMPT_POLISH:
+		"你是一個專業的文本潤色助手，擅長改進文本的表達方式，使其更加清晰、專業。",
 };

@@ -230,4 +230,30 @@ export default {
 	NOTICE_AI_PROCESSING: "AI is processing...",
 	NOTICE_NO_TEXT: "No text to process",
 	NOTICE_AI_DONE: "AI processing completed",
+
+	// AI Service Messages & Prompts
+	AI_CONFIG_INCOMPLETE:
+		"AI configuration is incomplete. Please configure API Key and model in settings.",
+	AI_API_ERROR: "API Request Failed: {0} {1}",
+	AI_EMPTY_RESPONSE: "AI returned empty content",
+	AI_UNKNOWN_ERROR: "Unknown error",
+	AI_NETWORK_ERROR: "Network Request Failed: {0}",
+
+	PROMPT_EXTRACT_KEYPOINTS:
+		"Please extract the key points from the following text, output as a list, one point per line:",
+	SYSTEM_PROMPT_EXTRACT:
+		"You are a professional text analysis assistant, skilled in extracting core points from text. Please summarize points concisely and accurately.",
+
+	PROMPT_SUMMARIZE: "Please summarize the following text, keep it concise:",
+	SYSTEM_PROMPT_SUMMARIZE:
+		"You are a professional text summarization assistant, skilled in summarizing the main content of text with concise language.",
+
+	PROMPT_TRANSLATE: "Please translate the following text into {0}:",
+	SYSTEM_PROMPT_TRANSLATE:
+		"You are a professional translation assistant. Please translate the text accurately and fluently, maintaining the original tone and style.",
+
+	PROMPT_POLISH:
+		"Please polish the following text to make it more fluent and professional, but keep the original meaning unchanged:",
+	SYSTEM_PROMPT_POLISH:
+		"You are a professional text polishing assistant, skilled in improving text expression to make it clearer and more professional.",
 };

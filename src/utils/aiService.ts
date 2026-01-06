@@ -1,5 +1,6 @@
 import { Notice } from "obsidian";
 import { MyTextToolsSettings } from "../settings";
+import { t } from "../lang/helpers";
 
 export interface AIChatMessage {
 	role: "system" | "user" | "assistant";
@@ -43,7 +44,7 @@ export class AIService {
 		if (!this.isConfigured()) {
 			return {
 				content: "",
-				error: "AI 配置不完整，请在设置中配置 API Key 和模型",
+				error: t("AI_CONFIG_INCOMPLETE"),
 			};
 		}
 
@@ -85,7 +86,10 @@ export class AIService {
 				const errorData = await response.json().catch(() => ({}));
 				const errorMessage =
 					errorData.error?.message ||
-					`API 请求失败: ${response.status} ${response.statusText}`;
+					t("AI_API_ERROR", [
+						String(response.status),
+						response.statusText,
+					]);
 				return {
 					content: "",
 					error: errorMessage,
@@ -98,7 +102,7 @@ export class AIService {
 			if (!content) {
 				return {
 					content: "",
-					error: "AI 返回了空内容",
+					error: t("AI_EMPTY_RESPONSE"),
 				};
 			}
 
@@ -107,10 +111,10 @@ export class AIService {
 			};
 		} catch (error) {
 			const errorMessage =
-				error instanceof Error ? error.message : "未知错误";
+				error instanceof Error ? error.message : t("AI_UNKNOWN_ERROR");
 			return {
 				content: "",
-				error: `网络请求失败: ${errorMessage}`,
+				error: t("AI_NETWORK_ERROR", [errorMessage]),
 			};
 		}
 	}
@@ -119,9 +123,8 @@ export class AIService {
 	 * 提取要点
 	 */
 	async extractKeyPoints(text: string): Promise<AIResponse> {
-		const prompt = "请提取以下文本的要点，以列表形式输出，每个要点一行：";
-		const systemPrompt =
-			"你是一个专业的文本分析助手，擅长提取文本的核心要点。请用简洁、准确的语言概括要点。";
+		const prompt = t("PROMPT_EXTRACT_KEYPOINTS");
+		const systemPrompt = t("SYSTEM_PROMPT_EXTRACT");
 		return this.processText(prompt, text, systemPrompt);
 	}
 
@@ -129,19 +132,20 @@ export class AIService {
 	 * 总结文本
 	 */
 	async summarize(text: string): Promise<AIResponse> {
-		const prompt = "请对以下文本进行总结，要求简洁明了：";
-		const systemPrompt =
-			"你是一个专业的文本总结助手，擅长用简洁的语言概括文本的主要内容。";
+		const prompt = t("PROMPT_SUMMARIZE");
+		const systemPrompt = t("SYSTEM_PROMPT_SUMMARIZE");
 		return this.processText(prompt, text, systemPrompt);
 	}
 
 	/**
 	 * 翻译文本
 	 */
-	async translate(text: string, targetLanguage: string = "英文"): Promise<AIResponse> {
-		const prompt = `请将以下文本翻译成${targetLanguage}：`;
-		const systemPrompt =
-			"你是一个专业的翻译助手，请准确、流畅地翻译文本，保持原文的语气和风格。";
+	async translate(
+		text: string,
+		targetLanguage: string = "英文"
+	): Promise<AIResponse> {
+		const prompt = t("PROMPT_TRANSLATE", [targetLanguage]);
+		const systemPrompt = t("SYSTEM_PROMPT_TRANSLATE");
 		return this.processText(prompt, text, systemPrompt);
 	}
 
@@ -149,11 +153,8 @@ export class AIService {
 	 * 润色文本
 	 */
 	async polish(text: string): Promise<AIResponse> {
-		const prompt =
-			"请对以下文本进行润色，使其更加流畅、专业，但保持原意不变：";
-		const systemPrompt =
-			"你是一个专业的文本润色助手，擅长改进文本的表达方式，使其更加清晰、专业。";
+		const prompt = t("PROMPT_POLISH");
+		const systemPrompt = t("SYSTEM_PROMPT_POLISH");
 		return this.processText(prompt, text, systemPrompt);
 	}
 }
-

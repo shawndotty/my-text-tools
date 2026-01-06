@@ -14,7 +14,7 @@ export function renderGlobalSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks
 ): void {
-	parent.createEl("h3", {
+	parent.createEl("h4", {
 		text: t("SETTINGS_GLOBAL_TITLE"),
 		cls: "mtt-panel-title",
 	});
@@ -60,7 +60,7 @@ export function renderToolSettings(
 ): void {
 	parent.createEl("hr"); // 分隔线
 
-	parent.createEl("h3", {
+	parent.createEl("h4", {
 		text: t("SETTINGS_TITLE"),
 		cls: "mtt-panel-title",
 	});
