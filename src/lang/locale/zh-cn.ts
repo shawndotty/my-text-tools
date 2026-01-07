@@ -141,6 +141,7 @@ export default {
 	BTN_COPY_CLIPBOARD: "复制到剪贴板",
 	NOTICE_COPY_CLIPBOARD_SUCCESS: "✅ 已成功复制到剪贴板",
 	NOTICE_COPY_CLIPBOARD_ERROR: "❌ 复制失败，请检查权限",
+	NOTICE_NO_SELECTION: "请先选择要处理的文本",
 	SETTINGS_GLOBAL_TITLE: "全局配置",
 	CHECKBOX_PRESERVE_FRONTMATTER: " 保护 Frontmatter (不处理开头YAML)",
 	CHECKBOX_PRESERVE_HEADER: " 保护首行 (标题行)",

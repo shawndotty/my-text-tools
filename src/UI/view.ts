@@ -473,10 +473,7 @@ export class MyTextToolsView extends ItemView {
 		const previousContent = this.historyManager.undo(this.content);
 		if (previousContent !== null) {
 			this.content = previousContent;
-			new Notice(t("NOTICE_UNDO"));
-			this.render(); // 重新渲染界面
-		} else {
-			new Notice(t("NOTICE_NO_UNDO"));
+			this.render();
 		}
 	}
 
@@ -486,8 +483,6 @@ export class MyTextToolsView extends ItemView {
 		if (nextContent !== null) {
 			this.content = nextContent;
 			this.render();
-		} else {
-			new Notice(t("NOTICE_NO_REDO"));
 		}
 	}
 
@@ -501,5 +496,12 @@ export class MyTextToolsView extends ItemView {
 
 	replaceEditorSelection(text: string) {
 		this.editorPanelHandle?.replaceSelection(text);
+	}
+
+	updateHistoryUI() {
+		this.editorPanelHandle?.updateHistoryButtons(
+			this.historyManager.canUndo(),
+			this.historyManager.canRedo()
+		);
 	}
 }

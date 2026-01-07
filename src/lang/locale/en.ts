@@ -142,6 +142,7 @@ export default {
 	BTN_COPY_CLIPBOARD: "Copy to Clipboard",
 	NOTICE_COPY_CLIPBOARD_SUCCESS: "✅ Successfully copied to clipboard",
 	NOTICE_COPY_CLIPBOARD_ERROR: "❌ Copy failed, please check permissions",
+	NOTICE_NO_SELECTION: "Please select some text first",
 	SETTINGS_GLOBAL_TITLE: "Global Settings",
 	CHECKBOX_PRESERVE_FRONTMATTER:
 		" Preserve Frontmatter (do not process YAML header)",

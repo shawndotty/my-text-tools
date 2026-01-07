@@ -150,21 +150,22 @@ export default class MyTextTools extends Plugin {
 			const view = mttLeaf.view as MyTextToolsView;
 			content = view.content;
 
-			// 尝试获取 View 中的选区
 			const currentSelection = view.getEditorSelection();
 			if (currentSelection) {
 				selection = currentSelection.text;
 			} else {
-				selection = ""; // 如果没有选区，selection 为空字符串
+				selection = "";
 			}
 
 			updateCallback = (newText: string) => {
 				view.historyManager.pushToHistory(view.content);
 				if (currentSelection) {
 					view.replaceEditorSelection(newText);
+					view.updateHistoryUI();
 				} else {
 					view.content = newText;
 					view.render();
+					view.updateHistoryUI();
 				}
 			};
 		} else if (activeView && activeView.editor) {
@@ -183,10 +184,16 @@ export default class MyTextTools extends Plugin {
 			return;
 		}
 
+		const usesSelectionOnly =
+			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
+		const hasSelection = !!selection;
+		if (!hasSelection && usesSelectionOnly) {
+			new Notice(t("NOTICE_NO_SELECTION"));
+			return;
+		}
+
 		try {
 			const executor = new ScriptExecutor(this.app);
-			// 注意：如果用户没有选中任何内容，selection 将为空字符串。
-			// 我们依然传入全文 content 作为第二个参数，供用户脚本使用。
 			const result = await executor.execute(
 				script.code,
 				content,

@@ -111,7 +111,6 @@ export function renderEditorPanel(
 			}
 		};
 
-		// 实现接口方法
 		getSelection = () => {
 			const start = ta.selectionStart;
 			const end = ta.selectionEnd;
@@ -123,7 +122,6 @@ export function renderEditorPanel(
 			const start = ta.selectionStart;
 			const end = ta.selectionEnd;
 			ta.setRangeText(text, start, end, "select");
-			// 手动触发变更回调
 			if (callbacks.onContentChange) {
 				callbacks.onContentChange(ta.value);
 			}
