@@ -10,6 +10,7 @@ export interface EditorPanelCallbacks {
 	onSaveOriginal: () => void;
 	onContentChange?: (content: string) => void;
 	onProcessSelection?: (text: string) => string | null;
+	onPushHistory?: () => void;
 }
 
 export interface EditorPanelHandle {
@@ -95,6 +96,11 @@ export function renderEditorPanel(
 	});
 	setIcon(clearBtn, "trash-2");
 	clearBtn.onclick = () => {
+		// 保存历史记录
+		if (callbacks.onPushHistory) {
+			callbacks.onPushHistory();
+		}
+
 		if (textAreaRef) {
 			textAreaRef.value = "";
 			textAreaRef.focus();

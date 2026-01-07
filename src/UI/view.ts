@@ -180,6 +180,15 @@ export class MyTextToolsView extends ItemView {
 				this.content = content;
 			},
 			onProcessSelection: (text: string) => this.processOnSelect(text),
+			onPushHistory: () => {
+				this.historyManager.pushToHistory(this.content);
+				if (this.editorPanelHandle) {
+					this.editorPanelHandle.updateHistoryButtons(
+						this.historyManager.canUndo(),
+						this.historyManager.canRedo()
+					);
+				}
+			},
 		};
 		this.editorPanelHandle = renderEditorPanel(
 			centerPanel,
