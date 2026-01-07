@@ -177,6 +177,21 @@ export default {
 	TOOL_AI_TRANSLATE: "AI 翻譯",
 	TOOL_AI_POLISH: "AI 潤色",
 	TOOL_ON_SELECT: "即時處理",
+
+	// On-select Tool
+	ON_SELECT_DESC: "選中文字時立即執行操作 (請先啟用)",
+	SETTING_ON_SELECT_ENABLE: "啟用即時處理",
+	SETTING_ON_SELECT_ACTION: "選擇操作:",
+	ACTION_WRAP: "添加前後綴",
+	ACTION_REGEX: "正則查找替換",
+	ACTION_REPLACE_ALL: "全部替換為",
+	ACTION_DELETE: "刪除選中內容",
+	ACTION_HTML_ENTITY: "轉為 HTML 實體",
+	ACTION_LOWERCASE: "轉為小寫",
+	ACTION_UPPERCASE: "轉為大寫",
+	PLACEHOLDER_REPLACE_ALL: "替換成這段文字...",
+	ON_SELECT_NOTICE_PROCESSED: "已自動處理選中內容",
+
 	AI_DESCRIPTION_EXTRACT: "使用 AI 提取文字的核心要點，以列表形式輸出",
 	AI_DESCRIPTION_SUMMARIZE: "使用 AI 對文字進行總結，生成簡潔的摘要",
 	AI_DESCRIPTION_TRANSLATE: "使用 AI 翻譯文字（預設翻譯為英文）",
