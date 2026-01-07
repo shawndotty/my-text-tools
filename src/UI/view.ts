@@ -46,6 +46,7 @@ export class MyTextToolsView extends ItemView {
 	private loadingEl: HTMLElement | null = null;
 	private editorPanelHandle: EditorPanelHandle | null = null;
 	private isImporting: boolean = false;
+	private isSaving: boolean = false;
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
 		super(leaf);
@@ -472,22 +473,29 @@ export class MyTextToolsView extends ItemView {
 			return;
 		}
 
+		// 防止重复保存
+		if (this.isSaving) return;
+		this.isSaving = true;
+
 		// 1. 如果有明确的目标文件 (例如通过导入或初始化获得)
 		if (this.targetFile) {
 			try {
 				await this.app.vault.modify(this.targetFile, this.content);
-				new Notice(t("NOTICE_SAVE_SUCCESS"));
+				new Notice(t("NOTICE_SAVE_SUCCESS"), 2000);
+				this.isSaving = false;
 				return;
 			} catch (error) {
 				console.error("Failed to save to target file:", error);
-				new Notice(t("NOTICE_SAVE_ERROR"));
+				new Notice(t("NOTICE_SAVE_ERROR"), 2000);
 			}
+			this.isSaving = false;
 			return;
 		}
 
 		// 2. Fallback: 如果没有 targetFile，尝试使用 originalEditor (旧逻辑)
 		if (!this.originalEditor) {
-			new Notice("❌ " + t("NOTICE_NO_EDITOR"));
+			new Notice("❌ " + t("NOTICE_NO_EDITOR"), 2000);
+			this.isSaving = false;
 			return;
 		}
 
@@ -505,7 +513,7 @@ export class MyTextToolsView extends ItemView {
 				range.start,
 				range.end
 			);
-			new Notice(t("NOTICE_SAVE_SELECTION_SUCCESS"));
+			new Notice(t("NOTICE_SAVE_SELECTION_SUCCESS"), 2000);
 
 			// 重新计算 end 坐标
 			const lines = this.content.split("\n");
@@ -520,6 +528,7 @@ export class MyTextToolsView extends ItemView {
 			// 全文模式：覆盖整个文件
 			saveToOriginal(this.content, this.originalEditor);
 		}
+		this.isSaving = false;
 	}
 
 	async onClose() {

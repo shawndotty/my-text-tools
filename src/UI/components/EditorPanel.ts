@@ -312,7 +312,7 @@ export function renderEditorPanel(
 			} else if (callbacks.onContentChange) {
 				callbacks.onContentChange(finalContent);
 			}
-			new Notice(t("NOTICE_IMPORT_SUCCESS"));
+			new Notice(t("NOTICE_IMPORT_SUCCESS"), 2000);
 		}).open();
 	};
 
@@ -328,9 +328,9 @@ export function renderEditorPanel(
 	copyClipboardBtn.onclick = async () => {
 		try {
 			await navigator.clipboard.writeText(content);
-			new Notice(t("NOTICE_COPY_CLIPBOARD_SUCCESS"));
+			new Notice(t("NOTICE_COPY_CLIPBOARD_SUCCESS"), 2000);
 		} catch (err) {
-			new Notice(t("NOTICE_COPY_CLIPBOARD_ERROR"));
+			new Notice(t("NOTICE_COPY_CLIPBOARD_ERROR"), 2000);
 		}
 	};
 

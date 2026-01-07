@@ -10,10 +10,10 @@ export function saveToOriginal(
 ): boolean {
 	if (originalEditor) {
 		originalEditor.setValue(content);
-		new Notice(t("NOTICE_SAVE_SUCCESS"));
+		new Notice(t("NOTICE_SAVE_SUCCESS"), 2000);
 		return true;
 	} else {
-		new Notice(t("NOTICE_SAVE_ERROR"));
+		new Notice(t("NOTICE_SAVE_ERROR"), 2000);
 		return false;
 	}
 }
@@ -54,7 +54,7 @@ export async function saveToNewFile(
 	try {
 		// 2. 创建新文件
 		const newFile = await app.vault.create(newFileName, content);
-		new Notice(t("NOTICE_COPY_CREATED", [`${baseName}_${counter}`]));
+		new Notice(t("NOTICE_COPY_CREATED", [`${baseName}_${counter}`]), 2000);
 
 		// 3. 在新标签页中打开这个文件
 		if (newFile instanceof TFile) {
@@ -66,7 +66,7 @@ export async function saveToNewFile(
 		}
 	} catch (error) {
 		console.error(error);
-		new Notice(t("NOTICE_COPY_ERROR"));
+		new Notice(t("NOTICE_COPY_ERROR"), 2000);
 	}
 }
 
