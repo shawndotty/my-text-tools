@@ -14,6 +14,8 @@ export interface EditorPanelCallbacks {
 
 export interface EditorPanelHandle {
 	updateHistoryButtons: (canUndo: boolean, canRedo: boolean) => void;
+	getSelection: () => { start: number; end: number; text: string } | null;
+	replaceSelection: (text: string) => void;
 }
 
 /**
@@ -91,6 +93,9 @@ export function renderEditorPanel(
 		cls: "mtt-editor-container",
 	});
 
+	let getSelection: EditorPanelHandle["getSelection"] = () => null;
+	let replaceSelection: EditorPanelHandle["replaceSelection"] = () => {};
+
 	if (editMode === "source") {
 		// 源码模式：使用 textarea 处理
 		const ta = editorContainer.createEl("textarea", {
@@ -103,6 +108,24 @@ export function renderEditorPanel(
 			const newContent = (e.target as HTMLTextAreaElement).value;
 			if (callbacks.onContentChange) {
 				callbacks.onContentChange(newContent);
+			}
+		};
+
+		// 实现接口方法
+		getSelection = () => {
+			const start = ta.selectionStart;
+			const end = ta.selectionEnd;
+			if (start === end) return null;
+			return { start, end, text: ta.value.substring(start, end) };
+		};
+
+		replaceSelection = (text: string) => {
+			const start = ta.selectionStart;
+			const end = ta.selectionEnd;
+			ta.setRangeText(text, start, end, "select");
+			// 手动触发变更回调
+			if (callbacks.onContentChange) {
+				callbacks.onContentChange(ta.value);
 			}
 		};
 
@@ -180,5 +203,5 @@ export function renderEditorPanel(
 		saveOverBtn.onclick = () => callbacks.onSaveOriginal();
 	}
 
-	return { updateHistoryButtons };
+	return { updateHistoryButtons, getSelection, replaceSelection };
 }

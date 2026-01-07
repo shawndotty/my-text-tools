@@ -276,4 +276,26 @@ export default {
 	PROMPT_POLISH: "请对以下文本进行润色，使其更加流畅、专业，但保持原意不变：",
 	SYSTEM_PROMPT_POLISH:
 		"你是一个专业的文本润色助手，擅长改进文本的表达方式，使其更加清晰、专业。",
+
+	CustomScriptsSettings: "自定义 JS 脚本设置",
+	CUSTOM_SCRIPTS_TITLE: "自定义 JS 脚本",
+	CUSTOM_SCRIPTS_MANAGE: "管理自定义脚本",
+	CUSTOM_SCRIPTS_DESC:
+		"使用 JavaScript 创建自定义工具。脚本可以访问 'selection', 'app', 'text', 'console' 和 'Notice'。请返回新的文本以替换选区或全文。",
+	BTN_ADD_SCRIPT: "新增脚本",
+	SCRIPT_GROUP_NAME: "脚本",
+	SCRIPT_NAME_AND_ICON: "名称与图标",
+	SCRIPT_NAME_PLACEHOLDER: "脚本名称",
+	SCRIPT_DESC_LABEL: "描述",
+	SCRIPT_DESC_PLACEHOLDER: "简短描述",
+	SCRIPT_CODE_LABEL: "JavaScript 代码",
+	SCRIPT_CODE_DESC: "可用变量: selection, text, app, console, Notice",
+	SCRIPT_CODE_PLACEHOLDER: "return selection.toUpperCase();",
+	TOOLTIP_DELETE_SCRIPT: "删除脚本",
+	GROUP_SCRIPTS: "自定义脚本",
+	HINT_RUN_SCRIPT: "运行自定义 JavaScript 工具。",
+	BTN_RUN_SCRIPT: "运行脚本",
+	NOTICE_SCRIPT_SUCCESS: "脚本执行成功！",
+	NOTICE_SCRIPT_ERROR: "脚本执行失败: {0}",
+	NOTICE_SCRIPT_NOT_FOUND: "找不到该脚本！",
 };

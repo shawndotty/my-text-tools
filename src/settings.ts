@@ -22,6 +22,15 @@ export interface CustomAIAction {
 	overrideTemperature?: number;
 }
 
+export interface CustomScript {
+	id: string;
+	name: string;
+	description?: string;
+	icon?: string;
+	showInRibbon: boolean;
+	code: string; // JavaScript code content
+}
+
 export interface MyTextToolsSettings {
 	mySetting: string;
 	// 工具可见性配置
@@ -35,6 +44,8 @@ export interface MyTextToolsSettings {
 	aiTemperature: number; // 温度参数 0-1
 	// 自定义 AI 动作卡片
 	customActions: CustomAIAction[];
+	// 自定义 JS 脚本
+	customScripts: CustomScript[];
 	// 默认 AI 工具配置
 	aiTools: Record<string, AIToolConfig>;
 }
@@ -58,6 +69,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	aiMaxTokens: 2000,
 	aiTemperature: 0.7,
 	customActions: [],
+	customScripts: [],
 	aiTools: {},
 };
 
@@ -97,10 +109,19 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				renderMethod: (content: HTMLElement) =>
 					this.renderUserPromptsSettings(content),
 			},
+			{
+				title: "CustomScriptsSettings",
+				renderMethod: (content: HTMLElement) =>
+					this.renderCustomScriptsSettings(content),
+			},
 		];
 
 		tabConfigs.forEach((config) => {
-			tabbedSettings.addTab(t(config.title as any), config.renderMethod);
+			const title =
+				t(config.title as any) === config.title
+					? config.title
+					: t(config.title as any);
+			tabbedSettings.addTab(title, config.renderMethod);
 		});
 	}
 
@@ -607,6 +628,117 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 							})
 					);
 			}
+		});
+	}
+
+	private renderCustomScriptsSettings(containerEl: HTMLElement) {
+		containerEl.createEl("h3", {
+			text: t("CUSTOM_SCRIPTS_TITLE"),
+		});
+
+		new Setting(containerEl)
+			.setName(t("CUSTOM_SCRIPTS_MANAGE"))
+			.setDesc(t("CUSTOM_SCRIPTS_DESC"))
+			.addButton((btn) =>
+				btn.setButtonText(t("BTN_ADD_SCRIPT")).onClick(async () => {
+					const nextIndex =
+						(this.plugin.settings.customScripts?.length || 0) + 1;
+					const newScript: CustomScript = {
+						id: `${Date.now()}`,
+						name: `${t("SCRIPT_GROUP_NAME")} ${nextIndex}`,
+						description: "",
+						icon: "scroll",
+						showInRibbon: true,
+						code: "return selection.toUpperCase();",
+					};
+					this.plugin.settings.customScripts.push(newScript);
+					await this.plugin.saveSettings();
+					(this.plugin as any).refreshCustomRibbons?.();
+					containerEl.empty();
+					this.renderCustomScriptsSettings(containerEl);
+				})
+			);
+
+		this.plugin.settings.customScripts.forEach((script, idx) => {
+			const cardContainer = containerEl.createDiv({
+				cls: "mtt-custom-card",
+			});
+
+			new Setting(cardContainer)
+				.setName(`${t("SCRIPT_GROUP_NAME")} ${idx + 1}`)
+				.setDesc(t("SCRIPT_NAME_AND_ICON"))
+				.addText((text) =>
+					text
+						.setPlaceholder(t("SCRIPT_NAME_PLACEHOLDER"))
+						.setValue(script.name)
+						.onChange(async (value) => {
+							script.name = value;
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addText((text) =>
+					text
+						.setPlaceholder(t("ICON_PLACEHOLDER"))
+						.setValue(script.icon || "scroll")
+						.onChange(async (value) => {
+							script.icon = value || "scroll";
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addToggle((toggle) =>
+					toggle
+						.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
+						.setValue(script.showInRibbon)
+						.onChange(async (value) => {
+							script.showInRibbon = value;
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addExtraButton((btn) =>
+					btn
+						.setIcon("trash")
+						.setTooltip(t("TOOLTIP_DELETE_SCRIPT"))
+						.onClick(async () => {
+							this.plugin.settings.customScripts =
+								this.plugin.settings.customScripts.filter(
+									(s) => s.id !== script.id
+								);
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+							containerEl.empty();
+							this.renderCustomScriptsSettings(containerEl);
+						})
+				);
+
+			new Setting(cardContainer)
+				.setName(t("SCRIPT_DESC_LABEL"))
+				.addText((text) =>
+					text
+						.setPlaceholder(t("SCRIPT_DESC_PLACEHOLDER"))
+						.setValue(script.description || "")
+						.onChange(async (value) => {
+							script.description = value;
+							await this.plugin.saveSettings();
+						})
+				);
+
+			new Setting(cardContainer)
+				.setName(t("SCRIPT_CODE_LABEL"))
+				.setDesc(t("SCRIPT_CODE_DESC"))
+				.addTextArea((ta) => {
+					ta.inputEl.rows = 6;
+					ta.inputEl.style.width = "100%";
+					ta.inputEl.style.fontFamily = "monospace";
+					ta.setPlaceholder(t("SCRIPT_CODE_PLACEHOLDER"));
+					ta.setValue(script.code || "");
+					ta.onChange(async (value) => {
+						script.code = value;
+						await this.plugin.saveSettings();
+					});
+				});
 		});
 	}
 }

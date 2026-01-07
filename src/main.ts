@@ -15,6 +15,7 @@ import {
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
 import { t } from "./lang/helpers";
 import { AIService } from "./utils/aiService";
+import { ScriptExecutor } from "./utils/scriptExecutor";
 
 // Remember to rename these classes and interfaces!
 
@@ -120,6 +121,86 @@ export default class MyTextTools extends Plugin {
 				leaf.view.render();
 			}
 		});
+	}
+
+	// 执行自定义 JS 脚本
+	async runCustomScript(scriptId: string) {
+		const script = this.settings.customScripts?.find(
+			(s) => s.id === scriptId
+		);
+		if (!script) {
+			new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
+			return;
+		}
+
+		// 获取当前内容和选区
+		let content = "";
+		let selection = "";
+		let updateCallback: (newText: string) => void = () => {};
+
+		const mttLeaf =
+			this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
+		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+		if (
+			mttLeaf &&
+			mttLeaf.view &&
+			mttLeaf.view instanceof MyTextToolsView
+		) {
+			const view = mttLeaf.view as MyTextToolsView;
+			content = view.content;
+
+			// 尝试获取 View 中的选区
+			const currentSelection = view.getEditorSelection();
+			if (currentSelection) {
+				selection = currentSelection.text;
+			} else {
+				selection = ""; // 如果没有选区，selection 为空字符串
+			}
+
+			updateCallback = (newText: string) => {
+				view.historyManager.pushToHistory(view.content);
+				if (currentSelection) {
+					view.replaceEditorSelection(newText);
+				} else {
+					view.content = newText;
+					view.render();
+				}
+			};
+		} else if (activeView && activeView.editor) {
+			const editor = activeView.editor;
+			content = editor.getValue();
+			selection = editor.getSelection();
+			updateCallback = (newText: string) => {
+				if (selection) {
+					editor.replaceSelection(newText);
+				} else {
+					editor.setValue(newText);
+				}
+			};
+		} else {
+			new Notice(t("NOTICE_NO_EDITOR"));
+			return;
+		}
+
+		try {
+			const executor = new ScriptExecutor(this.app);
+			// 注意：如果用户没有选中任何内容，selection 将为空字符串。
+			// 我们依然传入全文 content 作为第二个参数，供用户脚本使用。
+			const result = await executor.execute(
+				script.code,
+				content,
+				selection
+			);
+
+			if (typeof result === "string") {
+				updateCallback(result);
+				new Notice(t("NOTICE_SCRIPT_SUCCESS"));
+			}
+		} catch (error: any) {
+			console.error("Script execution failed:", error);
+			new Notice(t("NOTICE_SCRIPT_ERROR").replace("{0}", error.message));
+		}
 	}
 
 	// 执行自定义 AI 动作

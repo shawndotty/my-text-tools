@@ -116,6 +116,20 @@ export function renderToolSettings(
 		return;
 	}
 
+	// 自定义脚本卡片
+	if (activeTool.startsWith("custom-script:")) {
+		settingsContent.createEl("p", {
+			text: t("HINT_RUN_SCRIPT"),
+			cls: "mtt-ai-hint",
+		});
+		const runBtn = settingsContent.createEl("button", {
+			text: t("BTN_RUN_SCRIPT"),
+			cls: "mtt-run-btn",
+		});
+		runBtn.onclick = () => callbacks.onRun(activeTool);
+		return;
+	}
+
 	switch (activeTool) {
 		case "remove-string":
 			renderFilterSettings(settingsContent, settings, callbacks);

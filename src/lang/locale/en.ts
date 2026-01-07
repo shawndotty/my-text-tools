@@ -281,4 +281,27 @@ export default {
 		"Please polish the following text to make it more fluent and professional, but keep the original meaning unchanged:",
 	SYSTEM_PROMPT_POLISH:
 		"You are a professional text polishing assistant, skilled in improving text expression to make it clearer and more professional.",
+
+	CustomScriptsSettings: "Custom JS Scripts Settings",
+	CUSTOM_SCRIPTS_TITLE: "Custom JS Scripts",
+	CUSTOM_SCRIPTS_MANAGE: "Manage Custom Scripts",
+	CUSTOM_SCRIPTS_DESC:
+		"Create custom tools using JavaScript. The script has access to 'selection', 'app', 'text', 'console', and 'Notice'. Return the new text to replace selection or full text.",
+	BTN_ADD_SCRIPT: "Add Script",
+	SCRIPT_GROUP_NAME: "Script",
+	SCRIPT_NAME_AND_ICON: "Name & Icon",
+	SCRIPT_NAME_PLACEHOLDER: "Script name",
+	SCRIPT_DESC_LABEL: "Description",
+	SCRIPT_DESC_PLACEHOLDER: "Short description",
+	SCRIPT_CODE_LABEL: "JavaScript Code",
+	SCRIPT_CODE_DESC:
+		"Available variables: selection, text, app, console, Notice",
+	SCRIPT_CODE_PLACEHOLDER: "return selection.toUpperCase();",
+	TOOLTIP_DELETE_SCRIPT: "Delete script",
+	GROUP_SCRIPTS: "Custom Scripts",
+	HINT_RUN_SCRIPT: "Run custom JavaScript tool.",
+	BTN_RUN_SCRIPT: "Run Script",
+	NOTICE_SCRIPT_SUCCESS: "Script executed successfully!",
+	NOTICE_SCRIPT_ERROR: "Script execution failed: {0}",
+	NOTICE_SCRIPT_NOT_FOUND: "Script not found!",
 };

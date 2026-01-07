@@ -146,6 +146,7 @@ export class MyTextToolsView extends ItemView {
 				this.render(); // 重新渲染以更新 UI 状态
 			},
 			this.plugin.settings.customActions,
+			this.plugin.settings.customScripts,
 			this.plugin.settings.enabledTools
 		);
 
@@ -201,6 +202,11 @@ export class MyTextToolsView extends ItemView {
 				if (toolId.startsWith("custom-ai:")) {
 					const id = toolId.split(":")[1]!;
 					await this.plugin.runCustomAIAction(id);
+					return;
+				}
+				if (toolId.startsWith("custom-script:")) {
+					const id = toolId.split(":")[1]!;
+					await this.plugin.runCustomScript(id);
 					return;
 				}
 				await this.processText(toolId);
@@ -487,5 +493,13 @@ export class MyTextToolsView extends ItemView {
 
 	async saveToNewFile() {
 		await saveToNewFile(this.app, this.content);
+	}
+
+	getEditorSelection() {
+		return this.editorPanelHandle?.getSelection() || null;
+	}
+
+	replaceEditorSelection(text: string) {
+		this.editorPanelHandle?.replaceSelection(text);
 	}
 }

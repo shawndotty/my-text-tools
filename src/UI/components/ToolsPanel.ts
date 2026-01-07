@@ -19,11 +19,19 @@ export interface CustomActionBrief {
 	showInRibbon?: boolean;
 }
 
+export interface CustomScriptBrief {
+	id: string;
+	name: string;
+	icon?: string;
+	showInRibbon: boolean;
+}
+
 /**
  * 获取工具组配置
  */
 export function getToolGroups(
 	customActions: CustomActionBrief[] = [],
+	customScripts: CustomScriptBrief[] = [],
 	enabledTools?: Record<string, boolean>
 ): ToolGroup[] {
 	const isEnabled = (id: string) => enabledTools?.[id] ?? true;
@@ -61,6 +69,18 @@ export function getToolGroups(
 					name: t("TOOL_AI_POLISH"),
 					icon: "wand",
 				},
+			],
+		},
+		{
+			name: t("GROUP_SCRIPTS"),
+			tools: [
+				...customScripts
+					.filter((s) => s.showInRibbon)
+					.map((s) => ({
+						id: `custom-script:${s.id}`,
+						name: s.name,
+						icon: s.icon || "scroll",
+					})),
 			],
 		},
 		{
@@ -168,6 +188,7 @@ export function renderToolsPanel(
 	activeTool: string,
 	onToolSelect: (toolId: string) => void,
 	customActions: CustomActionBrief[] = [],
+	customScripts: CustomScriptBrief[] = [],
 	enabledTools?: Record<string, boolean>
 ): void {
 	parent.createEl("h4", {
@@ -175,7 +196,7 @@ export function renderToolsPanel(
 		cls: "mtt-panel-title",
 	});
 
-	const groups = getToolGroups(customActions, enabledTools);
+	const groups = getToolGroups(customActions, customScripts, enabledTools);
 
 	groups.forEach((group) => {
 		parent.createEl("h6", {
