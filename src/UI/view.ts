@@ -76,7 +76,7 @@ export class MyTextToolsView extends ItemView {
 		this.render();
 	}
 
-	showLoading(text: string = "AI 正在处理…") {
+	showLoading(text: string = t("NOTICE_AI_PROCESSING")) {
 		if (this.loadingEl) return;
 		const overlay = this.contentEl.createDiv({
 			cls: "mtt-loading-overlay",

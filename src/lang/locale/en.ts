@@ -205,6 +205,9 @@ export default {
 	SelectionMode: "Selection Mode",
 
 	AISettings: "AI Provider Settings",
+	BasicSettings: "Basic Settings",
+	BasicSettingsDesc:
+		"Control visibility of default tools in the left workbench panel.",
 	DefaultPromptsSettings: "Default Prompts Settings",
 	UserPromptsSettings: "User Prompts Settings",
 	CUSTOM_PROMPTS_TITLE: "Custom AI Prompts",

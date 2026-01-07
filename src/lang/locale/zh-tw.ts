@@ -262,4 +262,27 @@ export default {
 	PROMPT_POLISH: "請對以下文本進行潤色，使其更加流暢、專業，但保持原意不變：",
 	SYSTEM_PROMPT_POLISH:
 		"你是一個專業的文本潤色助手，擅長改進文本的表達方式，使其更加清晰、專業。",
+
+	// Custom Scripts (missing keys filled to match other locales)
+	CustomScriptsSettings: "自定義 JS 腳本設置",
+	CUSTOM_SCRIPTS_TITLE: "自定義 JS 腳本",
+	CUSTOM_SCRIPTS_MANAGE: "管理自定義腳本",
+	CUSTOM_SCRIPTS_DESC:
+		"使用 JavaScript 創建自定義工具。腳本可以訪問 'selection', 'app', 'text', 'console' 和 'Notice'。請返回新的文字以替換選區或全文。",
+	BTN_ADD_SCRIPT: "新增腳本",
+	SCRIPT_GROUP_NAME: "腳本",
+	SCRIPT_NAME_AND_ICON: "名稱與圖示",
+	SCRIPT_NAME_PLACEHOLDER: "腳本名稱",
+	SCRIPT_DESC_LABEL: "描述",
+	SCRIPT_DESC_PLACEHOLDER: "簡短描述",
+	SCRIPT_CODE_LABEL: "JavaScript 程式碼",
+	SCRIPT_CODE_DESC: "可用變數: selection, text, app, console, Notice",
+	SCRIPT_CODE_PLACEHOLDER: "return selection.toUpperCase();",
+	TOOLTIP_DELETE_SCRIPT: "刪除腳本",
+	GROUP_SCRIPTS: "自定義腳本",
+	HINT_RUN_SCRIPT: "運行自定義 JavaScript 工具。",
+	BTN_RUN_SCRIPT: "運行腳本",
+	NOTICE_SCRIPT_SUCCESS: "腳本執行成功！",
+	NOTICE_SCRIPT_ERROR: "腳本執行失敗: {0}",
+	NOTICE_SCRIPT_NOT_FOUND: "找不到該腳本！",
 };
