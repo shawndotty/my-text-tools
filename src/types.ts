@@ -62,6 +62,10 @@ export interface SettingsState {
 	onSelectSuffix: string;
 	onSelectCaseInsensitive: boolean;
 	onSelectRegex: boolean;
+
+	// Combination Generator settings
+	combinationInputs: string[];
+	customIcons: Record<string, string>;
 }
 
 /**
@@ -121,6 +125,10 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	onSelectSuffix: "",
 	onSelectCaseInsensitive: false,
 	onSelectRegex: false,
+
+	// Combination Generator defaults
+	combinationInputs: ["", ""],
+	customIcons: {},
 };
 
 /**
@@ -140,6 +148,7 @@ export type ToolType =
 	| "empty-line"
 	| "clear-format"
 	| "line-break-tools"
+	| "combination-generator"
 	| "ai-extract-keypoints"
 	| "ai-summarize"
 	| "ai-translate"
@@ -148,26 +157,39 @@ export type ToolType =
 export interface ToolInfo {
 	id: string;
 	nameKey: string;
+	icon: string;
 }
 
 export const BUILTIN_TOOLS: ToolInfo[] = [
-	{ id: "ai-extract-keypoints", nameKey: "TOOL_AI_EXTRACT_KEYPOINTS" },
-	{ id: "ai-summarize", nameKey: "TOOL_AI_SUMMARIZE" },
-	{ id: "ai-translate", nameKey: "TOOL_AI_TRANSLATE" },
-	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH" },
-	{ id: "on-select", nameKey: "TOOL_ON_SELECT" },
-	{ id: "regex", nameKey: "TOOL_REGEX" },
-	{ id: "remove-whitespace", nameKey: "TOOL_WHITESPACE" },
-	{ id: "clear-format", nameKey: "TOOL_CLEAR_FORMAT" },
-	{ id: "dedupe", nameKey: "TOOL_DEDUPE" },
-	{ id: "empty-line", nameKey: "TOOL_EMPTY_LINE" },
-	{ id: "line-break-tools", nameKey: "TOOL_LINE_BREAK" },
-	{ id: "add-wrap", nameKey: "TOOL_WRAP" },
-	{ id: "remove-string", nameKey: "TOOL_FILTER" },
-	{ id: "number-list", nameKey: "TOOL_NUMBER_LIST" },
-	{ id: "extract-column", nameKey: "TOOL_EXTRACT_COL" },
-	{ id: "swap-columns", nameKey: "TOOL_SWAP_COL" },
-	{ id: "extract-between", nameKey: "TOOL_EXTRACT_BETWEEN" },
-	{ id: "word-frequency", nameKey: "TOOL_WORD_FREQ" },
+	{
+		id: "ai-extract-keypoints",
+		nameKey: "TOOL_AI_EXTRACT_KEYPOINTS",
+		icon: "sparkles",
+	},
+	{ id: "ai-summarize", nameKey: "TOOL_AI_SUMMARIZE", icon: "file-text" },
+	{ id: "ai-translate", nameKey: "TOOL_AI_TRANSLATE", icon: "languages" },
+	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH", icon: "wand-gesture" },
+	{ id: "on-select", nameKey: "TOOL_ON_SELECT", icon: "cursor-click" },
+	{ id: "regex", nameKey: "TOOL_REGEX", icon: "regex" },
+	{ id: "remove-whitespace", nameKey: "TOOL_WHITESPACE", icon: "space" },
+	{ id: "clear-format", nameKey: "TOOL_CLEAR_FORMAT", icon: "eraser" },
+	{ id: "dedupe", nameKey: "TOOL_DEDUPE", icon: "list-minus" },
+	{ id: "empty-line", nameKey: "TOOL_EMPTY_LINE", icon: "list-x" },
+	{ id: "line-break-tools", nameKey: "TOOL_LINE_BREAK", icon: "pilcrow" },
+	{ id: "add-wrap", nameKey: "TOOL_WRAP", icon: "list-collapse" },
+	{ id: "remove-string", nameKey: "TOOL_FILTER", icon: "filter-x" },
+	{ id: "number-list", nameKey: "TOOL_NUMBER_LIST", icon: "list-ordered" },
+	{ id: "extract-column", nameKey: "TOOL_EXTRACT_COL", icon: "columns" },
+	{ id: "swap-columns", nameKey: "TOOL_SWAP_COL", icon: "arrow-left-right" },
+	{
+		id: "extract-between",
+		nameKey: "TOOL_EXTRACT_BETWEEN",
+		icon: "brackets",
+	},
+	{ id: "word-frequency", nameKey: "TOOL_WORD_FREQ", icon: "bar-chart" },
+	{
+		id: "combination-generator",
+		nameKey: "TOOL_COMBINATION",
+		icon: "combine",
+	},
 ];
-

@@ -88,6 +88,23 @@ export function renderEditorPanel(
 	setIcon(modeBtn, editMode === "source" ? "eye" : "code");
 	modeBtn.onclick = () => callbacks.onModeToggle();
 
+	// 清空内容按钮
+	const clearBtn = actionGroup.createEl("button", {
+		cls: "mtt-icon-btn",
+		attr: { "aria-label": t("BTN_CLEAR") },
+	});
+	setIcon(clearBtn, "trash-2");
+	clearBtn.onclick = () => {
+		if (textAreaRef) {
+			textAreaRef.value = "";
+			textAreaRef.focus();
+		}
+		// 无论是在源码模式还是预览模式，都通知内容变更为""
+		if (callbacks.onContentChange) {
+			callbacks.onContentChange("");
+		}
+	};
+
 	// 内容区域
 	const editorContainer = parent.createDiv({
 		cls: "mtt-editor-container",
@@ -95,12 +112,14 @@ export function renderEditorPanel(
 
 	let getSelection: EditorPanelHandle["getSelection"] = () => null;
 	let replaceSelection: EditorPanelHandle["replaceSelection"] = () => {};
+	let textAreaRef: HTMLTextAreaElement | null = null;
 
 	if (editMode === "source") {
 		// 源码模式：使用 textarea 处理
 		const ta = editorContainer.createEl("textarea", {
 			cls: "mtt-textarea mtt-monospace",
 		});
+		textAreaRef = ta;
 		// 显式设置值，防止属性注入失败
 		ta.value = content;
 		ta.oninput = (e) => {

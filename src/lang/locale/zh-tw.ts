@@ -19,6 +19,7 @@ export default {
 	TOOL_SWAP_COL: "交換列",
 	TOOL_EXTRACT_BETWEEN: "內容提取",
 	TOOL_WORD_FREQ: "詞頻分析",
+	TOOL_COMBINATION: "組合生成器",
 	TOOL_CLEAR_FORMAT: "去除 Markdown 格式",
 
 	EDITOR_HEADER: "臨時編輯區 (不會自動保存到原筆記)",

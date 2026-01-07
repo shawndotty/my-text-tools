@@ -147,7 +147,8 @@ export class MyTextToolsView extends ItemView {
 			},
 			this.plugin.settings.customActions,
 			this.plugin.settings.customScripts,
-			this.plugin.settings.enabledTools
+			this.plugin.settings.enabledTools,
+			this.plugin.settings.customIcons
 		);
 
 		// 恢复左侧面板的滚动位置

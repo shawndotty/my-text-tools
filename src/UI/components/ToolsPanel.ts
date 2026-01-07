@@ -1,5 +1,6 @@
 import { setIcon } from "obsidian";
 import { t } from "../../lang/helpers";
+import { BUILTIN_TOOLS } from "../../types";
 
 export interface ToolGroup {
 	name: string;
@@ -26,15 +27,27 @@ export interface CustomScriptBrief {
 	showInRibbon: boolean;
 }
 
+const collapsedGroups = new Set<string>();
+
 /**
  * 获取工具组配置
  */
 export function getToolGroups(
 	customActions: CustomActionBrief[] = [],
 	customScripts: CustomScriptBrief[] = [],
-	enabledTools?: Record<string, boolean>
+	enabledTools?: Record<string, boolean>,
+	customIcons?: Record<string, string>
 ): ToolGroup[] {
 	const isEnabled = (id: string) => enabledTools?.[id] ?? true;
+
+	const getBuiltin = (id: string) => {
+		const tool = BUILTIN_TOOLS.find((t) => t.id === id);
+		return {
+			id,
+			name: tool ? t(tool.nameKey as any) : id,
+			icon: tool?.icon || "help-circle",
+		};
+	};
 
 	const groups: ToolGroup[] = [
 		{
@@ -49,26 +62,10 @@ export function getToolGroups(
 						icon: a.icon || "sparkles",
 					})),
 				// 再显示内置 AI 工具
-				{
-					id: "ai-extract-keypoints",
-					name: t("TOOL_AI_EXTRACT_KEYPOINTS"),
-					icon: "sparkles",
-				},
-				{
-					id: "ai-summarize",
-					name: t("TOOL_AI_SUMMARIZE"),
-					icon: "file-text",
-				},
-				{
-					id: "ai-translate",
-					name: t("TOOL_AI_TRANSLATE"),
-					icon: "languages",
-				},
-				{
-					id: "ai-polish",
-					name: t("TOOL_AI_POLISH"),
-					icon: "wand",
-				},
+				getBuiltin("ai-extract-keypoints"),
+				getBuiltin("ai-summarize"),
+				getBuiltin("ai-translate"),
+				getBuiltin("ai-polish"),
 			],
 		},
 		{
@@ -86,90 +83,47 @@ export function getToolGroups(
 		{
 			name: t("GROUP_BASIC"),
 			tools: [
-				{
-					id: "on-select",
-					name: t("TOOL_ON_SELECT"),
-					icon: "mouse-pointer-click",
-				},
-				{ id: "regex", name: t("TOOL_REGEX"), icon: "search" },
-				{
-					id: "remove-whitespace",
-					name: t("TOOL_WHITESPACE"),
-					icon: "brush-cleaning",
-				},
-				{
-					id: "clear-format",
-					name: t("TOOL_CLEAR_FORMAT"),
-					icon: "eraser",
-				},
+				getBuiltin("on-select"),
+				getBuiltin("regex"),
+				getBuiltin("remove-whitespace"),
+				getBuiltin("clear-format"),
 			],
 		},
 		{
 			name: t("GROUP_LINES"),
 			tools: [
-				{
-					id: "dedupe",
-					name: t("TOOL_DEDUPE"),
-					icon: "list-minus",
-				},
-				{
-					id: "empty-line",
-					name: t("TOOL_EMPTY_LINE"),
-					icon: "list-x",
-				},
-				{
-					id: "line-break-tools",
-					name: t("TOOL_LINE_BREAK"),
-					icon: "wrap-text",
-				},
-				{
-					id: "add-wrap",
-					name: t("TOOL_WRAP"),
-					icon: "list-collapse",
-				},
-				{
-					id: "remove-string",
-					name: t("TOOL_FILTER"),
-					icon: "filter",
-				},
-				{
-					id: "number-list",
-					name: t("TOOL_NUMBER_LIST"),
-					icon: "list-ordered",
-				},
+				getBuiltin("dedupe"),
+				getBuiltin("empty-line"),
+				getBuiltin("line-break-tools"),
+				getBuiltin("add-wrap"),
+				getBuiltin("remove-string"),
+				getBuiltin("number-list"),
+				getBuiltin("combination-generator"),
 			],
 		},
 		{
 			name: t("GROUP_COLUMNS"),
-			tools: [
-				{
-					id: "extract-column",
-					name: t("TOOL_EXTRACT_COL"),
-					icon: "columns",
-				},
-				{
-					id: "swap-columns",
-					name: t("TOOL_SWAP_COL"),
-					icon: "arrow-left-right",
-				},
-			],
+			tools: [getBuiltin("extract-column"), getBuiltin("swap-columns")],
 		},
 		{
 			name: t("GROUP_ANALYSIS"),
 			tools: [
-				{
-					id: "extract-between",
-					name: t("TOOL_EXTRACT_BETWEEN"),
-					icon: "scissors",
-				},
-				{
-					id: "word-frequency",
-					name: t("TOOL_WORD_FREQ"),
-					icon: "bar-chart",
-				},
+				getBuiltin("extract-between"),
+				getBuiltin("word-frequency"),
 			],
 		},
 	];
+
+	if (customIcons) {
+		groups.forEach((group) => {
+			group.tools.forEach((tool) => {
+				const customIcon = customIcons[tool.id];
+				if (customIcon) {
+					tool.icon = customIcon;
+				}
+			});
+		});
+	}
 
 	// Filter tools based on visibility
 	return groups
@@ -189,22 +143,66 @@ export function renderToolsPanel(
 	onToolSelect: (toolId: string) => void,
 	customActions: CustomActionBrief[] = [],
 	customScripts: CustomScriptBrief[] = [],
-	enabledTools?: Record<string, boolean>
+	enabledTools?: Record<string, boolean>,
+	customIcons?: Record<string, string>
 ): void {
 	parent.createEl("h4", {
 		text: t("TEXT_TOOLS"),
 		cls: "mtt-panel-title",
 	});
 
-	const groups = getToolGroups(customActions, customScripts, enabledTools);
+	const groups = getToolGroups(
+		customActions,
+		customScripts,
+		enabledTools,
+		customIcons
+	);
 
 	groups.forEach((group) => {
-		parent.createEl("h6", {
+		const isCollapsed = collapsedGroups.has(group.name);
+
+		const groupHeader = parent.createDiv({
+			cls: "mtt-group-header",
+		});
+		groupHeader.style.display = "flex";
+		groupHeader.style.alignItems = "center";
+		groupHeader.style.cursor = "pointer";
+		groupHeader.style.userSelect = "none";
+
+		const iconSpan = groupHeader.createSpan({ cls: "mtt-collapse-icon" });
+		iconSpan.style.marginRight = "4px";
+		iconSpan.style.display = "flex";
+		setIcon(iconSpan, isCollapsed ? "chevron-right" : "chevron-down");
+
+		groupHeader.createEl("h6", {
 			text: group.name,
 			cls: "mtt-group-label",
 		});
+		// Override h6 margin to make it look part of the header
+		const h6 = groupHeader.querySelector("h6");
+		if (h6) h6.style.margin = "0";
+
+		const toolList = parent.createDiv({
+			cls: "mtt-tool-list",
+		});
+		if (isCollapsed) {
+			toolList.style.display = "none";
+		}
+
+		groupHeader.onclick = () => {
+			if (collapsedGroups.has(group.name)) {
+				collapsedGroups.delete(group.name);
+				toolList.style.display = "block";
+				setIcon(iconSpan, "chevron-down");
+			} else {
+				collapsedGroups.add(group.name);
+				toolList.style.display = "none";
+				setIcon(iconSpan, "chevron-right");
+			}
+		};
+
 		group.tools.forEach((tool) => {
-			const btn = parent.createDiv({
+			const btn = toolList.createDiv({
 				cls: `mtt-tool-item ${
 					activeTool === tool.id ? "is-active" : ""
 				}`,

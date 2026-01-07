@@ -19,6 +19,7 @@ export default {
 	TOOL_SWAP_COL: "交换列",
 	TOOL_EXTRACT_BETWEEN: "内容提取",
 	TOOL_WORD_FREQ: "词频分析",
+	TOOL_COMBINATION: "组合生成器",
 	TOOL_CLEAR_FORMAT: "去除 Markdown 格式",
 
 	EDITOR_HEADER: "临时编辑区 (不会自动保存到原笔记)",
@@ -27,6 +28,7 @@ export default {
 	MODE_SOURCE: "源码模式",
 	BTN_UNDO: "撤销 (Ctrl+Z)",
 	BTN_REDO: "重做 (Ctrl+Y)",
+	BTN_CLEAR: "清空编辑器内容",
 	EDITOR_PLACEHOLDER: "在此输入或处理文本...",
 	BTN_SAVE_NEW: "存为新笔记",
 	BTN_UPDATE_SELECTION: "更新选区",
@@ -97,6 +99,17 @@ export default {
 	CHECKBOX_WS_ALL: " 彻底删除所有空格",
 	CHECKBOX_WS_TABS: " 彻底删除所有制表符 (Tab)",
 	BTN_RUN_CLEAN: "执行清理",
+
+	// Combination Generator
+	BTN_ADD_INPUT_BOX: "添加输入框",
+	BTN_REMOVE_INPUT_BOX: "移除",
+	BTN_GENERATE_COMBINATIONS: "生成组合",
+	LABEL_COMBINATION_COUNT: "组合总数:",
+	LABEL_COMBINATION_SAMPLE: "组合示例:",
+	PLACEHOLDER_INPUT_BOX: "输入对象 (每行一个)",
+	NOTICE_COMBINATION_DONE: "组合生成完成",
+	NOTICE_COMBINATION_LARGE:
+		"警告: 数量过大可能会导致浏览器卡顿，请谨慎操作。",
 
 	SETTING_LB_TRIGGER: "匹配字符或正则:",
 	PLACEHOLDER_LB_TRIGGER: "例如: 。 或 d+",

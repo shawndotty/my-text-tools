@@ -50,6 +50,7 @@ export interface MyTextToolsSettings {
 	customScripts: CustomScript[];
 	// 默认 AI 工具配置
 	aiTools: Record<string, AIToolConfig>;
+	customIcons: Record<string, string>;
 }
 
 export interface AIToolConfig {
@@ -73,6 +74,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	customActions: [],
 	customScripts: [],
 	aiTools: {},
+	customIcons: {},
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {
@@ -136,6 +138,23 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 		BUILTIN_TOOLS.forEach((tool) => {
 			new Setting(containerEl)
 				.setName(t(tool.nameKey as any))
+
+				.addText((text) =>
+					text
+						.setPlaceholder(tool.icon)
+						.setValue(
+							this.plugin.settings.customIcons?.[tool.id] || ""
+						)
+						.onChange(async (value) => {
+							if (!this.plugin.settings.customIcons) {
+								this.plugin.settings.customIcons = {};
+							}
+							this.plugin.settings.customIcons[tool.id] = value;
+							await this.plugin.saveSettings();
+							// 触发视图更新
+							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
 				.addToggle((toggle) =>
 					toggle
 						.setValue(

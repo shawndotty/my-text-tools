@@ -19,6 +19,7 @@ export default {
 	TOOL_SWAP_COL: "Swap Columns",
 	TOOL_EXTRACT_BETWEEN: "Extract Content",
 	TOOL_WORD_FREQ: "Word Frequency",
+	TOOL_COMBINATION: "Combination Generator",
 	TOOL_CLEAR_FORMAT: "Remove Markdown Formatting",
 
 	EDITOR_HEADER: "Temporary Editor (Will not auto-save to original note)",
@@ -27,6 +28,7 @@ export default {
 	MODE_SOURCE: "Source Mode",
 	BTN_UNDO: "Undo (Ctrl+Z)",
 	BTN_REDO: "Redo (Ctrl+Y)",
+	BTN_CLEAR: "Clear Editor Content",
 	EDITOR_PLACEHOLDER: "Enter or process text here...",
 	BTN_SAVE_NEW: "Save as New Note",
 	BTN_UPDATE_SELECTION: "Update Selection",
@@ -98,6 +100,17 @@ export default {
 	CHECKBOX_WS_ALL: " Remove All Spaces",
 	CHECKBOX_WS_TABS: " Remove All Tabs",
 	BTN_RUN_CLEAN: "Run Clean",
+
+	// Combination Generator
+	BTN_ADD_INPUT_BOX: "Create another object box",
+	BTN_REMOVE_INPUT_BOX: "Remove",
+	BTN_GENERATE_COMBINATIONS: "Generate Combinations",
+	LABEL_COMBINATION_COUNT: "Count:",
+	LABEL_COMBINATION_SAMPLE: "Sample of combined text:",
+	PLACEHOLDER_INPUT_BOX: "Enter objects (one per line)",
+	NOTICE_COMBINATION_DONE: "Combinations generated successfully",
+	NOTICE_COMBINATION_LARGE:
+		"Warning: Large counts can freeze your browser. Proceed with caution.",
 
 	SETTING_LB_TRIGGER: "Match Char or Regex:",
 	PLACEHOLDER_LB_TRIGGER: "e.g.: . or \\d+",

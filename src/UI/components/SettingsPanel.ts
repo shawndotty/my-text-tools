@@ -1,3 +1,4 @@
+import { setIcon } from "obsidian";
 import { t } from "../../lang/helpers";
 import { SettingsState } from "../../types";
 import { AIToolConfig } from "../../settings";
@@ -183,6 +184,13 @@ export function renderToolSettings(
 			break;
 		case "on-select":
 			renderOnSelectSettings(settingsContent, settings, callbacks);
+			break;
+		case "combination-generator":
+			renderCombinationGeneratorSettings(
+				settingsContent,
+				settings,
+				callbacks
+			);
 			break;
 		default:
 			settingsContent.createEl("p", {
@@ -889,6 +897,122 @@ function renderClearFormatSettings(
 		cls: "mtt-run-btn",
 	});
 	runBtn.onclick = () => callbacks.onRun("clear-format");
+}
+
+function renderCombinationGeneratorSettings(
+	parent: HTMLElement,
+	settings: SettingsState,
+	callbacks: SettingsPanelCallbacks
+): void {
+	const container = parent.createDiv();
+
+	// Stats Container
+	const statsContainer = container.createDiv();
+	statsContainer.style.marginBottom = "10px";
+	statsContainer.style.padding = "10px";
+	statsContainer.style.background = "var(--background-secondary)";
+	statsContainer.style.borderRadius = "4px";
+
+	const countEl = statsContainer.createDiv();
+	const sampleEl = statsContainer.createDiv();
+	const warningEl = statsContainer.createDiv();
+	warningEl.style.color = "var(--text-error)";
+	warningEl.style.display = "none";
+
+	const updateStats = () => {
+		let count = 1;
+		const currentInputs = settings.combinationInputs || ["", ""];
+		const pools = currentInputs.map((s) => s.split("\n"));
+		if (pools.length === 0) count = 0;
+		else pools.forEach((p) => (count *= p.length));
+
+		countEl.setText(`${t("LABEL_COMBINATION_COUNT")} ${count}`);
+
+		if (count > 10000) {
+			warningEl.setText(t("NOTICE_COMBINATION_LARGE"));
+			warningEl.style.display = "block";
+		} else {
+			warningEl.style.display = "none";
+		}
+
+		const sample = pools.map((p) => p[0]).join("");
+		sampleEl.setText(`${t("LABEL_COMBINATION_SAMPLE")} ${sample}`);
+	};
+
+	// Input Boxes Container
+	const inputsContainer = container.createDiv();
+
+	const renderInputs = () => {
+		inputsContainer.empty();
+		const currentInputs = settings.combinationInputs || ["", ""];
+
+		currentInputs.forEach((input, index) => {
+			const row = inputsContainer.createDiv();
+			row.style.display = "flex";
+			row.style.marginBottom = "10px";
+			row.style.gap = "10px";
+			row.style.alignItems = "flex-start";
+
+			const textarea = row.createEl("textarea", {
+				text: input,
+				placeholder: t("PLACEHOLDER_INPUT_BOX"),
+			});
+			textarea.style.flex = "1";
+			textarea.rows = 3;
+
+			textarea.oninput = (e) => {
+				const val = (e.target as HTMLTextAreaElement).value;
+				const newInputs = [...(settings.combinationInputs || ["", ""])];
+				newInputs[index] = val;
+				settings.combinationInputs = newInputs;
+				callbacks.onSettingsChange("combinationInputs", newInputs);
+				updateStats();
+			};
+
+			if (currentInputs.length > 2) {
+				const removeBtn = row.createDiv({
+					cls: "clickable-icon",
+					attr: { "aria-label": t("BTN_REMOVE_INPUT_BOX") },
+				});
+				setIcon(removeBtn, "trash-2");
+				removeBtn.onclick = () => {
+					const newInputs = (
+						settings.combinationInputs || ["", ""]
+					).filter((_, i) => i !== index);
+					settings.combinationInputs = newInputs;
+					callbacks.onSettingsChange("combinationInputs", newInputs);
+					renderInputs();
+					updateStats();
+				};
+			}
+		});
+	};
+
+	renderInputs();
+	updateStats();
+
+	// Add Button
+	const btnRow = container.createDiv();
+	btnRow.style.marginBottom = "20px";
+
+	const addBtn = btnRow.createEl("button", {
+		text: t("BTN_ADD_INPUT_BOX"),
+	});
+	addBtn.onclick = () => {
+		const newInputs = [...(settings.combinationInputs || ["", ""]), ""];
+		settings.combinationInputs = newInputs;
+		callbacks.onSettingsChange("combinationInputs", newInputs);
+		renderInputs();
+		updateStats();
+	};
+
+	// Generate Button
+	const genBtn = container.createEl("button", {
+		text: t("BTN_GENERATE_COMBINATIONS"),
+		cls: "mod-cta",
+	});
+	genBtn.style.width = "100%";
+	genBtn.onclick = () => callbacks.onRun("combination-generator");
 }
 
 function renderAISettings(

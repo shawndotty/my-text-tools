@@ -179,6 +179,12 @@ export function processText(
 			);
 			new Notice(t("NOTICE_CLEAR_FORMAT_DONE"));
 			break;
+		case "combination-generator":
+			processedBody = processCombinationGenerator(
+				settings.combinationInputs
+			);
+			new Notice(t("NOTICE_COMBINATION_DONE"));
+			break;
 		default:
 			processedBody = lines.join("\n");
 	}
@@ -752,4 +758,30 @@ function processClearFormat(
 	}
 
 	return result;
+}
+
+export function processCombinationGenerator(inputs: string[]): string {
+	if (!inputs || inputs.length === 0) return "";
+
+	// Convert inputs to arrays of lines, handling Windows line endings
+	const pools = inputs.map((input) => input.split(/\r?\n/));
+
+	let result = pools[0];
+	if (!result) return "";
+
+	// Iterative Cartesian product
+	for (let i = 1; i < pools.length; i++) {
+		const nextPool = pools[i];
+		if (!nextPool) continue;
+
+		const nextResult: string[] = [];
+		for (const r of result) {
+			for (const n of nextPool) {
+				nextResult.push(r + n);
+			}
+		}
+		result = nextResult;
+	}
+
+	return result.join("\n");
 }
