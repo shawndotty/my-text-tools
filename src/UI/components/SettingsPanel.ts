@@ -925,9 +925,13 @@ function renderAISettings(
 
 	// 如果没有配置，使用默认值
 	const defaultKeys = DEFAULT_AI_KEYS[toolId];
-	const currentConfig: AIToolConfig = config || {
-		prompt: defaultKeys ? t(defaultKeys.prompt as any) : "",
-		systemPrompt: defaultKeys ? t(defaultKeys.system as any) : "",
+	const defPrompt = defaultKeys ? t(defaultKeys.prompt as any) : "";
+	const defSys = defaultKeys ? t(defaultKeys.system as any) : "";
+
+	const currentConfig: AIToolConfig = {
+		...config,
+		prompt: config?.prompt ?? defPrompt,
+		systemPrompt: config?.systemPrompt ?? defSys,
 	};
 
 	// 1. 提示词设置
