@@ -35,6 +35,9 @@ export default {
 	BTN_SAVE_ORIGINAL: "Apply & Overwrite Original",
 	BTN_IMPORT: "Import Note",
 	IMPORT_MODAL_PLACEHOLDER: "Select a note to import...",
+	OPTION_IMPORT_OVERWRITE: "Overwrite content",
+	OPTION_IMPORT_INSERT: "Insert at cursor",
+	LABEL_REMOVE_FRONTMATTER: "Remove Properties",
 	NOTICE_IMPORT_SUCCESS: "Note content imported successfully.",
 	MENU_OPEN_PLUGIN: "Open in MyTextTools",
 

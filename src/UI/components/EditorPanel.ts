@@ -16,7 +16,11 @@ export interface EditorPanelCallbacks {
 	onCopy: () => void;
 	onSaveNew: () => void;
 	onSaveOriginal: () => void;
-	onImport?: (file: TFile, content: string) => void;
+	onImport?: (
+		file: TFile,
+		content: string,
+		mode: "overwrite" | "insert"
+	) => void;
 	onContentChange?: (content: string) => void;
 	onProcessSelection?: (text: string) => string | null;
 	onPushHistory?: () => void;
@@ -204,22 +208,109 @@ export function renderEditorPanel(
 
 	// 左侧按钮组 (新增)
 	const leftBtnGroup = footer.createDiv({ cls: "mtt-footer-btn-group" });
+	leftBtnGroup.style.display = "flex";
+	leftBtnGroup.style.alignItems = "center";
+	leftBtnGroup.style.gap = "8px";
+
 	const importBtn = leftBtnGroup.createEl("button", {
 		text: t("BTN_IMPORT"),
 		cls: "mtt-secondary-btn",
 	});
 	setIcon(importBtn, "import");
-	importBtn.onclick = () => {
+
+	// 导入模式选择
+	const modeSelect = leftBtnGroup.createEl("select", { cls: "dropdown" });
+	modeSelect.style.maxWidth = "130px";
+	// 覆盖现有内容
+	modeSelect.createEl("option", {
+		value: "overwrite",
+		text: t("OPTION_IMPORT_OVERWRITE"),
+	});
+	// 在光标处插入
+	modeSelect.createEl("option", {
+		value: "insert",
+		text: t("OPTION_IMPORT_INSERT"),
+	});
+
+	// 移除属性开关容器
+	const toggleContainer = leftBtnGroup.createDiv();
+	toggleContainer.style.display = "none"; // 默认隐藏 (overwrite模式)
+	toggleContainer.style.alignItems = "center";
+	toggleContainer.style.gap = "4px";
+
+	const removeFrontmatterCheckbox = toggleContainer.createEl("input", {
+		type: "checkbox",
+	});
+	removeFrontmatterCheckbox.checked = true; // 默认移除
+
+	const toggleLabel = toggleContainer.createEl("label", {
+		text: t("LABEL_REMOVE_FRONTMATTER"),
+	});
+	toggleLabel.style.fontSize = "0.85em";
+	toggleLabel.style.cursor = "pointer";
+	toggleLabel.htmlFor = removeFrontmatterCheckbox.id; // 关联 label 和 checkbox (需设置 id)
+
+	// 手动绑定 label 点击事件作为兜底
+	toggleLabel.onclick = () => {
+		removeFrontmatterCheckbox.checked = !removeFrontmatterCheckbox.checked;
+	};
+
+	// 监听模式变化
+	modeSelect.onchange = () => {
+		if (modeSelect.value === "insert") {
+			toggleContainer.style.display = "flex";
+		} else {
+			toggleContainer.style.display = "none";
+		}
+	};
+
+	// 移除 Frontmatter 的辅助函数
+	const removeFrontmatter = (text: string): string => {
+		return text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+	};
+
+	importBtn.onclick = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		const mode = modeSelect.value as "overwrite" | "insert";
+		const shouldRemoveFrontmatter = removeFrontmatterCheckbox.checked;
+
 		new ImportNoteModal(app, (file, importedContent) => {
-			if (textAreaRef) {
-				textAreaRef.value = importedContent;
-				// 触发 oninput 逻辑以更新状态
-				textAreaRef.dispatchEvent(new Event("input"));
+			let contentToUse = importedContent;
+
+			// 仅在插入模式下检查是否需要移除属性
+			if (mode === "insert" && shouldRemoveFrontmatter) {
+				contentToUse = removeFrontmatter(importedContent);
 			}
+
+			let finalContent = contentToUse;
+			if (textAreaRef) {
+				if (mode === "overwrite") {
+					textAreaRef.value = contentToUse;
+				} else {
+					// 插入模式
+					const start = textAreaRef.selectionStart;
+					const end = textAreaRef.selectionEnd;
+					const text = textAreaRef.value;
+					const before = text.substring(0, start);
+					const after = text.substring(end);
+					finalContent = before + contentToUse + after;
+					textAreaRef.value = finalContent;
+
+					// 移动光标到插入内容之后
+					const newCursorPos = start + contentToUse.length;
+					textAreaRef.setSelectionRange(newCursorPos, newCursorPos);
+					textAreaRef.focus();
+				}
+				// 移除手动 dispatchEvent，避免重复触发 onContentChange，因为 onImport 回调已经处理了内容更新
+				// textAreaRef.dispatchEvent(new Event("input"));
+			}
+
 			if (callbacks.onImport) {
-				callbacks.onImport(file, importedContent);
+				callbacks.onImport(file, finalContent, mode);
 			} else if (callbacks.onContentChange) {
-				callbacks.onContentChange(importedContent);
+				callbacks.onContentChange(finalContent);
 			}
 			new Notice(t("NOTICE_IMPORT_SUCCESS"));
 		}).open();

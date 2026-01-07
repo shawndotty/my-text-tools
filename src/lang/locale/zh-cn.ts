@@ -35,6 +35,9 @@ export default {
 	BTN_SAVE_ORIGINAL: "应用并覆盖原笔记",
 	BTN_IMPORT: "导入笔记",
 	IMPORT_MODAL_PLACEHOLDER: "选择要导入的笔记...",
+	OPTION_IMPORT_OVERWRITE: "覆盖现有内容",
+	OPTION_IMPORT_INSERT: "在光标处插入",
+	LABEL_REMOVE_FRONTMATTER: "移除属性",
 	NOTICE_IMPORT_SUCCESS: "笔记内容导入成功。",
 	MENU_OPEN_PLUGIN: "在 MyTextTools 中编辑",
 

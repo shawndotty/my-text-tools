@@ -34,6 +34,9 @@ export default {
 	BTN_SAVE_ORIGINAL: "應用並覆蓋原筆記",
 	BTN_IMPORT: "匯入筆記",
 	IMPORT_MODAL_PLACEHOLDER: "選擇要匯入的筆記...",
+	OPTION_IMPORT_OVERWRITE: "覆蓋現有內容",
+	OPTION_IMPORT_INSERT: "在游標處插入",
+	LABEL_REMOVE_FRONTMATTER: "移除屬性",
 	NOTICE_IMPORT_SUCCESS: "筆記內容匯入成功。",
 	MENU_OPEN_PLUGIN: "在 MyTextTools 中編輯",
 

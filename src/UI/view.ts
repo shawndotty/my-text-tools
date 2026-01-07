@@ -45,6 +45,7 @@ export class MyTextToolsView extends ItemView {
 	plugin: MyTextTools; // 插件实例引用
 	private loadingEl: HTMLElement | null = null;
 	private editorPanelHandle: EditorPanelHandle | null = null;
+	private isImporting: boolean = false;
 
 	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
 		super(leaf);
@@ -179,6 +180,25 @@ export class MyTextToolsView extends ItemView {
 			},
 			onSaveNew: () => this.saveToNewFile(),
 			onSaveOriginal: () => this.handleSaveToOriginal(),
+			onImport: (
+				file: TFile,
+				content: string,
+				mode: "overwrite" | "insert"
+			) => {
+				// 设置导入标志位，防止触发自动保存逻辑
+				this.isImporting = true;
+				// 500ms 后重置标志位
+				setTimeout(() => {
+					this.isImporting = false;
+				}, 500);
+
+				this.content = content;
+				if (mode === "overwrite") {
+					this.targetFile = file;
+					this.selectionRange = null;
+				}
+				// If insert, do not change targetFile. Content is updated.
+			},
 			onContentChange: (content: string) => {
 				this.content = content;
 			},
@@ -446,6 +466,12 @@ export class MyTextToolsView extends ItemView {
 
 	// 保存回原笔记
 	async handleSaveToOriginal() {
+		// 如果正在导入，阻止保存
+		if (this.isImporting) {
+			console.log("MyTextTools: Save blocked due to importing state.");
+			return;
+		}
+
 		// 1. 如果有明确的目标文件 (例如通过导入或初始化获得)
 		if (this.targetFile) {
 			try {
