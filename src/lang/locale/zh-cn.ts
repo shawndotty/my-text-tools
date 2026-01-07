@@ -33,6 +33,9 @@ export default {
 	BTN_SAVE_NEW: "存为新笔记",
 	BTN_UPDATE_SELECTION: "更新选区",
 	BTN_SAVE_ORIGINAL: "应用并覆盖原笔记",
+	BTN_IMPORT: "导入笔记",
+	IMPORT_MODAL_PLACEHOLDER: "选择要导入的笔记...",
+	NOTICE_IMPORT_SUCCESS: "笔记内容导入成功。",
 	MENU_OPEN_PLUGIN: "在 MyTextTools 中编辑",
 
 	SETTINGS_TITLE: "参数设置",

@@ -33,6 +33,9 @@ export default {
 	BTN_SAVE_NEW: "Save as New Note",
 	BTN_UPDATE_SELECTION: "Update Selection",
 	BTN_SAVE_ORIGINAL: "Apply & Overwrite Original",
+	BTN_IMPORT: "Import Note",
+	IMPORT_MODAL_PLACEHOLDER: "Select a note to import...",
+	NOTICE_IMPORT_SUCCESS: "Note content imported successfully.",
 	MENU_OPEN_PLUGIN: "Open in MyTextTools",
 
 	SETTINGS_TITLE: "Settings",

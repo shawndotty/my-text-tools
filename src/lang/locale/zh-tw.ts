@@ -32,6 +32,9 @@ export default {
 	BTN_SAVE_NEW: "存為新筆記",
 	BTN_UPDATE_SELECTION: "更新選區",
 	BTN_SAVE_ORIGINAL: "應用並覆蓋原筆記",
+	BTN_IMPORT: "匯入筆記",
+	IMPORT_MODAL_PLACEHOLDER: "選擇要匯入的筆記...",
+	NOTICE_IMPORT_SUCCESS: "筆記內容匯入成功。",
 	MENU_OPEN_PLUGIN: "在 MyTextTools 中編輯",
 
 	SETTINGS_TITLE: "參數設置",

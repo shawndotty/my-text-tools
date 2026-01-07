@@ -1,5 +1,13 @@
-import { Notice, setIcon, MarkdownRenderer, Component } from "obsidian";
+import {
+	Notice,
+	setIcon,
+	MarkdownRenderer,
+	Component,
+	App,
+	TFile,
+} from "obsidian";
 import { t } from "../../lang/helpers";
+import { ImportNoteModal } from "../modals/ImportNoteModal";
 
 export interface EditorPanelCallbacks {
 	onUndo: () => void;
@@ -8,6 +16,7 @@ export interface EditorPanelCallbacks {
 	onCopy: () => void;
 	onSaveNew: () => void;
 	onSaveOriginal: () => void;
+	onImport?: (file: TFile, content: string) => void;
 	onContentChange?: (content: string) => void;
 	onProcessSelection?: (text: string) => string | null;
 	onPushHistory?: () => void;
@@ -189,6 +198,32 @@ export function renderEditorPanel(
 	}
 
 	const footer = parent.createDiv({ cls: "mtt-center-footer" });
+	footer.style.justifyContent = "space-between";
+	footer.style.width = "100%";
+	footer.style.display = "flex";
+
+	// 左侧按钮组 (新增)
+	const leftBtnGroup = footer.createDiv({ cls: "mtt-footer-btn-group" });
+	const importBtn = leftBtnGroup.createEl("button", {
+		text: t("BTN_IMPORT"),
+		cls: "mtt-secondary-btn",
+	});
+	setIcon(importBtn, "import");
+	importBtn.onclick = () => {
+		new ImportNoteModal(app, (file, importedContent) => {
+			if (textAreaRef) {
+				textAreaRef.value = importedContent;
+				// 触发 oninput 逻辑以更新状态
+				textAreaRef.dispatchEvent(new Event("input"));
+			}
+			if (callbacks.onImport) {
+				callbacks.onImport(file, importedContent);
+			} else if (callbacks.onContentChange) {
+				callbacks.onContentChange(importedContent);
+			}
+			new Notice(t("NOTICE_IMPORT_SUCCESS"));
+		}).open();
+	};
 
 	// 按钮组容器，方便设置间距
 	const btnGroup = footer.createDiv({ cls: "mtt-footer-btn-group" });

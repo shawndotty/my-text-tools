@@ -94,7 +94,7 @@ export default class MyTextTools extends Plugin {
 		if (activeView && activeView.editor) {
 			const view = leaf.view as MyTextToolsView;
 			if (view) {
-				view.updateInput(activeView.editor);
+				view.updateInput(activeView.editor, activeView.file);
 			}
 		}
 	}

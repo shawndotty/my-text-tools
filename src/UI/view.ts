@@ -4,6 +4,7 @@ import {
 	Notice,
 	Editor,
 	EditorPosition,
+	TFile,
 } from "obsidian";
 import { t } from "../lang/helpers";
 import { SettingsState, DEFAULT_SETTINGS_STATE, ToolType } from "../types";
@@ -37,6 +38,7 @@ export class MyTextToolsView extends ItemView {
 	editMode: "source" | "preview" = "source"; // 默认源码模式
 	historyManager: HistoryManager = new HistoryManager();
 	originalEditor: Editor | null = null; // 对原笔记编辑器的引用
+	targetFile: TFile | null = null; // 当前编辑的目标文件
 	selectionRange: SelectionRange | null = null; // 选区范围
 	activeTool: string | "" = ""; // 当前选中的工具 ID
 	settingsState: SettingsState = { ...DEFAULT_SETTINGS_STATE };
@@ -56,8 +58,9 @@ export class MyTextToolsView extends ItemView {
 	/**
 	 * 更新输入内容（支持选区模式）
 	 */
-	updateInput(editor: Editor) {
+	updateInput(editor: Editor, file?: TFile | null) {
 		this.originalEditor = editor;
+		this.targetFile = file || null;
 
 		if (editor.somethingSelected()) {
 			this.content = editor.getSelection();
@@ -442,7 +445,21 @@ export class MyTextToolsView extends ItemView {
 	}
 
 	// 保存回原笔记
-	handleSaveToOriginal() {
+	async handleSaveToOriginal() {
+		// 1. 如果有明确的目标文件 (例如通过导入或初始化获得)
+		if (this.targetFile) {
+			try {
+				await this.app.vault.modify(this.targetFile, this.content);
+				new Notice(t("NOTICE_SAVE_SUCCESS"));
+				return;
+			} catch (error) {
+				console.error("Failed to save to target file:", error);
+				new Notice(t("NOTICE_SAVE_ERROR"));
+			}
+			return;
+		}
+
+		// 2. Fallback: 如果没有 targetFile，尝试使用 originalEditor (旧逻辑)
 		if (!this.originalEditor) {
 			new Notice("❌ " + t("NOTICE_NO_EDITOR"));
 			return;
