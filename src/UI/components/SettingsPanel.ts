@@ -939,6 +939,7 @@ function renderAISettings(
 	const promptArea = content.createEl("textarea", {
 		cls: "mtt-textarea-small",
 		text: currentConfig.prompt,
+		attr: { rows: 4 },
 	});
 	promptArea.onchange = async (e) => {
 		const newVal = (e.target as HTMLTextAreaElement).value;
@@ -953,6 +954,7 @@ function renderAISettings(
 	const sysPromptArea = content.createEl("textarea", {
 		cls: "mtt-textarea-small",
 		text: currentConfig.systemPrompt,
+		attr: { rows: 4 },
 	});
 	sysPromptArea.onchange = async (e) => {
 		const newVal = (e.target as HTMLTextAreaElement).value;
