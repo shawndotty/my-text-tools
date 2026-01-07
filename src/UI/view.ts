@@ -231,7 +231,13 @@ export class MyTextToolsView extends ItemView {
 
 	// On-select 处理逻辑
 	processOnSelect(text: string): string | null {
-		if (!this.settingsState.onSelectEnabled) return null;
+		if (
+			!(
+				this.activeTool === "on-select" &&
+				this.settingsState.onSelectEnabled
+			)
+		)
+			return null;
 
 		// 保存历史状态以便撤销
 		this.historyManager.pushToHistory(this.content);
