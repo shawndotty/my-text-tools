@@ -1,6 +1,6 @@
 {
 	"name": "my-text-tools",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"description": "An advanced text processing workbench for Obsidian, inspired by mytexttools.com",
 	"main": "main.js",
 	"type": "module",
