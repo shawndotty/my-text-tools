@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, PluginSettingTab, Setting, setIcon } from "obsidian";
 import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
@@ -407,29 +407,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				cls: "mtt-custom-card",
 			});
 
-			new Setting(cardContainer)
+			const headerSetting = new Setting(cardContainer)
 				.setName(`${t("PROMPT_GROUP_NAME")} ${idx + 1}`)
-				.setDesc(t("PROMPT_NAME_AND_ICON"))
-				.addText((text) =>
-					text
-						.setPlaceholder(t("PROMPT_NAME_PLACEHOLDER"))
-						.setValue(card.name)
-						.onChange(async (value) => {
-							card.name = value;
-							await this.plugin.saveSettings();
-							(this.plugin as any).refreshCustomRibbons?.();
-						})
-				)
-				.addText((text) =>
-					text
-						.setPlaceholder(t("ICON_PLACEHOLDER"))
-						.setValue(card.icon || "sparkles")
-						.onChange(async (value) => {
-							card.icon = value || "sparkles";
-							await this.plugin.saveSettings();
-							(this.plugin as any).refreshCustomRibbons?.();
-						})
-				)
 				.addToggle((toggle) =>
 					toggle
 						.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
@@ -456,33 +435,81 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						})
 				);
 
-			new Setting(cardContainer)
-				.setName(t("PROMPT_FIELD_LABEL"))
-				.setDesc(t("PROMPT_FIELD_DESC"))
-				.addTextArea((ta) => {
-					ta.inputEl.rows = 4;
-					ta.setPlaceholder(t("PROMPT_PLACEHOLDER"));
-					ta.setValue(card.prompt || "");
-					ta.onChange(async (value) => {
-						card.prompt = value;
-						await this.plugin.saveSettings();
-					});
-				});
+			const headerInfo = headerSetting.settingEl.querySelector(
+				".setting-item-info"
+			) as HTMLElement | null;
+			const bodyEl = cardContainer.createDiv({ cls: "mtt-card-body" });
+			let expanded = false;
+			const arrowEl = document.createElement("span");
+			arrowEl.style.marginRight = "6px";
+			if (headerInfo) headerInfo.prepend(arrowEl);
+			const updateVisibility = () => {
+				bodyEl.style.display = expanded ? "block" : "none";
+				setIcon(arrowEl, expanded ? "chevron-down" : "chevron-right");
+			};
+			updateVisibility();
+			headerInfo?.addEventListener("click", () => {
+				expanded = !expanded;
+				updateVisibility();
+			});
 
-			new Setting(cardContainer)
-				.setName(t("SYSTEM_PROMPT_LABEL"))
-				.setDesc(t("SYSTEM_PROMPT_DESC"))
-				.addTextArea((ta) => {
-					ta.inputEl.rows = 3;
-					ta.setPlaceholder(t("SYSTEM_PROMPT_PLACEHOLDER"));
-					ta.setValue(card.systemPrompt || "");
-					ta.onChange(async (value) => {
-						card.systemPrompt = value;
-						await this.plugin.saveSettings();
-					});
-				});
+			bodyEl.createEl("label", { text: t("PROMPT_NAME_PLACEHOLDER") });
+			const nameInput = bodyEl.createEl("input", {
+				type: "text",
+				placeholder: t("PROMPT_NAME_PLACEHOLDER"),
+				value: card.name,
+			});
+			nameInput.style.width = "100%";
+			nameInput.onchange = async (e) => {
+				card.name = (e.target as HTMLInputElement).value;
+				await this.plugin.saveSettings();
+				(this.plugin as any).refreshCustomRibbons?.();
+			};
 
-			new Setting(cardContainer)
+			bodyEl.createEl("label", { text: t("ICON_PLACEHOLDER") });
+			const iconInput = bodyEl.createEl("input", {
+				type: "text",
+				placeholder: t("ICON_PLACEHOLDER"),
+				value: card.icon || "sparkles",
+			});
+			iconInput.style.width = "100%";
+			iconInput.onchange = async (e) => {
+				card.icon = (e.target as HTMLInputElement).value || "sparkles";
+				await this.plugin.saveSettings();
+				(this.plugin as any).refreshCustomRibbons?.();
+			};
+
+			bodyEl.createEl("label", { text: t("PROMPT_FIELD_LABEL") });
+			bodyEl.createEl("p", {
+				text: t("PROMPT_FIELD_DESC"),
+				cls: "setting-item-description",
+			});
+			const promptArea = bodyEl.createEl("textarea");
+			promptArea.rows = 4;
+			promptArea.style.width = "100%";
+			promptArea.placeholder = t("PROMPT_PLACEHOLDER") as string;
+			promptArea.value = card.prompt || "";
+			promptArea.onchange = async (e) => {
+				card.prompt = (e.target as HTMLTextAreaElement).value;
+				await this.plugin.saveSettings();
+			};
+
+			bodyEl.createEl("label", { text: t("SYSTEM_PROMPT_LABEL") });
+			bodyEl.createEl("p", {
+				text: t("SYSTEM_PROMPT_DESC"),
+				cls: "setting-item-description",
+			});
+			const sysArea = bodyEl.createEl("textarea");
+			sysArea.rows = 3;
+			sysArea.style.width = "100%";
+			sysArea.placeholder = t("SYSTEM_PROMPT_PLACEHOLDER") as string;
+			sysArea.value = card.systemPrompt || "";
+			sysArea.onchange = async (e) => {
+				card.systemPrompt = (e.target as HTMLTextAreaElement).value;
+				await this.plugin.saveSettings();
+			};
+
+			new Setting(bodyEl)
 				.setName(t("APPLY_SCOPE_LABEL"))
 				.setDesc(t("APPLY_SCOPE_DESC"))
 				.addToggle((toggle) =>
@@ -494,7 +521,6 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						})
 				);
 
-			// 覆盖参数开关
 			let useOverride =
 				!!card.overrideEnabled ||
 				!!card.overrideProvider ||
@@ -503,32 +529,15 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				!!card.overrideModel ||
 				card.overrideMaxTokens !== undefined ||
 				card.overrideTemperature !== undefined;
-			new Setting(cardContainer)
-				.setName(t("OVERRIDE_SWITCH_LABEL"))
-				.setDesc(t("OVERRIDE_SWITCH_DESC"))
-				.addToggle((toggle) =>
-					toggle.setValue(useOverride).onChange(async (value) => {
-						card.overrideEnabled = value;
-						if (!value) {
-							card.overrideProvider = undefined;
-							card.overrideApiUrl = undefined;
-							card.overrideApiKey = undefined;
-							card.overrideModel = undefined;
-							card.overrideMaxTokens = undefined;
-							card.overrideTemperature = undefined;
-							await this.plugin.saveSettings();
-							containerEl.empty();
-							this.renderUserPromptsSettings(containerEl);
-						} else {
-							await this.plugin.saveSettings();
-							containerEl.empty();
-							this.renderUserPromptsSettings(containerEl);
-						}
-					})
-				);
 
-			if (useOverride) {
-				new Setting(cardContainer)
+			const pluginRef = this.plugin;
+			function renderOverride() {
+				// 运行时会在 overrideSection 初始化后才调用
+				if (!overrideSection) return;
+				overrideSection.empty();
+				if (!useOverride) return;
+
+				new Setting(overrideSection)
 					.setName(t("PROVIDER_LABEL"))
 					.addDropdown((dropdown) =>
 						dropdown
@@ -537,7 +546,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 							.addOption("custom", t("PROVIDER_OPTION_CUSTOM"))
 							.setValue(
 								card.overrideProvider ||
-									this.plugin.settings.aiProvider
+									pluginRef.settings.aiProvider
 							)
 							.onChange(async (value) => {
 								card.overrideProvider = value as any;
@@ -550,11 +559,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 										"https://api.openai.com/v1/chat/completions";
 									card.overrideModel = "gpt-3.5-turbo";
 								}
-								await this.plugin.saveSettings();
+								await pluginRef.saveSettings();
 							})
 					);
 
-				new Setting(cardContainer)
+				new Setting(overrideSection)
 					.setName(t("API_KEY_LABEL"))
 					.addText((text) => {
 						text.inputEl.type = "password";
@@ -562,72 +571,96 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 							.setValue(card.overrideApiKey || "")
 							.onChange(async (value) => {
 								card.overrideApiKey = value;
-								await this.plugin.saveSettings();
+								await pluginRef.saveSettings();
 							});
 					});
 
-				new Setting(cardContainer)
+				new Setting(overrideSection)
 					.setName(t("API_URL_LABEL"))
 					.addText((text) =>
 						text
 							.setPlaceholder(t("API_URL_PLACEHOLDER"))
 							.setValue(
 								card.overrideApiUrl ||
-									this.plugin.settings.aiApiUrl
+									pluginRef.settings.aiApiUrl
 							)
 							.onChange(async (value) => {
 								card.overrideApiUrl = value;
-								await this.plugin.saveSettings();
+								await pluginRef.saveSettings();
 							})
 					);
 
-				new Setting(cardContainer)
+				new Setting(overrideSection)
 					.setName(t("MODEL_LABEL"))
 					.addText((text) =>
 						text
 							.setPlaceholder(t("MODEL_PLACEHOLDER"))
 							.setValue(
-								card.overrideModel ||
-									this.plugin.settings.aiModel
+								card.overrideModel || pluginRef.settings.aiModel
 							)
 							.onChange(async (value) => {
 								card.overrideModel = value;
-								await this.plugin.saveSettings();
+								await pluginRef.saveSettings();
 							})
 					);
 
-				new Setting(cardContainer)
+				new Setting(overrideSection)
 					.setName(t("MAX_TOKENS_LABEL"))
 					.addSlider((slider) =>
 						slider
 							.setLimits(500, 4000, 100)
 							.setValue(
 								card.overrideMaxTokens ??
-									this.plugin.settings.aiMaxTokens
+									pluginRef.settings.aiMaxTokens
 							)
 							.setDynamicTooltip()
 							.onChange(async (value) => {
 								card.overrideMaxTokens = value;
-								await this.plugin.saveSettings();
+								await pluginRef.saveSettings();
 							})
 					);
 
-				new Setting(cardContainer)
+				new Setting(overrideSection)
 					.setName(t("TEMPERATURE_LABEL"))
 					.addSlider((slider) =>
 						slider
 							.setLimits(0, 1, 0.1)
 							.setValue(
 								card.overrideTemperature ??
-									this.plugin.settings.aiTemperature
+									pluginRef.settings.aiTemperature
 							)
 							.setDynamicTooltip()
 							.onChange(async (value) => {
 								card.overrideTemperature = value;
-								await this.plugin.saveSettings();
+								await pluginRef.saveSettings();
 							})
 					);
 			}
+
+			new Setting(bodyEl)
+				.setName(t("OVERRIDE_SWITCH_LABEL"))
+				.setDesc(t("OVERRIDE_SWITCH_DESC"))
+				.addToggle((toggle) =>
+					toggle.setValue(useOverride).onChange(async (value) => {
+						card.overrideEnabled = value;
+						useOverride = value;
+						if (!value) {
+							card.overrideProvider = undefined;
+							card.overrideApiUrl = undefined;
+							card.overrideApiKey = undefined;
+							card.overrideModel = undefined;
+							card.overrideMaxTokens = undefined;
+							card.overrideTemperature = undefined;
+						}
+						await this.plugin.saveSettings();
+						renderOverride();
+					})
+				);
+
+			const overrideSection = bodyEl.createDiv({
+				cls: "mtt-override-section",
+			});
+			renderOverride();
 		});
 	}
 
@@ -664,29 +697,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				cls: "mtt-custom-card",
 			});
 
-			new Setting(cardContainer)
+			const headerSetting = new Setting(cardContainer)
 				.setName(`${t("SCRIPT_GROUP_NAME")} ${idx + 1}`)
-				.setDesc(t("SCRIPT_NAME_AND_ICON"))
-				.addText((text) =>
-					text
-						.setPlaceholder(t("SCRIPT_NAME_PLACEHOLDER"))
-						.setValue(script.name)
-						.onChange(async (value) => {
-							script.name = value;
-							await this.plugin.saveSettings();
-							(this.plugin as any).refreshCustomRibbons?.();
-						})
-				)
-				.addText((text) =>
-					text
-						.setPlaceholder(t("ICON_PLACEHOLDER"))
-						.setValue(script.icon || "scroll")
-						.onChange(async (value) => {
-							script.icon = value || "scroll";
-							await this.plugin.saveSettings();
-							(this.plugin as any).refreshCustomRibbons?.();
-						})
-				)
 				.addToggle((toggle) =>
 					toggle
 						.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
@@ -713,32 +725,87 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						})
 				);
 
-			new Setting(cardContainer)
-				.setName(t("SCRIPT_DESC_LABEL"))
-				.addText((text) =>
-					text
-						.setPlaceholder(t("SCRIPT_DESC_PLACEHOLDER"))
-						.setValue(script.description || "")
-						.onChange(async (value) => {
-							script.description = value;
-							await this.plugin.saveSettings();
-						})
-				);
+			const headerInfo = headerSetting.settingEl.querySelector(
+				".setting-item-info"
+			) as HTMLElement | null;
+			const bodyEl = cardContainer.createDiv({ cls: "mtt-card-body" });
+			let expanded = false;
+			const arrowEl = document.createElement("span");
+			arrowEl.style.marginRight = "6px";
+			if (headerInfo) headerInfo.prepend(arrowEl);
+			const updateVisibility = () => {
+				bodyEl.style.display = expanded ? "block" : "none";
+				setIcon(arrowEl, expanded ? "chevron-down" : "chevron-right");
+			};
+			updateVisibility();
+			headerInfo?.addEventListener("click", () => {
+				expanded = !expanded;
+				updateVisibility();
+			});
 
-			new Setting(cardContainer)
-				.setName(t("SCRIPT_CODE_LABEL"))
-				.setDesc(t("SCRIPT_CODE_DESC"))
-				.addTextArea((ta) => {
-					ta.inputEl.rows = 6;
-					ta.inputEl.style.width = "100%";
-					ta.inputEl.style.fontFamily = "monospace";
-					ta.setPlaceholder(t("SCRIPT_CODE_PLACEHOLDER"));
-					ta.setValue(script.code || "");
-					ta.onChange(async (value) => {
-						script.code = value;
-						await this.plugin.saveSettings();
-					});
-				});
+			bodyEl.createEl("label", {
+				text: t("SCRIPT_NAME_PLACEHOLDER"),
+			});
+			const nameInput = bodyEl.createEl("input", {
+				type: "text",
+				placeholder: t("SCRIPT_NAME_PLACEHOLDER"),
+				value: script.name,
+			});
+			nameInput.style.width = "100%";
+			nameInput.onchange = async (e) => {
+				script.name = (e.target as HTMLInputElement).value;
+				await this.plugin.saveSettings();
+				(this.plugin as any).refreshCustomRibbons?.();
+			};
+
+			bodyEl.createEl("label", {
+				text: t("ICON_PLACEHOLDER"),
+			});
+			const iconInput = bodyEl.createEl("input", {
+				type: "text",
+				placeholder: t("ICON_PLACEHOLDER"),
+				value: script.icon || "scroll",
+			});
+			iconInput.style.width = "100%";
+			iconInput.onchange = async (e) => {
+				script.icon = (e.target as HTMLInputElement).value || "scroll";
+				await this.plugin.saveSettings();
+				(this.plugin as any).refreshCustomRibbons?.();
+			};
+
+			bodyEl.createEl("label", {
+				text: t("SCRIPT_DESC_LABEL"),
+			});
+			const descInput = bodyEl.createEl("input", {
+				type: "text",
+				placeholder: t("SCRIPT_DESC_PLACEHOLDER"),
+				value: script.description || "",
+			});
+			descInput.style.width = "100%";
+			descInput.onchange = async (e) => {
+				script.description = (e.target as HTMLInputElement).value;
+				await this.plugin.saveSettings();
+			};
+
+			bodyEl.createEl("label", {
+				text: t("SCRIPT_CODE_LABEL"),
+			});
+			bodyEl.createEl("p", {
+				text: t("SCRIPT_CODE_DESC"),
+				cls: "setting-item-description",
+			});
+			const codeArea = bodyEl.createEl("textarea", {
+				cls: "mtt-monospace",
+			});
+			codeArea.rows = 10;
+			codeArea.style.width = "100%";
+			codeArea.style.fontFamily = "monospace";
+			codeArea.placeholder = t("SCRIPT_CODE_PLACEHOLDER") as string;
+			codeArea.value = script.code || "";
+			codeArea.onchange = async (e) => {
+				script.code = (e.target as HTMLTextAreaElement).value;
+				await this.plugin.saveSettings();
+			};
 		});
 	}
 }

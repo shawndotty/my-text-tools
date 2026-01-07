@@ -444,6 +444,23 @@ input[type="number"].mtt-small-input {
 	width: 100%;
 }
 
+.mtt-custom-card input[type="text"] {
+	margin: 0.5em 0;
+}
+
+.mtt-custom-card p.setting-item-description {
+	margin-top: 0;
+}
+
+.mtt-custom-card .mod-toggle {
+	margin-bottom: 0;
+	cursor: pointer;
+}
+
+.mtt-custom-card .setting-item-info {
+	display: flex;
+}
+
 
 /* ==========================================================================
    加载状态 (Loading State)
