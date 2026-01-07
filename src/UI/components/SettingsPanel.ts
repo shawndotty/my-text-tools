@@ -925,10 +925,9 @@ function renderAISettings(
 
 	// 如果没有配置，使用默认值
 	const defaultKeys = DEFAULT_AI_KEYS[toolId];
-	const currentConfig = config || {
+	const currentConfig: AIToolConfig = config || {
 		prompt: defaultKeys ? t(defaultKeys.prompt as any) : "",
 		systemPrompt: defaultKeys ? t(defaultKeys.system as any) : "",
-		overrideGlobal: false,
 	};
 
 	// 1. 提示词设置
@@ -959,41 +958,22 @@ function renderAISettings(
 		}
 	};
 
-	// 3. 覆盖全局设置开关
-	const overrideLabel = content.createEl("label", {
-		cls: "mtt-checkbox-label",
-	});
-	overrideLabel.style.marginTop = "10px";
-	const overrideCheck = overrideLabel.createEl("input", { type: "checkbox" });
-	overrideCheck.checked = (currentConfig as any).overrideGlobal || false;
-	overrideCheck.onchange = async (e) => {
-		(currentConfig as any).overrideGlobal = (
-			e.target as HTMLInputElement
-		).checked;
-		if (callbacks.onSaveAISettings) {
-			await callbacks.onSaveAISettings(toolId, currentConfig);
-		}
-		// 刷新显示
-		modelSection.style.display = (currentConfig as any).overrideGlobal
-			? "block"
-			: "none";
-	};
-	overrideLabel.appendText(t("OVERRIDE_SWITCH_LABEL"));
-
-	// 4. 单独的模型配置区域
-	const modelSection = content.createDiv({
-		cls: "mtt-ai-override-section",
-	});
-	modelSection.style.display = (currentConfig as any).overrideGlobal
-		? "block"
-		: "none";
-	modelSection.createEl("p", {
-		text: t("OVERRIDE_SWITCH_DESC"),
-		cls: "mtt-setting-desc",
-	});
-
-	// ... 这里可以继续添加 model, apiKey 等输入框，逻辑同 SettingsTab
-	// 暂时为了简洁，仅保留 prompt 修改
+	// 3. 翻译目标语言 (仅 ai-translate)
+	if (toolId === "ai-translate") {
+		content.createEl("label", { text: t("SETTING_TARGET_LANG") });
+		const langInput = content.createEl("input", {
+			type: "text",
+			placeholder: "English",
+			value: currentConfig.targetLanguage || "English",
+		});
+		langInput.onchange = async (e) => {
+			const newVal = (e.target as HTMLInputElement).value;
+			currentConfig.targetLanguage = newVal;
+			if (callbacks.onSaveAISettings) {
+				await callbacks.onSaveAISettings(toolId, currentConfig);
+			}
+		};
+	}
 
 	content.createEl("hr");
 
