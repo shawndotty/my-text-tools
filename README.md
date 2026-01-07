@@ -17,6 +17,10 @@ My Text Tools organizes its utilities into several categories:
     -   Trim leading/trailing whitespace.
     -   Compress multiple spaces into one.
     -   Remove all spaces or tabs.
+-   **Text Conversion**:
+    -   Uppercase/Lowercase conversion.
+    -   Chinese punctuation standardization.
+    -   Alphanumeric filtering.
 
 ### 📝 Line Operations
 
@@ -39,15 +43,29 @@ Great for processing CSV-like data or structured text:
 -   **Extract Content**: Extract text occurring between two markers (start/end tags), with regex support.
 -   **Word Frequency**: Analyze text to find the most frequent words, with options to filter by length and include/exclude numbers.
 
+### 🤖 AI Tools
+
+Leverage the power of AI to process your text (requires OpenAI-compatible API configuration):
+
+-   **Summarize**: Generate concise summaries of your text.
+-   **Polish**: Improve grammar, flow, and clarity.
+-   **Continue Writing**: Let AI expand on your current text.
+-   **Translate**: Instantly translate text to your target language.
+
+### ⚡ Custom Scripts
+
+Extend functionality with your own code:
+
+-   **JavaScript Execution**: Write and run custom JavaScript to process text in the editor.
+-   **Script Management**: Save, edit, and delete your frequently used scripts in the settings.
+
 ## How to Use
 
 1. **Open the Workbench**:
-
     - Click the "My Text Tools" icon (remove-formatting icon) in the left ribbon.
-    - Or use the Command Palette (`Cmd/Ctrl + P`) and search for **"My Text Tools: 开启 MyTextTools 增强工作台"**.
+    - Or use the Command Palette (`Cmd/Ctrl + P`) and search for **"My Text Tools: Open Workbench"**.
 
 2. **The Workbench Interface**:
-
     - **Left Panel**: Select the tool you want to use.
     - **Center Panel (Temporary Editor)**:
         - This text area is initialized with the content of your active note.
@@ -58,6 +76,13 @@ Great for processing CSV-like data or structured text:
 3. **Saving Changes**:
     - **Apply to Note**: Overwrites the original note with the content from the workbench.
     - **Save as New Note**: Creates a new file with the processed text.
+
+## Settings
+
+Go to **Settings > My Text Tools** to configure:
+-   **Basic Settings**: Manage default tool visibility.
+-   **AI Settings**: Configure API Endpoint, Key, and Model for AI features.
+-   **Custom Scripts**: Add and manage your custom JavaScript snippets.
 
 ## Installation
 
