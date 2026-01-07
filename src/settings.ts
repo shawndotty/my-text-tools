@@ -3,6 +3,8 @@ import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
 import { BUILTIN_TOOLS } from "./types";
+import { AIGenerateScriptModal } from "./UI/modals/AIGenerateScriptModal";
+import { AIService } from "./utils/aiService";
 
 export interface CustomAIAction {
 	id: string;
@@ -806,6 +808,24 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				script.code = (e.target as HTMLTextAreaElement).value;
 				await this.plugin.saveSettings();
 			};
+
+			new Setting(bodyEl).addButton((btn) =>
+				btn
+					.setButtonText(t("BTN_GENERATE_SCRIPT_AI"))
+					.setIcon("sparkles")
+					.onClick(() => {
+						const aiService = new AIService(this.plugin.settings);
+						new AIGenerateScriptModal(
+							this.app,
+							aiService,
+							async (code) => {
+								script.code = code;
+								codeArea.value = code;
+								await this.plugin.saveSettings();
+							}
+						).open();
+					})
+			);
 		});
 	}
 }

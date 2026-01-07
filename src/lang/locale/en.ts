@@ -308,4 +308,16 @@ export default {
 	NOTICE_SCRIPT_SUCCESS: "Script executed successfully!",
 	NOTICE_SCRIPT_ERROR: "Script execution failed: {0}",
 	NOTICE_SCRIPT_NOT_FOUND: "Script not found!",
+	BTN_GENERATE_SCRIPT_AI: "Generate Script By Using AI",
+	MODAL_GENERATE_SCRIPT_TITLE: "Generate Custom Script",
+	MODAL_GENERATE_CONTEXT_LABEL: "Context",
+	MODAL_GENERATE_CONTEXT_SELECTION: "Selection",
+	MODAL_GENERATE_CONTEXT_WHOLE: "Whole Text",
+	MODAL_GENERATE_REQ_LABEL: "Requirement",
+	MODAL_GENERATE_REQ_PLACEHOLDER:
+		"Describe what you want the script to do...",
+	BTN_GENERATE: "Generate",
+	GENERATING_NOTICE: "Generating script...",
+	GENERATE_SUCCESS: "Script generated successfully!",
+	GENERATE_ERROR: "Failed to generate script: ",
 };
