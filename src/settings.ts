@@ -874,6 +874,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				cls: "mtt-panel-title",
 			});
 			paramsHeader.style.marginTop = "12px";
+			paramsHeader.style.paddingLeft = "0px";
 
 			new Setting(bodyEl)
 				.setName("参数管理")
@@ -911,11 +912,19 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 				const grid = pCard.createDiv();
 				grid.style.display = "grid";
-				grid.style.gridTemplateColumns = "1fr 1fr";
+				grid.style.gridTemplateColumns = "1fr";
 				grid.style.gap = "8px";
 
-				const keyLabel = grid.createEl("label", { text: "Key" });
-				const keyInput = grid.createEl("input", {
+				// Key 字段组
+				const keyContainer = grid.createDiv();
+				keyContainer.style.display = "flex";
+				keyContainer.style.alignItems = "center";
+				keyContainer.style.justifyContent = "space-between";
+				keyContainer.style.gap = "8px";
+				const keyLabel = keyContainer.createEl("label", {
+					text: "Key",
+				});
+				const keyInput = keyContainer.createEl("input", {
 					type: "text",
 					value: param.key,
 				});
@@ -924,8 +933,16 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				};
 
-				const labelLabel = grid.createEl("label", { text: "标签" });
-				const labelInput = grid.createEl("input", {
+				// 标签字段组
+				const labelContainer = grid.createDiv();
+				labelContainer.style.display = "flex";
+				labelContainer.style.alignItems = "center";
+				labelContainer.style.justifyContent = "space-between";
+				labelContainer.style.gap = "8px";
+				const labelLabel = labelContainer.createEl("label", {
+					text: "标签",
+				});
+				const labelInput = labelContainer.createEl("input", {
 					type: "text",
 					value: param.label || "",
 				});
@@ -934,8 +951,16 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				};
 
-				const typeLabel = grid.createEl("label", { text: "类型" });
-				const typeSelect = grid.createEl("select");
+				// 类型字段组
+				const typeContainer = grid.createDiv();
+				typeContainer.style.display = "flex";
+				typeContainer.style.alignItems = "center";
+				typeContainer.style.justifyContent = "space-between";
+				typeContainer.style.gap = "8px";
+				const typeLabel = typeContainer.createEl("label", {
+					text: "类型",
+				});
+				const typeSelect = typeContainer.createEl("select");
 				["text", "number", "boolean", "select"].forEach((opt) => {
 					const o = document.createElement("option");
 					o.value = opt;
@@ -954,10 +979,18 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					this.renderCustomScriptsSettings(containerEl);
 				};
 
-				const defaultLabel = grid.createEl("label", { text: "默认值" });
+				// 默认值字段组
+				const defaultContainer = grid.createDiv();
+				defaultContainer.style.display = "flex";
+				defaultContainer.style.alignItems = "center";
+				defaultContainer.style.justifyContent = "space-between";
+				defaultContainer.style.gap = "8px";
+				const defaultLabel = defaultContainer.createEl("label", {
+					text: "默认值",
+				});
 				let defaultInput: HTMLElement;
 				if (param.type === "boolean") {
-					const checkbox = grid.createEl("input", {
+					const checkbox = defaultContainer.createEl("input", {
 						type: "checkbox",
 					});
 					checkbox.checked = !!param.default;
@@ -967,7 +1000,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					};
 					defaultInput = checkbox;
 				} else {
-					const input = grid.createEl("input", {
+					const input = defaultContainer.createEl("input", {
 						type: param.type === "number" ? "number" : "text",
 						value:
 							param.default !== undefined
@@ -983,10 +1016,16 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					defaultInput = input;
 				}
 
-				const optionsLabel = grid.createEl("label", {
+				// 选项字段组
+				const optionsContainer = grid.createDiv();
+				optionsContainer.style.display = "flex";
+				optionsContainer.style.alignItems = "center";
+				optionsContainer.style.justifyContent = "space-between";
+				optionsContainer.style.gap = "8px";
+				const optionsLabel = optionsContainer.createEl("label", {
 					text: "选项(逗号分隔)",
 				});
-				const optionsInput = grid.createEl("input", {
+				const optionsInput = optionsContainer.createEl("input", {
 					type: "text",
 					value: (param.options || []).join(","),
 				});

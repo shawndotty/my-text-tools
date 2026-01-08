@@ -143,9 +143,12 @@ export function renderToolSettings(
 			const label = param.label || param.key;
 			const row = settingsContent.createDiv({ cls: "mtt-setting-row" });
 			row.style.display = "flex";
-			row.style.alignItems = "center";
+			row.style.alignItems = "flex-start";
 			row.style.gap = "8px";
-			row.createEl("label", { text: label });
+			row.createEl("label", {
+				text: label,
+				attr: { style: "display: inline-block; margin-bottom: 4px;" },
+			});
 			let valueEl: HTMLElement;
 			const current = (settings as any)[key] ?? param.default;
 			if (param.type === "boolean") {
