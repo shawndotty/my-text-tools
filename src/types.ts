@@ -168,7 +168,7 @@ export const BUILTIN_TOOLS: ToolInfo[] = [
 	},
 	{ id: "ai-summarize", nameKey: "TOOL_AI_SUMMARIZE", icon: "file-text" },
 	{ id: "ai-translate", nameKey: "TOOL_AI_TRANSLATE", icon: "languages" },
-	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH", icon: "wand-gesture" },
+	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH", icon: "wand" },
 	{ id: "on-select", nameKey: "TOOL_ON_SELECT", icon: "mouse-pointer-click" },
 	{ id: "regex", nameKey: "TOOL_REGEX", icon: "regex" },
 	{ id: "remove-whitespace", nameKey: "TOOL_WHITESPACE", icon: "space" },
