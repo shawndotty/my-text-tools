@@ -352,6 +352,7 @@ export default {
 	PARAM_TYPE_NUMBER: "数字",
 	PARAM_TYPE_BOOLEAN: "布尔",
 	PARAM_TYPE_SELECT: "下拉选择",
+	PARAM_TYPE_ARRAY: "数组 (换行分隔)",
 	PARAM_DEFAULT_LABEL: "默认值",
 	PARAM_OPTIONS_LABEL: "选项（逗号分隔）",
 };

@@ -34,7 +34,12 @@ export interface CustomScript {
 	params?: ScriptParam[];
 }
 
-export type ScriptParamType = "text" | "number" | "boolean" | "select";
+export type ScriptParamType =
+	| "text"
+	| "number"
+	| "boolean"
+	| "select"
+	| "array";
 
 export interface ScriptParam {
 	key: string;
@@ -963,20 +968,24 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					text: t("PARAM_TYPE_LABEL"),
 				});
 				const typeSelect = typeContainer.createEl("select");
-				["text", "number", "boolean", "select"].forEach((opt) => {
-					const o = document.createElement("option");
-					o.value = opt;
-					o.text =
-						opt === "text"
-							? (t("PARAM_TYPE_TEXT") as string)
-							: opt === "number"
-							? (t("PARAM_TYPE_NUMBER") as string)
-							: opt === "boolean"
-							? (t("PARAM_TYPE_BOOLEAN") as string)
-							: (t("PARAM_TYPE_SELECT") as string);
-					if (param.type === opt) o.selected = true;
-					typeSelect.appendChild(o);
-				});
+				["text", "number", "boolean", "select", "array"].forEach(
+					(opt) => {
+						const o = document.createElement("option");
+						o.value = opt;
+						o.text =
+							opt === "text"
+								? (t("PARAM_TYPE_TEXT") as string)
+								: opt === "number"
+								? (t("PARAM_TYPE_NUMBER") as string)
+								: opt === "boolean"
+								? (t("PARAM_TYPE_BOOLEAN") as string)
+								: opt === "select"
+								? (t("PARAM_TYPE_SELECT") as string)
+								: (t("PARAM_TYPE_ARRAY") as string);
+						if (param.type === opt) o.selected = true;
+						typeSelect.appendChild(o);
+					}
+				);
 				typeSelect.onchange = async (e) => {
 					param.type = (e.target as HTMLSelectElement)
 						.value as ScriptParamType;
@@ -1008,6 +1017,21 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					};
 					defaultInput = checkbox;
+				} else if (param.type === "array") {
+					const textarea = defaultContainer.createEl("textarea", {
+						cls: "mtt-textarea-small",
+					});
+					textarea.rows = 3;
+					textarea.value =
+						param.default !== undefined
+							? String(param.default)
+							: "";
+					textarea.onchange = async (e) => {
+						const val = (e.target as HTMLTextAreaElement).value;
+						param.default = val;
+						await this.plugin.saveSettings();
+					};
+					defaultInput = textarea;
 				} else {
 					const input = defaultContainer.createEl("input", {
 						type: param.type === "number" ? "number" : "text",

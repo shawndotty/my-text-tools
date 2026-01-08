@@ -213,6 +213,18 @@ export function renderToolSettings(
 						(e.target as HTMLSelectElement).value
 					);
 				valueEl = select;
+			} else if (param.type === "array") {
+				const textarea = row.createEl("textarea", {
+					cls: "mtt-textarea-small",
+				});
+				textarea.rows = 3;
+				textarea.value = current !== undefined ? String(current) : "";
+				textarea.onchange = (e) =>
+					callbacks.onSettingsChange(
+						key,
+						(e.target as HTMLTextAreaElement).value
+					);
+				valueEl = textarea;
 			} else {
 				const input = row.createEl("input", {
 					type: param.type === "number" ? "number" : "text",

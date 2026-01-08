@@ -86,8 +86,8 @@ Available variables:
 - selection: The currently selected text (string).
 - text: The entire text of the document (string).
 - params: User-defined parameters (Record<string, any>), e.g., params.foo, params.count, params.enabled.
-  - Types may be text, number, boolean, or select.
-  - Keys not provided may be undefined; handle defaults safely.
+  - Types may be text, number, boolean, select, or array.
+  - For array-type params, the input may come as a single newline-separated string; convert it to an array by splitting on /\\r?\\n/, trimming each item, and filtering out empty lines.
 - app: The Obsidian App instance.
 - console: The console object.
 - Notice: The Obsidian Notice class.
@@ -99,7 +99,7 @@ The code should be a valid JavaScript function body (you may use async/await).
 Do not wrap the code in markdown code blocks. Just return the code.
 Ensure the code handles edge cases gracefully.
 If the user wants to process each line, split the text by newline, process, and join back.
-If parameters are relevant, read them from 'params' and apply sensible defaults.`;
+If parameters are relevant, read them from 'params' and apply sensible defaults. When using array-type params, ensure you handle both pre-split arrays and newline strings by normalizing to string[] first.`;
 
 			const fullUserPrompt = `Requirement: ${this.requirement}
 Target: ${

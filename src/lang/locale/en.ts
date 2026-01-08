@@ -363,6 +363,7 @@ export default {
 	PARAM_TYPE_NUMBER: "Number",
 	PARAM_TYPE_BOOLEAN: "Boolean",
 	PARAM_TYPE_SELECT: "Select",
+	PARAM_TYPE_ARRAY: "Array (Split by newline)",
 	PARAM_DEFAULT_LABEL: "Default",
 	PARAM_OPTIONS_LABEL: "Options (comma-separated)",
 };

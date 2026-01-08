@@ -341,6 +341,7 @@ export default {
 	PARAM_TYPE_NUMBER: "數字",
 	PARAM_TYPE_BOOLEAN: "布林",
 	PARAM_TYPE_SELECT: "下拉選擇",
+	PARAM_TYPE_ARRAY: "陣列 (換行分隔)",
 	PARAM_DEFAULT_LABEL: "默認值",
 	PARAM_OPTIONS_LABEL: "選項（逗號分隔）",
 };

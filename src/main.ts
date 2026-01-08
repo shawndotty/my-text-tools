@@ -216,6 +216,14 @@ export default class MyTextTools extends Plugin {
 								.replace(/\\r/g, "\r");
 						}
 
+						// 如果是数组类型，按换行符分割
+						if (
+							p.type === "array" &&
+							typeof finalVal === "string"
+						) {
+							finalVal = finalVal.split(/\r?\n/);
+						}
+
 						acc[p.key] = finalVal;
 						return acc;
 					}, {} as Record<string, any>);
