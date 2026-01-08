@@ -202,6 +202,9 @@ export class MyTextToolsView extends ItemView {
 				if (mode === "overwrite") {
 					this.targetFile = file;
 					this.selectionRange = null;
+					if (this.editorPanelHandle) {
+						this.editorPanelHandle.updateFilePath(file.path);
+					}
 				}
 				// If insert, do not change targetFile. Content is updated.
 			},

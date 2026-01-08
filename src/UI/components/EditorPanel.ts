@@ -30,6 +30,7 @@ export interface EditorPanelHandle {
 	updateHistoryButtons: (canUndo: boolean, canRedo: boolean) => void;
 	getSelection: () => { start: number; end: number; text: string } | null;
 	replaceSelection: (text: string) => void;
+	updateFilePath: (path: string | null) => void;
 }
 
 /**
@@ -66,23 +67,28 @@ export function renderEditorPanel(
 	}
 
 	// 显示当前文件路径
-	if (currentFilePath) {
-		const pathContainer = header.createDiv({ cls: "mtt-header-path" });
-		pathContainer.setText(currentFilePath);
-		pathContainer.title = currentFilePath;
-		pathContainer.style.flex = "1";
-		pathContainer.style.textAlign = "center";
-		pathContainer.style.overflow = "hidden";
-		pathContainer.style.textOverflow = "ellipsis";
-		pathContainer.style.whiteSpace = "nowrap";
-		pathContainer.style.margin = "0 10px";
-		pathContainer.style.fontSize = "0.85em";
-		pathContainer.style.color = "var(--text-muted)";
-	} else {
-		// 占位符，保持 flex 布局平衡（可选）
-		const spacer = header.createDiv();
-		spacer.style.flex = "1";
-	}
+	const pathContainer = header.createDiv({ cls: "mtt-header-path" });
+	pathContainer.style.flex = "1";
+	pathContainer.style.textAlign = "center";
+	pathContainer.style.overflow = "hidden";
+	pathContainer.style.textOverflow = "ellipsis";
+	pathContainer.style.whiteSpace = "nowrap";
+	pathContainer.style.margin = "0 10px";
+	pathContainer.style.fontSize = "0.85em";
+	pathContainer.style.color = "var(--text-muted)";
+
+	const updateFilePath = (path: string | null) => {
+		if (path) {
+			pathContainer.setText(path);
+			pathContainer.title = path;
+		} else {
+			pathContainer.setText("");
+			pathContainer.removeAttribute("title");
+		}
+	};
+
+	// 初始化路径显示
+	updateFilePath(currentFilePath);
 
 	// 按钮容器
 	const actionGroup = header.createDiv({ cls: "mtt-action-group" });
@@ -372,5 +378,10 @@ export function renderEditorPanel(
 		saveOverBtn.onclick = () => callbacks.onSaveOriginal();
 	}
 
-	return { updateHistoryButtons, getSelection, replaceSelection };
+	return {
+		updateHistoryButtons,
+		getSelection,
+		replaceSelection,
+		updateFilePath,
+	};
 }
