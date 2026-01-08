@@ -281,6 +281,7 @@ export class MyTextToolsView extends ItemView {
 						this.settingsState.savedBatches =
 							this.plugin.settings.savedBatches;
 						new Notice(t("NOTICE_BATCH_DELETED"));
+						this.render();
 					},
 					(batch) => {
 						// Edit batch
@@ -300,6 +301,7 @@ export class MyTextToolsView extends ItemView {
 									this.settingsState.savedBatches =
 										this.plugin.settings.savedBatches;
 									new Notice(t("NOTICE_BATCH_UPDATED"));
+									this.render();
 								}
 							},
 							async (newBatch) => {
@@ -311,6 +313,7 @@ export class MyTextToolsView extends ItemView {
 								this.settingsState.savedBatches =
 									this.plugin.settings.savedBatches;
 								new Notice(t("NOTICE_BATCH_SAVED_AS_NEW"));
+								this.render();
 							}
 						).open();
 					}

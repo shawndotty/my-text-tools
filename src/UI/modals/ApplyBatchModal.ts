@@ -1,6 +1,7 @@
 import { App, Modal, Setting, ButtonComponent } from "obsidian";
 import { t } from "../../lang/helpers";
 import { BatchProcess } from "../../types";
+import { ConfirmModal } from "./ConfirmModal";
 
 export class ApplyBatchModal extends Modal {
 	batches: BatchProcess[];
@@ -79,15 +80,29 @@ export class ApplyBatchModal extends Modal {
 			new ButtonComponent(btnGroup)
 				.setIcon("trash-2")
 				.setTooltip(t("BTN_DELETE"))
-				.onClick(async () => {
-					if (confirm(t("CONFIRM_DELETE_BATCH"))) {
-						this.onDelete(batch);
-						// Refresh list
-						row.remove();
-						if (this.batches.length === 0) {
-							this.close();
-						}
-					}
+				.onClick(() => {
+					new ConfirmModal(
+						this.app,
+						t("BTN_DELETE"),
+						t("CONFIRM_DELETE_BATCH"),
+						() => {
+							this.onDelete(batch);
+							// Remove from local array to check length
+							const index = this.batches.indexOf(batch);
+							if (index > -1) {
+								this.batches.splice(index, 1);
+							}
+
+							// Refresh list
+							row.remove();
+							if (this.batches.length === 0) {
+								this.close();
+							}
+						},
+						t("BTN_DELETE"),
+						t("BTN_CANCEL"),
+						true
+					).open();
 				});
 		});
 	}

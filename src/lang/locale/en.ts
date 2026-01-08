@@ -387,6 +387,8 @@ export default {
 	NOTICE_NO_BATCHES: "No saved batch processes found.",
 	CONFIRM_DELETE_BATCH: "Are you sure you want to delete this batch process?",
 	BTN_DELETE: "Delete",
+	BTN_CANCEL: "Cancel",
+	BTN_CONFIRM: "Confirm",
 	BTN_SAVE_NEW_BATCH: "Save Batch Process",
 
 	// Edit Batch

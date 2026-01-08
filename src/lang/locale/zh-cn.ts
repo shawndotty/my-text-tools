@@ -375,6 +375,8 @@ export default {
 	NOTICE_NO_BATCHES: "没有保存的批处理。",
 	BTN_APPLY: "应用",
 	BTN_DELETE: "删除",
+	BTN_CANCEL: "取消",
+	BTN_CONFIRM: "确认",
 	CONFIRM_DELETE_BATCH: "确定要删除这个批处理吗？",
 	NOTICE_BATCH_APPLIED: "批处理应用成功。",
 
