@@ -141,21 +141,23 @@ export class ImportNoteModal extends SuggestModal<ImportItem> {
 
 		if (item.heading) {
 			// Header
-			title.setText(item.heading.heading);
-			const note = content.createDiv({ cls: "suggestion-note" });
-			note.setText(item.file.path);
-
 			if (item.match) {
 				renderMatches(title, item.heading.heading, item.match.matches);
+			} else {
+				title.setText(item.heading.heading);
 			}
+
+			const note = content.createDiv({ cls: "suggestion-note" });
+			note.setText(item.file.path);
 		} else {
 			// File
-			title.setText(item.file.path);
 			// Optional: Show modification date or size in note?
 			// const note = content.createDiv({ cls: "suggestion-note" });
 
 			if (item.match) {
 				renderMatches(title, item.file.path, item.match.matches);
+			} else {
+				title.setText(item.file.path);
 			}
 		}
 	}
