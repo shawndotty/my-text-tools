@@ -794,6 +794,43 @@ function renderLineBreakSettings(
 			(e.target as HTMLSelectElement).value
 		);
 
+	parent.createEl("label", {
+		text: t("SETTING_LB_STYLE"),
+	});
+	const styleSelect = parent.createEl("select", {
+		cls: "mtt-select",
+	});
+	styleSelect.createEl("option", {
+		text: t("OPTION_LB_AUTO"),
+		value: "auto",
+	});
+	styleSelect.createEl("option", {
+		text: t("OPTION_LB_LF"),
+		value: "LF",
+	});
+	styleSelect.createEl("option", {
+		text: t("OPTION_LB_CRLF"),
+		value: "CRLF",
+	});
+	styleSelect.value = settings.lbStyle;
+	styleSelect.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"lbStyle",
+			(e.target as HTMLSelectElement).value
+		);
+
+	const mergeLabel = parent.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const mergeCheck = mergeLabel.createEl("input", { type: "checkbox" });
+	mergeCheck.checked = settings.lbMergeEmpty;
+	mergeCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"lbMergeEmpty",
+			(e.target as HTMLInputElement).checked
+		);
+	mergeLabel.appendText(" " + t("CHECKBOX_LB_MERGE_EMPTY"));
+
 	const runBtn = parent.createEl("button", {
 		text: t("BTN_RUN_LB"),
 		cls: "mtt-run-btn",

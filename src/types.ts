@@ -40,6 +40,8 @@ export interface SettingsState {
 		| "remove-before"
 		| "remove-all";
 	lbRegex: boolean; // 是否启用正则
+	lbStyle: "auto" | "LF" | "CRLF";
+	lbMergeEmpty: boolean;
 	preserveFrontmatter: boolean; // 默认开启保护
 	preserveHeader: boolean; // 默认不开启，用户按需勾选
 	dedupeIncludeEmpty: boolean; // 默认不包含空行，即：空行不参与去重，原样保留
@@ -110,6 +112,8 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	lbTrigger: "",
 	lbAction: "add-after",
 	lbRegex: false,
+	lbStyle: "auto",
+	lbMergeEmpty: false,
 	preserveFrontmatter: true,
 	preserveHeader: false,
 	dedupeIncludeEmpty: false,

@@ -164,7 +164,9 @@ export function processText(
 				textToProcess,
 				settings.lbTrigger,
 				settings.lbAction,
-				settings.lbRegex
+				settings.lbRegex,
+				settings.lbStyle,
+				settings.lbMergeEmpty
 			);
 			break;
 		case "clear-format":
@@ -541,10 +543,19 @@ function processLineBreakTools(
 		| "remove-after"
 		| "remove-before"
 		| "remove-all",
-	lbRegex: boolean
+	lbRegex: boolean,
+	lbStyle: "auto" | "LF" | "CRLF",
+	lbMergeEmpty: boolean
 ): string {
+	const detected = /\r\n/.test(text)
+		? "\r\n"
+		: /\r/.test(text) && !/\n/.test(text)
+		? "\r"
+		: "\n";
+	const eol =
+		lbStyle === "LF" ? "\n" : lbStyle === "CRLF" ? "\r\n" : detected;
 	if (lbAction === "remove-all") {
-		return text.replace(/\n/g, "");
+		return text.replace(/\r\n|\n|\r/g, "");
 	}
 	if (!lbTrigger) {
 		new Notice(t("NOTICE_LB_TRIGGER"));
@@ -552,7 +563,6 @@ function processLineBreakTools(
 	}
 
 	try {
-		// 辅助函数：转义普通字符以用于正则
 		const escape = (str: string) =>
 			str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 		const patternStr = lbRegex ? lbTrigger : escape(lbTrigger);
@@ -562,37 +572,33 @@ function processLineBreakTools(
 
 		switch (lbAction) {
 			case "add-after":
-				// 在匹配项后加换行：$0 是匹配到的内容本身
 				regex = new RegExp(patternStr, "g");
-				replacement = `$&` + `\n`;
+				replacement = `$&` + eol;
 				break;
 			case "add-before":
-				// 在匹配项前加换行
 				regex = new RegExp(patternStr, "g");
-				replacement = `\n` + `$&`;
+				replacement = eol + `$&`;
 				break;
 			case "remove-after":
-				// 移除匹配项后的换行：匹配 内容+换行 替换为 内容
-				regex = new RegExp(`${patternStr}\\n`, "g");
-				replacement = `$&`.replace(/\n$/, ""); // 移除匹配末尾的换行
+				regex = new RegExp(`${patternStr}(?:\\r\\n|\\n|\\r)`, "g");
+				replacement = `$&`.replace(/\r\n|\n|\r$/, "");
 				break;
 			case "remove-before":
-				// 移除匹配项前的换行
-				regex = new RegExp(`\\n${patternStr}`, "g");
-				replacement = `$&`.replace(/^\n/, ""); // 移除匹配开头的换行
+				regex = new RegExp(`(?:\\r\\n|\\n|\\r)${patternStr}`, "g");
+				replacement = `$&`.replace(/^\r\n|\n|\r/, "");
 				break;
 		}
 
-		// 执行替换
 		if (lbAction.startsWith("add")) {
-			return text.replace(regex!, replacement);
+			const out = text.replace(regex!, replacement);
+			return lbMergeEmpty ? out.replace(/(?:\r\n|\n|\r){2,}/g, eol) : out;
 		} else {
-			// 移除操作时，由于正则已经包含了 \n，直接替换为匹配项中除换行外的部分
-			return text.replace(regex!, (match) => {
+			const out = text.replace(regex!, (match) => {
 				return lbAction === "remove-after"
-					? match.replace(/\n$/, "")
-					: match.replace(/^\n/, "");
+					? match.replace(/\r\n|\n|\r$/, "")
+					: match.replace(/^\r\n|\n|\r/, "");
 			});
+			return lbMergeEmpty ? out.replace(/(?:\r\n|\n|\r){2,}/g, eol) : out;
 		}
 	} catch (e) {
 		new Notice(t("NOTICE_LB_ERROR"));

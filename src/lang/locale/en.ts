@@ -127,6 +127,11 @@ export default {
 	OPTION_REMOVE_AFTER: "Remove Line Break AFTER match",
 	OPTION_REMOVE_BEFORE: "Remove Line Break BEFORE match",
 	OPTION_REMOVE_ALL: "Remove ALL Line Breaks",
+	SETTING_LB_STYLE: "Line Break Style:",
+	OPTION_LB_AUTO: "Auto (preserve)",
+	OPTION_LB_LF: "LF (\\n)",
+	OPTION_LB_CRLF: "CRLF (\\r\\n)",
+	CHECKBOX_LB_MERGE_EMPTY: " Merge consecutive empty lines",
 	BTN_RUN_LB: "Run Line Break Tool",
 
 	NOTICE_DEDUPE: "Duplicate lines removed",

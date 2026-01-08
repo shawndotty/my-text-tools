@@ -126,6 +126,11 @@ export default {
 	OPTION_REMOVE_AFTER: "移除 此内容 后的换行",
 	OPTION_REMOVE_BEFORE: "移除 此内容 前的换行",
 	OPTION_REMOVE_ALL: "移除所有换行",
+	SETTING_LB_STYLE: "换行风格：",
+	OPTION_LB_AUTO: "自动（保持原风格）",
+	OPTION_LB_LF: "LF（\\n）",
+	OPTION_LB_CRLF: "CRLF（\\r\\n）",
+	CHECKBOX_LB_MERGE_EMPTY: " 合并连续空行",
 	BTN_RUN_LB: "执行换行处理",
 
 	NOTICE_DEDUPE: "已去除重复行",
