@@ -90,6 +90,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 
 export class MyTextToolsSettingTab extends PluginSettingTab {
 	plugin: MyTextTools;
+	private expandedScripts: Set<string> = new Set();
 
 	constructor(app: App, plugin: MyTextTools) {
 		super(app, plugin);
@@ -471,13 +472,18 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				".setting-item-info"
 			) as HTMLElement | null;
 			const bodyEl = cardContainer.createDiv({ cls: "mtt-card-body" });
-			let expanded = false;
+			let expanded = this.expandedScripts.has(card.id);
 			const arrowEl = document.createElement("span");
 			arrowEl.style.marginRight = "6px";
 			if (headerInfo) headerInfo.prepend(arrowEl);
 			const updateVisibility = () => {
 				bodyEl.style.display = expanded ? "block" : "none";
 				setIcon(arrowEl, expanded ? "chevron-down" : "chevron-right");
+				if (expanded) {
+					this.expandedScripts.add(card.id);
+				} else {
+					this.expandedScripts.delete(card.id);
+				}
 			};
 			updateVisibility();
 			headerInfo?.addEventListener("click", () => {
@@ -762,13 +768,18 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				".setting-item-info"
 			) as HTMLElement | null;
 			const bodyEl = cardContainer.createDiv({ cls: "mtt-card-body" });
-			let expanded = false;
+			let expanded = this.expandedScripts.has(script.id);
 			const arrowEl = document.createElement("span");
 			arrowEl.style.marginRight = "6px";
 			if (headerInfo) headerInfo.prepend(arrowEl);
 			const updateVisibility = () => {
 				bodyEl.style.display = expanded ? "block" : "none";
 				setIcon(arrowEl, expanded ? "chevron-down" : "chevron-right");
+				if (expanded) {
+					this.expandedScripts.add(script.id);
+				} else {
+					this.expandedScripts.delete(script.id);
+				}
 			};
 			updateVisibility();
 			headerInfo?.addEventListener("click", () => {
@@ -989,8 +1000,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				};
 				if (param.type !== "select") {
-					optionsLabel.style.opacity = "0.5";
-					optionsInput.style.opacity = "0.5";
+					optionsLabel.style.display = "none";
+					optionsInput.style.display = "none";
 					optionsInput.disabled = true;
 				}
 			});

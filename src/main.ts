@@ -206,7 +206,17 @@ export default class MyTextTools extends Plugin {
 					params = script.params.reduce((acc, p) => {
 						const key = `custom:${script.id}:${p.key}`;
 						const val = (view.settingsState as any)[key];
-						acc[p.key] = val !== undefined ? val : p.default;
+						let finalVal = val !== undefined ? val : p.default;
+
+						// 如果是文本类型，处理转义字符
+						if (p.type === "text" && typeof finalVal === "string") {
+							finalVal = finalVal
+								.replace(/\\n/g, "\n")
+								.replace(/\\t/g, "\t")
+								.replace(/\\r/g, "\r");
+						}
+
+						acc[p.key] = finalVal;
 						return acc;
 					}, {} as Record<string, any>);
 				}
