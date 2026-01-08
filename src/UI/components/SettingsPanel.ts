@@ -1,7 +1,7 @@
 import { setIcon } from "obsidian";
 import { t } from "../../lang/helpers";
 import { SettingsState } from "../../types";
-import { AIToolConfig, CustomScript } from "../../settings";
+import { AIToolConfig, CustomScript, CustomAIAction } from "../../settings";
 
 export interface SettingsPanelCallbacks {
 	onSettingsChange: (key: string, value: any) => void;
@@ -9,6 +9,10 @@ export interface SettingsPanelCallbacks {
 	onSaveAISettings?: (
 		toolId: string,
 		config: AIToolConfig
+	) => void | Promise<void>;
+	onSaveCustomAIAction?: (
+		actionId: string,
+		updates: Partial<CustomAIAction>
 	) => void | Promise<void>;
 }
 
@@ -83,7 +87,8 @@ export function renderToolSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks,
 	aiToolsConfig?: Record<string, AIToolConfig>,
-	customScripts?: CustomScript[]
+	customScripts?: CustomScript[],
+	customActions?: CustomAIAction[]
 ): void {
 	parent.createEl("hr"); // 分隔线
 
@@ -106,10 +111,41 @@ export function renderToolSettings(
 
 	// 自定义 AI 卡片
 	if (activeTool.startsWith("custom-ai:")) {
+		const id = activeTool.split(":")[1]!;
+		const action = customActions?.find((a) => a.id === id) || undefined;
 		settingsContent.createEl("p", {
 			text: t("AI_HINT"),
 			cls: "mtt-ai-hint",
 		});
+		settingsContent.createEl("label", { text: t("SETTING_PROMPT") });
+		const promptArea = settingsContent.createEl("textarea", {
+			cls: "mtt-textarea-small",
+			text: action?.prompt || "",
+			attr: { rows: 4 },
+		});
+		promptArea.onchange = async (e) => {
+			const newVal = (e.target as HTMLTextAreaElement).value;
+			if (callbacks.onSaveCustomAIAction) {
+				await callbacks.onSaveCustomAIAction(id, { prompt: newVal });
+			}
+		};
+		settingsContent.createEl("label", {
+			text: t("SETTING_SYSTEM_PROMPT"),
+		});
+		const sysPromptArea = settingsContent.createEl("textarea", {
+			cls: "mtt-textarea-small",
+			text: action?.systemPrompt || "",
+			attr: { rows: 4 },
+		});
+		sysPromptArea.onchange = async (e) => {
+			const newVal = (e.target as HTMLTextAreaElement).value;
+			if (callbacks.onSaveCustomAIAction) {
+				await callbacks.onSaveCustomAIAction(id, {
+					systemPrompt: newVal,
+				});
+			}
+		};
+		settingsContent.createEl("hr");
 		const runBtn = settingsContent.createEl("button", {
 			text: t("BTN_RUN_AI"),
 			cls: "mtt-run-btn",

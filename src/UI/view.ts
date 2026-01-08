@@ -13,7 +13,7 @@ import { processText } from "../utils/textProcessors";
 import { saveToOriginal, saveToNewFile } from "../utils/fileOperations";
 import { AIService } from "../utils/aiService";
 import MyTextTools from "../main";
-import { AIToolConfig } from "../settings";
+import { AIToolConfig, CustomAIAction } from "../settings";
 import { renderToolsPanel } from "./components/ToolsPanel";
 import {
 	renderEditorPanel,
@@ -261,6 +261,23 @@ export class MyTextToolsView extends ItemView {
 				this.plugin.settings.aiTools[toolId] = config;
 				await this.plugin.saveSettings();
 			},
+			onSaveCustomAIAction: async (
+				actionId: string,
+				updates: Partial<CustomAIAction>
+			) => {
+				const target = this.plugin.settings.customActions.find(
+					(a) => a.id === actionId
+				);
+				if (target) {
+					if (updates.prompt !== undefined) {
+						target.prompt = updates.prompt!;
+					}
+					if (updates.systemPrompt !== undefined) {
+						target.systemPrompt = updates.systemPrompt!;
+					}
+					await this.plugin.saveSettings();
+				}
+			},
 		};
 		renderGlobalSettings(rightPanel, this.settingsState, settingsCallbacks);
 		renderToolSettings(
@@ -269,7 +286,8 @@ export class MyTextToolsView extends ItemView {
 			this.settingsState,
 			settingsCallbacks,
 			this.plugin.settings.aiTools,
-			this.plugin.settings.customScripts
+			this.plugin.settings.customScripts,
+			this.plugin.settings.customActions
 		);
 	}
 
