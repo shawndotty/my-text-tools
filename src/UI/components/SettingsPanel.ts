@@ -782,6 +782,10 @@ function renderLineBreakSettings(
 		text: t("OPTION_REMOVE_BEFORE"),
 		value: "remove-before",
 	});
+	actionSelect.createEl("option", {
+		text: t("OPTION_REMOVE_ALL"),
+		value: "remove-all",
+	});
 
 	actionSelect.value = settings.lbAction;
 	actionSelect.onchange = (e) =>

@@ -535,9 +535,17 @@ function processRemoveWhitespace(
 function processLineBreakTools(
 	text: string,
 	lbTrigger: string,
-	lbAction: "add-after" | "add-before" | "remove-after" | "remove-before",
+	lbAction:
+		| "add-after"
+		| "add-before"
+		| "remove-after"
+		| "remove-before"
+		| "remove-all",
 	lbRegex: boolean
 ): string {
+	if (lbAction === "remove-all") {
+		return text.replace(/\n/g, "");
+	}
 	if (!lbTrigger) {
 		new Notice(t("NOTICE_LB_TRIGGER"));
 		return text;

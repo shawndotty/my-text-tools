@@ -113,6 +113,7 @@ export default {
 	OPTION_ADD_BEFORE: "在此內容 前 添加換行",
 	OPTION_REMOVE_AFTER: "移除 此內容 後的換行",
 	OPTION_REMOVE_BEFORE: "移除 此內容 前的換行",
+	OPTION_REMOVE_ALL: "移除所有換行",
 	BTN_RUN_LB: "執行換行處理",
 
 	NOTICE_DEDUPE: "已去除重複行",

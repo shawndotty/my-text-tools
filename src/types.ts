@@ -33,7 +33,12 @@ export interface SettingsState {
 	wsAll: boolean; // 删除所有空格
 	wsTabs: boolean; // 删除所有制表符
 	lbTrigger: string; // 触发内容（字符或正则）
-	lbAction: "add-after" | "add-before" | "remove-after" | "remove-before"; // 执行的操作
+	lbAction:
+		| "add-after"
+		| "add-before"
+		| "remove-after"
+		| "remove-before"
+		| "remove-all";
 	lbRegex: boolean; // 是否启用正则
 	preserveFrontmatter: boolean; // 默认开启保护
 	preserveHeader: boolean; // 默认不开启，用户按需勾选

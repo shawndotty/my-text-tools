@@ -126,6 +126,7 @@ export default {
 	OPTION_ADD_BEFORE: "Add Line Break BEFORE match",
 	OPTION_REMOVE_AFTER: "Remove Line Break AFTER match",
 	OPTION_REMOVE_BEFORE: "Remove Line Break BEFORE match",
+	OPTION_REMOVE_ALL: "Remove ALL Line Breaks",
 	BTN_RUN_LB: "Run Line Break Tool",
 
 	NOTICE_DEDUPE: "Duplicate lines removed",
