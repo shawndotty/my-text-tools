@@ -1,7 +1,7 @@
 import { setIcon } from "obsidian";
 import { t } from "../../lang/helpers";
 import { SettingsState } from "../../types";
-import { AIToolConfig } from "../../settings";
+import { AIToolConfig, CustomScript } from "../../settings";
 
 export interface SettingsPanelCallbacks {
 	onSettingsChange: (key: string, value: any) => void;
@@ -82,7 +82,8 @@ export function renderToolSettings(
 	activeTool: string | "",
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks,
-	aiToolsConfig?: Record<string, AIToolConfig>
+	aiToolsConfig?: Record<string, AIToolConfig>,
+	customScripts?: CustomScript[]
 ): void {
 	parent.createEl("hr"); // 分隔线
 
@@ -119,9 +120,72 @@ export function renderToolSettings(
 
 	// 自定义脚本卡片
 	if (activeTool.startsWith("custom-script:")) {
-		settingsContent.createEl("p", {
-			text: t("HINT_RUN_SCRIPT"),
-			cls: "mtt-ai-hint",
+		const id = activeTool.split(":")[1]!;
+		const script = customScripts?.find((s) => s.id === id) || undefined;
+		if (!script) {
+			const runBtn = settingsContent.createEl("button", {
+				text: t("BTN_RUN_SCRIPT"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => callbacks.onRun(activeTool);
+			return;
+		}
+		if ((script.params || []).length === 0) {
+			const runBtn = settingsContent.createEl("button", {
+				text: t("BTN_RUN_SCRIPT"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => callbacks.onRun(activeTool);
+			return;
+		}
+		(script.params || []).forEach((param) => {
+			const key = `custom:${id}:${param.key}`;
+			const label = param.label || param.key;
+			const row = settingsContent.createDiv({ cls: "mtt-setting-row" });
+			row.style.display = "flex";
+			row.style.alignItems = "center";
+			row.style.gap = "8px";
+			row.createEl("label", { text: label });
+			let valueEl: HTMLElement;
+			const current = (settings as any)[key] ?? param.default;
+			if (param.type === "boolean") {
+				const input = row.createEl("input", { type: "checkbox" });
+				input.checked = !!current;
+				input.onchange = (e) =>
+					callbacks.onSettingsChange(
+						key,
+						(e.target as HTMLInputElement).checked
+					);
+				valueEl = input;
+			} else if (param.type === "select") {
+				const select = row.createEl("select");
+				(param.options || []).forEach((opt) => {
+					const o = document.createElement("option");
+					o.value = opt;
+					o.text = opt;
+					if (current === opt) o.selected = true;
+					select.appendChild(o);
+				});
+				select.onchange = (e) =>
+					callbacks.onSettingsChange(
+						key,
+						(e.target as HTMLSelectElement).value
+					);
+				valueEl = select;
+			} else {
+				const input = row.createEl("input", {
+					type: param.type === "number" ? "number" : "text",
+					value: current !== undefined ? String(current) : "",
+				});
+				input.onchange = (e) =>
+					callbacks.onSettingsChange(
+						key,
+						param.type === "number"
+							? Number((e.target as HTMLInputElement).value)
+							: (e.target as HTMLInputElement).value
+					);
+				valueEl = input;
+			}
 		});
 		const runBtn = settingsContent.createEl("button", {
 			text: t("BTN_RUN_SCRIPT"),

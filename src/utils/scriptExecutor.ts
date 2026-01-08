@@ -6,9 +6,10 @@ export class ScriptExecutor {
 	async execute(
 		code: string,
 		text: string,
-		selection: string
+		selection: string,
+		params: Record<string, any> = {}
 	): Promise<string> {
-		return executeCustomScript(code, text, selection, this.app);
+		return executeCustomScript(code, text, selection, params, this.app);
 	}
 }
 
@@ -25,6 +26,7 @@ export async function executeCustomScript(
 	code: string,
 	text: string,
 	selection: string,
+	params: Record<string, any>,
 	app: App
 ): Promise<string> {
 	try {
@@ -38,6 +40,7 @@ export async function executeCustomScript(
 		const func = new AsyncFunction(
 			"selection",
 			"text",
+			"params",
 			"app",
 			"console",
 			"Notice",
@@ -51,7 +54,7 @@ export async function executeCustomScript(
 		);
 
 		// 执行函数
-		const result = await func(selection, text, app, console, Notice);
+		const result = await func(selection, text, params, app, console, Notice);
 
 		// 如果结果是字符串，返回它
 		if (typeof result === "string") {

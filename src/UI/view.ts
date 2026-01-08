@@ -268,7 +268,8 @@ export class MyTextToolsView extends ItemView {
 			this.activeTool,
 			this.settingsState,
 			settingsCallbacks,
-			this.plugin.settings.aiTools
+			this.plugin.settings.aiTools,
+			this.plugin.settings.customScripts
 		);
 	}
 

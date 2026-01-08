@@ -31,6 +31,17 @@ export interface CustomScript {
 	icon?: string;
 	showInRibbon: boolean;
 	code: string; // JavaScript code content
+	params?: ScriptParam[];
+}
+
+export type ScriptParamType = "text" | "number" | "boolean" | "select";
+
+export interface ScriptParam {
+	key: string;
+	label?: string;
+	type: ScriptParamType;
+	default?: string | number | boolean;
+	options?: string[];
 }
 
 export interface MyTextToolsSettings {
@@ -704,6 +715,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						icon: "scroll",
 						showInRibbon: true,
 						code: "return selection.toUpperCase();",
+						params: [],
 					};
 					this.plugin.settings.customScripts.push(newScript);
 					await this.plugin.saveSettings();
@@ -845,6 +857,143 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						).open();
 					})
 			);
+
+			const paramsHeader = bodyEl.createEl("h4", {
+				text: "参数",
+				cls: "mtt-panel-title",
+			});
+			paramsHeader.style.marginTop = "12px";
+
+			new Setting(bodyEl)
+				.setName("参数管理")
+				.setDesc("定义该脚本在运行时可配置的参数")
+				.addButton((btn) =>
+					btn.setButtonText("新增参数").onClick(async () => {
+						if (!script.params) script.params = [];
+						const nextIndex = (script.params?.length || 0) + 1;
+						script.params.push({
+							key: `param${nextIndex}`,
+							label: `参数 ${nextIndex}`,
+							type: "text",
+							default: "",
+						});
+						await this.plugin.saveSettings();
+						containerEl.empty();
+						this.renderCustomScriptsSettings(containerEl);
+					})
+				);
+
+			(script.params || []).forEach((param, pIdx) => {
+				const pCard = bodyEl.createDiv({ cls: "mtt-custom-card" });
+				new Setting(pCard)
+					.setName(`参数 ${pIdx + 1}`)
+					.addExtraButton((btn) =>
+						btn.setIcon("trash").onClick(async () => {
+							script.params = (script.params || []).filter(
+								(_, i) => i !== pIdx
+							);
+							await this.plugin.saveSettings();
+							containerEl.empty();
+							this.renderCustomScriptsSettings(containerEl);
+						})
+					);
+
+				const grid = pCard.createDiv();
+				grid.style.display = "grid";
+				grid.style.gridTemplateColumns = "1fr 1fr";
+				grid.style.gap = "8px";
+
+				const keyLabel = grid.createEl("label", { text: "Key" });
+				const keyInput = grid.createEl("input", {
+					type: "text",
+					value: param.key,
+				});
+				keyInput.onchange = async (e) => {
+					param.key = (e.target as HTMLInputElement).value;
+					await this.plugin.saveSettings();
+				};
+
+				const labelLabel = grid.createEl("label", { text: "标签" });
+				const labelInput = grid.createEl("input", {
+					type: "text",
+					value: param.label || "",
+				});
+				labelInput.onchange = async (e) => {
+					param.label = (e.target as HTMLInputElement).value;
+					await this.plugin.saveSettings();
+				};
+
+				const typeLabel = grid.createEl("label", { text: "类型" });
+				const typeSelect = grid.createEl("select");
+				["text", "number", "boolean", "select"].forEach((opt) => {
+					const o = document.createElement("option");
+					o.value = opt;
+					o.text = opt;
+					if (param.type === opt) o.selected = true;
+					typeSelect.appendChild(o);
+				});
+				typeSelect.onchange = async (e) => {
+					param.type = (e.target as HTMLSelectElement)
+						.value as ScriptParamType;
+					if (param.type !== "select") {
+						param.options = undefined;
+					}
+					await this.plugin.saveSettings();
+					containerEl.empty();
+					this.renderCustomScriptsSettings(containerEl);
+				};
+
+				const defaultLabel = grid.createEl("label", { text: "默认值" });
+				let defaultInput: HTMLElement;
+				if (param.type === "boolean") {
+					const checkbox = grid.createEl("input", {
+						type: "checkbox",
+					});
+					checkbox.checked = !!param.default;
+					checkbox.onchange = async (e) => {
+						param.default = (e.target as HTMLInputElement).checked;
+						await this.plugin.saveSettings();
+					};
+					defaultInput = checkbox;
+				} else {
+					const input = grid.createEl("input", {
+						type: param.type === "number" ? "number" : "text",
+						value:
+							param.default !== undefined
+								? String(param.default)
+								: "",
+					});
+					input.onchange = async (e) => {
+						const val = (e.target as HTMLInputElement).value;
+						param.default =
+							param.type === "number" ? Number(val) : val;
+						await this.plugin.saveSettings();
+					};
+					defaultInput = input;
+				}
+
+				const optionsLabel = grid.createEl("label", {
+					text: "选项(逗号分隔)",
+				});
+				const optionsInput = grid.createEl("input", {
+					type: "text",
+					value: (param.options || []).join(","),
+				});
+				optionsInput.onchange = async (e) => {
+					const raw = (e.target as HTMLInputElement).value;
+					const arr = raw
+						.split(",")
+						.map((s) => s.trim())
+						.filter((s) => s.length > 0);
+					param.options = arr.length ? arr : undefined;
+					await this.plugin.saveSettings();
+				};
+				if (param.type !== "select") {
+					optionsLabel.style.opacity = "0.5";
+					optionsInput.style.opacity = "0.5";
+					optionsInput.disabled = true;
+				}
+			});
 		});
 	}
 }

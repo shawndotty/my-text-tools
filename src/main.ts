@@ -195,10 +195,27 @@ export default class MyTextTools extends Plugin {
 
 		try {
 			const executor = new ScriptExecutor(this.app);
+			let params: Record<string, any> = {};
+			if (script.params && script.params.length > 0) {
+				if (
+					mttLeaf &&
+					mttLeaf.view &&
+					mttLeaf.view instanceof MyTextToolsView
+				) {
+					const view = mttLeaf.view as MyTextToolsView;
+					params = script.params.reduce((acc, p) => {
+						const key = `custom:${script.id}:${p.key}`;
+						const val = (view.settingsState as any)[key];
+						acc[p.key] = val !== undefined ? val : p.default;
+						return acc;
+					}, {} as Record<string, any>);
+				}
+			}
 			const result = await executor.execute(
 				script.code,
 				content,
-				selection
+				selection,
+				params
 			);
 
 			if (typeof result === "string") {
