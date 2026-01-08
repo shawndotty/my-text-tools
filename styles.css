@@ -419,6 +419,13 @@ input[type="number"].mtt-small-input {
 	left: 3px !important;
 }
 
+/* textarea */
+
+.mtt-setting-row .mtt-textarea-small {
+	margin: 0.5em 0;
+	width: 100%;
+}
+
 /* SubSetting */
 
 .mtt-sub-settings label {
