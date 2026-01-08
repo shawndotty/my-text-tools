@@ -2,7 +2,7 @@ import { App, PluginSettingTab, Setting, setIcon } from "obsidian";
 import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
-import { BUILTIN_TOOLS } from "./types";
+import { BUILTIN_TOOLS, BatchProcess } from "./types";
 import { AIGenerateScriptModal } from "./UI/modals/AIGenerateScriptModal";
 import { AIService } from "./utils/aiService";
 
@@ -67,6 +67,7 @@ export interface MyTextToolsSettings {
 	// 默认 AI 工具配置
 	aiTools: Record<string, AIToolConfig>;
 	customIcons: Record<string, string>;
+	savedBatches: BatchProcess[];
 }
 
 export interface AIToolConfig {
@@ -91,6 +92,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	customScripts: [],
 	aiTools: {},
 	customIcons: {},
+	savedBatches: [],
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {

@@ -24,6 +24,10 @@ export interface EditorPanelCallbacks {
 	onContentChange?: (content: string) => void;
 	onProcessSelection?: (text: string) => string | null;
 	onPushHistory?: () => void;
+	onStartRecording: () => void;
+	onStopRecording: () => void;
+	onCancelRecording: () => void;
+	onApplyBatch: () => void;
 }
 
 export interface EditorPanelHandle {
@@ -43,7 +47,9 @@ export function renderEditorPanel(
 	canUndo: boolean,
 	canRedo: boolean,
 	hasOriginalEditor: boolean,
-	isSelectionMode: boolean, // 新增参数
+	isSelectionMode: boolean,
+	isRecording: boolean,
+	hasBatches: boolean,
 	currentFilePath: string | null,
 	callbacks: EditorPanelCallbacks,
 	app: any
@@ -341,6 +347,49 @@ export function renderEditorPanel(
 			new Notice(t("NOTICE_IMPORT_SUCCESS"), 2000);
 		}).open();
 	};
+
+	// 中间录制控制按钮组
+	const centerBtnGroup = footer.createDiv({ cls: "mtt-footer-btn-group" });
+	centerBtnGroup.style.display = "flex";
+	centerBtnGroup.style.alignItems = "center";
+	centerBtnGroup.style.gap = "8px";
+
+	if (isRecording) {
+		// 录制中：显示取消和停止
+		const recIndicator = centerBtnGroup.createSpan();
+		recIndicator.setText("🔴 REC");
+		recIndicator.style.color = "var(--text-error)";
+		recIndicator.style.fontWeight = "bold";
+		recIndicator.style.fontSize = "0.8em";
+		recIndicator.style.marginRight = "4px";
+
+		const cancelRecBtn = centerBtnGroup.createEl("button", {
+			text: t("BTN_CANCEL_RECORDING"),
+			cls: "mtt-secondary-btn",
+		});
+		cancelRecBtn.onclick = callbacks.onCancelRecording;
+
+		const stopRecBtn = centerBtnGroup.createEl("button", {
+			text: t("BTN_STOP_RECORDING"),
+			cls: "mod-warning",
+		});
+		stopRecBtn.onclick = callbacks.onStopRecording;
+	} else {
+		// 未录制：显示应用批处理（如果有）和开始录制
+		if (hasBatches) {
+			const applyBatchBtn = centerBtnGroup.createEl("button", {
+				text: t("BTN_APPLY_BATCH"),
+				cls: "mtt-secondary-btn",
+			});
+			applyBatchBtn.onclick = callbacks.onApplyBatch;
+		}
+
+		const startRecBtn = centerBtnGroup.createEl("button", {
+			text: t("BTN_START_RECORDING"),
+			cls: "mtt-secondary-btn",
+		});
+		startRecBtn.onclick = callbacks.onStartRecording;
+	}
 
 	// 按钮组容器，方便设置间距
 	const btnGroup = footer.createDiv({ cls: "mtt-footer-btn-group" });

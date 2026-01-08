@@ -25,6 +25,9 @@ import {
 	renderToolSettings,
 	SettingsPanelCallbacks,
 } from "./components/SettingsPanel";
+import { BatchProcess, BatchOperation } from "../types";
+import { SaveBatchModal } from "./modals/SaveBatchModal";
+import { ApplyBatchModal } from "./modals/ApplyBatchModal";
 
 export const MY_TEXT_TOOLS_VIEW = "my-text-tools-view";
 
@@ -47,6 +50,8 @@ export class MyTextToolsView extends ItemView {
 	private editorPanelHandle: EditorPanelHandle | null = null;
 	private isImporting: boolean = false;
 	private isSaving: boolean = false;
+	private isRecording: boolean = false;
+	private currentBatchOperations: BatchOperation[] = [];
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -56,6 +61,8 @@ export class MyTextToolsView extends ItemView {
 	) {
 		super(leaf);
 		this.plugin = plugin;
+		this.settingsState.savedBatches =
+			this.plugin.settings.savedBatches || [];
 		// 初始加载逻辑将由 updateInput 接管，这里仅做基本初始化
 		if (originalEditor) {
 			this.updateInput(originalEditor, file);
@@ -221,6 +228,61 @@ export class MyTextToolsView extends ItemView {
 					);
 				}
 			},
+			onStartRecording: () => {
+				this.isRecording = true;
+				this.currentBatchOperations = [];
+				new Notice(t("NOTICE_RECORDING_STARTED"));
+				this.render();
+			},
+			onStopRecording: () => {
+				this.isRecording = false;
+				if (this.currentBatchOperations.length === 0) {
+					new Notice("No operations recorded.");
+					this.render();
+					return;
+				}
+				new SaveBatchModal(this.app, async (name) => {
+					const newBatch: BatchProcess = {
+						id: Date.now().toString(),
+						name,
+						operations: this.currentBatchOperations,
+					};
+					this.plugin.settings.savedBatches.push(newBatch);
+					await this.plugin.saveSettings();
+					this.settingsState.savedBatches =
+						this.plugin.settings.savedBatches;
+					new Notice("Batch saved: " + name);
+					this.render();
+				}).open();
+				this.render();
+			},
+			onCancelRecording: () => {
+				this.isRecording = false;
+				this.currentBatchOperations = [];
+				new Notice("Recording cancelled");
+				this.render();
+			},
+			onApplyBatch: () => {
+				new ApplyBatchModal(
+					this.app,
+					this.plugin.settings.savedBatches,
+					async (batch) => {
+						// Apply batch
+						await this.applyBatch(batch);
+					},
+					async (batch) => {
+						// Delete batch
+						this.plugin.settings.savedBatches =
+							this.plugin.settings.savedBatches.filter(
+								(b) => b.id !== batch.id
+							);
+						await this.plugin.saveSettings();
+						this.settingsState.savedBatches =
+							this.plugin.settings.savedBatches;
+						new Notice("Batch deleted");
+					}
+				).open();
+			},
 		};
 		this.editorPanelHandle = renderEditorPanel(
 			centerPanel,
@@ -230,6 +292,8 @@ export class MyTextToolsView extends ItemView {
 			this.historyManager.canRedo(),
 			!!this.originalEditor,
 			!!this.selectionRange, // 传递是否为选区模式
+			this.isRecording,
+			this.settingsState.savedBatches.length > 0,
 			this.targetFile ? this.targetFile.path : null,
 			editorCallbacks,
 			this.app
@@ -242,6 +306,17 @@ export class MyTextToolsView extends ItemView {
 				(this.settingsState as any)[key] = value;
 			},
 			onRun: async (toolId: string) => {
+				if (this.isRecording) {
+					// Record operation
+					this.currentBatchOperations.push({
+						toolId,
+						settingsSnapshot: JSON.parse(
+							JSON.stringify(this.settingsState)
+						),
+					});
+					new Notice(`Recorded: ${toolId}`);
+				}
+
 				if (toolId.startsWith("custom-ai:")) {
 					const id = toolId.split(":")[1]!;
 					await this.plugin.runCustomAIAction(id);
@@ -404,6 +479,28 @@ export class MyTextToolsView extends ItemView {
 		);
 		this.content = processedContent;
 
+		this.render();
+	}
+
+	async applyBatch(batch: BatchProcess) {
+		for (const op of batch.operations) {
+			// Restore settings snapshot, but preserve savedBatches
+			const currentBatches = this.settingsState.savedBatches;
+			this.settingsState = {
+				...op.settingsSnapshot,
+				savedBatches: currentBatches,
+			};
+
+			if (op.toolId.startsWith("custom-ai:")) {
+				const id = op.toolId.split(":")[1]!;
+				await this.plugin.runCustomAIAction(id);
+			} else if (op.toolId.startsWith("custom-script:")) {
+				const id = op.toolId.split(":")[1]!;
+				await this.plugin.runCustomScript(id);
+			} else {
+				await this.processText(op.toolId);
+			}
+		}
 		this.render();
 	}
 

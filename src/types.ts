@@ -1,7 +1,19 @@
+export interface BatchOperation {
+	toolId: string;
+	settingsSnapshot: SettingsState;
+}
+
+export interface BatchProcess {
+	id: string;
+	name: string;
+	operations: BatchOperation[];
+}
+
 /**
  * 设置状态类型定义
  */
 export interface SettingsState {
+	savedBatches: BatchProcess[]; // 保存的批处理
 	findText: string;
 	replaceText: string;
 	prefix: string;
@@ -79,6 +91,7 @@ export interface SettingsState {
  * 默认设置状态
  */
 export const DEFAULT_SETTINGS_STATE: SettingsState = {
+	savedBatches: [],
 	findText: "",
 	replaceText: "",
 	prefix: "",
