@@ -464,7 +464,7 @@ export class MyTextToolsView extends ItemView {
 			}
 
 			if (result.error) {
-				new Notice(`❌ ${result.error}`);
+				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
 				return;
 			}
 

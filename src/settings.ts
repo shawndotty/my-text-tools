@@ -220,7 +220,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			.addText((text) => {
 				text.setValue(this.plugin.settings.aiApiKey);
 				text.inputEl.type = "password";
-				text.setPlaceholder("sk-...");
+				text.setPlaceholder(t("API_KEY_PLACEHOLDER"));
 				text.onChange(async (value) => {
 					this.plugin.settings.aiApiKey = value;
 					await this.plugin.saveSettings();
@@ -384,8 +384,10 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					.setName(t("SETTING_TARGET_LANG"))
 					.addText((text) => {
 						const cfg = ensureConfig(id);
-						text.setPlaceholder("English");
-						text.setValue(cfg.targetLanguage ?? "English");
+						text.setPlaceholder(t("TARGET_LANG_PLACEHOLDER"));
+						text.setValue(
+							cfg.targetLanguage ?? t("TARGET_LANG_PLACEHOLDER")
+						);
 						text.onChange(async (value) => {
 							cfg.targetLanguage = value;
 							this.plugin.settings.aiTools[id] = cfg;
@@ -870,22 +872,22 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			);
 
 			const paramsHeader = bodyEl.createEl("h4", {
-				text: "参数",
+				text: t("SCRIPTS_PARAMS_TITLE"),
 				cls: "mtt-panel-title",
 			});
 			paramsHeader.style.marginTop = "12px";
 			paramsHeader.style.paddingLeft = "0px";
 
 			new Setting(bodyEl)
-				.setName("参数管理")
-				.setDesc("定义该脚本在运行时可配置的参数")
+				.setName(t("SCRIPTS_PARAMS_MANAGE"))
+				.setDesc(t("SCRIPTS_PARAMS_DESC"))
 				.addButton((btn) =>
-					btn.setButtonText("新增参数").onClick(async () => {
+					btn.setButtonText(t("BTN_ADD_PARAM")).onClick(async () => {
 						if (!script.params) script.params = [];
 						const nextIndex = (script.params?.length || 0) + 1;
 						script.params.push({
 							key: `param${nextIndex}`,
-							label: `参数 ${nextIndex}`,
+							label: `${t("PARAM_GROUP_NAME")} ${nextIndex}`,
 							type: "text",
 							default: "",
 						});
@@ -898,7 +900,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			(script.params || []).forEach((param, pIdx) => {
 				const pCard = bodyEl.createDiv({ cls: "mtt-custom-card" });
 				new Setting(pCard)
-					.setName(`参数 ${pIdx + 1}`)
+					.setName(`${t("PARAM_GROUP_NAME")} ${pIdx + 1}`)
 					.addExtraButton((btn) =>
 						btn.setIcon("trash").onClick(async () => {
 							script.params = (script.params || []).filter(
@@ -922,7 +924,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				keyContainer.style.justifyContent = "space-between";
 				keyContainer.style.gap = "8px";
 				const keyLabel = keyContainer.createEl("label", {
-					text: "Key",
+					text: t("PARAM_KEY_LABEL"),
 				});
 				const keyInput = keyContainer.createEl("input", {
 					type: "text",
@@ -940,7 +942,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				labelContainer.style.justifyContent = "space-between";
 				labelContainer.style.gap = "8px";
 				const labelLabel = labelContainer.createEl("label", {
-					text: "标签",
+					text: t("PARAM_LABEL_LABEL"),
 				});
 				const labelInput = labelContainer.createEl("input", {
 					type: "text",
@@ -958,13 +960,20 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				typeContainer.style.justifyContent = "space-between";
 				typeContainer.style.gap = "8px";
 				const typeLabel = typeContainer.createEl("label", {
-					text: "类型",
+					text: t("PARAM_TYPE_LABEL"),
 				});
 				const typeSelect = typeContainer.createEl("select");
 				["text", "number", "boolean", "select"].forEach((opt) => {
 					const o = document.createElement("option");
 					o.value = opt;
-					o.text = opt;
+					o.text =
+						opt === "text"
+							? (t("PARAM_TYPE_TEXT") as string)
+							: opt === "number"
+							? (t("PARAM_TYPE_NUMBER") as string)
+							: opt === "boolean"
+							? (t("PARAM_TYPE_BOOLEAN") as string)
+							: (t("PARAM_TYPE_SELECT") as string);
 					if (param.type === opt) o.selected = true;
 					typeSelect.appendChild(o);
 				});
@@ -986,7 +995,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				defaultContainer.style.justifyContent = "space-between";
 				defaultContainer.style.gap = "8px";
 				const defaultLabel = defaultContainer.createEl("label", {
-					text: "默认值",
+					text: t("PARAM_DEFAULT_LABEL"),
 				});
 				let defaultInput: HTMLElement;
 				if (param.type === "boolean") {
@@ -1023,7 +1032,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				optionsContainer.style.justifyContent = "space-between";
 				optionsContainer.style.gap = "8px";
 				const optionsLabel = optionsContainer.createEl("label", {
-					text: "选项(逗号分隔)",
+					text: t("PARAM_OPTIONS_LABEL"),
 				});
 				const optionsInput = optionsContainer.createEl("input", {
 					type: "text",

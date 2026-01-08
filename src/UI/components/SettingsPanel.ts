@@ -1239,8 +1239,8 @@ function renderAISettings(
 		content.createEl("label", { text: t("SETTING_TARGET_LANG") });
 		const langInput = content.createEl("input", {
 			type: "text",
-			placeholder: "English",
-			value: currentConfig.targetLanguage || "English",
+			placeholder: t("TARGET_LANG_PLACEHOLDER"),
+			value: currentConfig.targetLanguage || t("TARGET_LANG_PLACEHOLDER"),
 		});
 		langInput.onchange = async (e) => {
 			const newVal = (e.target as HTMLInputElement).value;

@@ -242,6 +242,7 @@ export default {
 	SETTING_TARGET_LANG: "目标语言：",
 	SETTING_PROMPT: "提示词：",
 	SETTING_SYSTEM_PROMPT: "系统提示词：",
+	TARGET_LANG_PLACEHOLDER: "English",
 
 	PROMPT_FIELD_LABEL: "提示器",
 	PROMPT_FIELD_DESC: "用于指导模型的 Prompt",
@@ -257,6 +258,7 @@ export default {
 	PROVIDER_OPTION_CUSTOM: "自定义",
 	API_KEY_LABEL: "API Key",
 	API_KEY_DESC: "输入您的 AI 服务 API Key",
+	API_KEY_PLACEHOLDER: "sk-...",
 	API_URL_LABEL: "API URL",
 	API_URL_PLACEHOLDER: "https://api.example.com/v1/chat/completions",
 	API_URL_DESC: "自定义 API 端点地址",
@@ -335,4 +337,21 @@ export default {
 	GENERATING_NOTICE: "正在生成脚本...",
 	GENERATE_SUCCESS: "脚本生成成功！",
 	GENERATE_ERROR: "脚本生成失败: ",
+	MODAL_SAMPLE_TEXT: "哇！",
+
+	// Custom Script Params UI
+	SCRIPTS_PARAMS_TITLE: "参数",
+	SCRIPTS_PARAMS_MANAGE: "参数管理",
+	SCRIPTS_PARAMS_DESC: "定义该脚本在运行时可配置的参数",
+	BTN_ADD_PARAM: "新增参数",
+	PARAM_GROUP_NAME: "参数",
+	PARAM_KEY_LABEL: "Key",
+	PARAM_LABEL_LABEL: "标签",
+	PARAM_TYPE_LABEL: "类型",
+	PARAM_TYPE_TEXT: "文本",
+	PARAM_TYPE_NUMBER: "数字",
+	PARAM_TYPE_BOOLEAN: "布尔",
+	PARAM_TYPE_SELECT: "下拉选择",
+	PARAM_DEFAULT_LABEL: "默认值",
+	PARAM_OPTIONS_LABEL: "选项（逗号分隔）",
 };

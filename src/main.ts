@@ -340,7 +340,7 @@ export default class MyTextTools extends Plugin {
 					action.systemPrompt || ""
 				);
 				if (result.error) {
-					new Notice(`❌ ${result.error}`);
+					new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
 					return;
 				}
 				editor.replaceSelection(result.content);
@@ -369,7 +369,7 @@ export default class MyTextTools extends Plugin {
 				action.systemPrompt || ""
 			);
 			if (result.error) {
-				new Notice(`❌ ${result.error}`);
+				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
 				return;
 			}
 			let finalContent = result.content;
@@ -396,7 +396,7 @@ class SampleModal extends Modal {
 
 	onOpen() {
 		let { contentEl } = this;
-		contentEl.setText("Woah!");
+		contentEl.setText(t("MODAL_SAMPLE_TEXT"));
 	}
 
 	onClose() {

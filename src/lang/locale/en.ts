@@ -259,6 +259,7 @@ export default {
 	PROVIDER_OPTION_CUSTOM: "Custom",
 	API_KEY_LABEL: "API Key",
 	API_KEY_DESC: "Enter your AI service API Key",
+	API_KEY_PLACEHOLDER: "sk-...",
 	API_URL_LABEL: "API URL",
 	API_URL_PLACEHOLDER: "https://api.example.com/v1/chat/completions",
 	API_URL_DESC: "Custom API endpoint",
@@ -281,6 +282,7 @@ export default {
 	SETTING_TARGET_LANG: "Target Language:",
 	SETTING_PROMPT: "Prompt:",
 	SETTING_SYSTEM_PROMPT: "System Prompt:",
+	TARGET_LANG_PLACEHOLDER: "English",
 
 	// Error Messages
 	AI_CONFIG_INCOMPLETE:
@@ -345,4 +347,22 @@ export default {
 	GENERATING_NOTICE: "Generating script...",
 	GENERATE_SUCCESS: "Script generated successfully!",
 	GENERATE_ERROR: "Failed to generate script: ",
+	MODAL_SAMPLE_TEXT: "Woah!",
+
+	// Custom Script Params UI
+	SCRIPTS_PARAMS_TITLE: "Parameters",
+	SCRIPTS_PARAMS_MANAGE: "Parameters Management",
+	SCRIPTS_PARAMS_DESC:
+		"Define parameters that can be configured when the script runs",
+	BTN_ADD_PARAM: "Add Parameter",
+	PARAM_GROUP_NAME: "Parameter",
+	PARAM_KEY_LABEL: "Key",
+	PARAM_LABEL_LABEL: "Label",
+	PARAM_TYPE_LABEL: "Type",
+	PARAM_TYPE_TEXT: "Text",
+	PARAM_TYPE_NUMBER: "Number",
+	PARAM_TYPE_BOOLEAN: "Boolean",
+	PARAM_TYPE_SELECT: "Select",
+	PARAM_DEFAULT_LABEL: "Default",
+	PARAM_OPTIONS_LABEL: "Options (comma-separated)",
 };
