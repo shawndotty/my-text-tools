@@ -302,7 +302,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			id: string,
 			showLang = false
 		) => {
-			containerEl.createEl("h5", { text: t(titleKey as any) });
+			containerEl.createEl("h3", { text: t(titleKey as any) });
 
 			// Prompt
 			new Setting(containerEl)
