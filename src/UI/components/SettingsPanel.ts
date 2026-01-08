@@ -147,13 +147,15 @@ export function renderToolSettings(
 			row.style.gap = "8px";
 			row.createEl("label", {
 				text: label,
-				attr: { style: "display: inline-block; margin-bottom: 4px;" },
+				attr: { style: "display: inline-block;" },
 			});
 			let valueEl: HTMLElement;
 			const current = (settings as any)[key] ?? param.default;
 			if (param.type === "boolean") {
+				row.addClass("mtt-checkbox-label");
 				const input = row.createEl("input", { type: "checkbox" });
 				input.checked = !!current;
+				input.style.width = "auto";
 				input.onchange = (e) =>
 					callbacks.onSettingsChange(
 						key,
