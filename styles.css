@@ -476,6 +476,19 @@ input[type="number"].mtt-small-input {
 	flex-direction: column;
 }
 
+/* mtt-batch-op */
+
+.mtt-batch-op-settings .mtt-run-btn, .mtt-batch-op-settings hr {
+	display: none;
+}
+
+.mtt-batch-op-header .mtt-batch-op-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+}
+
+
 
 /* ==========================================================================
    加载状态 (Loading State)

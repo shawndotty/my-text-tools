@@ -6,17 +6,20 @@ export class ApplyBatchModal extends Modal {
 	batches: BatchProcess[];
 	onApply: (batch: BatchProcess) => void;
 	onDelete: (batch: BatchProcess) => void;
+	onEdit: (batch: BatchProcess) => void;
 
 	constructor(
 		app: App,
 		batches: BatchProcess[],
 		onApply: (batch: BatchProcess) => void,
-		onDelete: (batch: BatchProcess) => void
+		onDelete: (batch: BatchProcess) => void,
+		onEdit: (batch: BatchProcess) => void
 	) {
 		super(app);
 		this.batches = batches;
 		this.onApply = onApply;
 		this.onDelete = onDelete;
+		this.onEdit = onEdit;
 	}
 
 	onOpen() {
@@ -63,6 +66,14 @@ export class ApplyBatchModal extends Modal {
 				.onClick(() => {
 					this.close();
 					this.onApply(batch);
+				});
+
+			new ButtonComponent(btnGroup)
+				.setIcon("pencil")
+				.setTooltip(t("BTN_EDIT"))
+				.onClick(() => {
+					this.close();
+					this.onEdit(batch);
 				});
 
 			new ButtonComponent(btnGroup)

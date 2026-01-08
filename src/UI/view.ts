@@ -28,6 +28,7 @@ import {
 import { BatchProcess, BatchOperation } from "../types";
 import { SaveBatchModal } from "./modals/SaveBatchModal";
 import { ApplyBatchModal } from "./modals/ApplyBatchModal";
+import { EditBatchModal } from "./modals/EditBatchModal";
 
 export const MY_TEXT_TOOLS_VIEW = "my-text-tools-view";
 
@@ -251,7 +252,7 @@ export class MyTextToolsView extends ItemView {
 					await this.plugin.saveSettings();
 					this.settingsState.savedBatches =
 						this.plugin.settings.savedBatches;
-					new Notice("Batch saved: " + name);
+					new Notice(t("NOTICE_BATCH_SAVED"));
 					this.render();
 				}).open();
 				this.render();
@@ -259,7 +260,7 @@ export class MyTextToolsView extends ItemView {
 			onCancelRecording: () => {
 				this.isRecording = false;
 				this.currentBatchOperations = [];
-				new Notice("Recording cancelled");
+				new Notice(t("NOTICE_RECORDING_CANCELLED"));
 				this.render();
 			},
 			onApplyBatch: () => {
@@ -279,7 +280,39 @@ export class MyTextToolsView extends ItemView {
 						await this.plugin.saveSettings();
 						this.settingsState.savedBatches =
 							this.plugin.settings.savedBatches;
-						new Notice("Batch deleted");
+						new Notice(t("NOTICE_BATCH_DELETED"));
+					},
+					(batch) => {
+						// Edit batch
+						new EditBatchModal(
+							this.app,
+							batch,
+							async (updatedBatch) => {
+								// Save changes
+								const index =
+									this.plugin.settings.savedBatches.findIndex(
+										(b) => b.id === updatedBatch.id
+									);
+								if (index !== -1) {
+									this.plugin.settings.savedBatches[index] =
+										updatedBatch;
+									await this.plugin.saveSettings();
+									this.settingsState.savedBatches =
+										this.plugin.settings.savedBatches;
+									new Notice(t("NOTICE_BATCH_UPDATED"));
+								}
+							},
+							async (newBatch) => {
+								// Save as new
+								this.plugin.settings.savedBatches.push(
+									newBatch
+								);
+								await this.plugin.saveSettings();
+								this.settingsState.savedBatches =
+									this.plugin.settings.savedBatches;
+								new Notice(t("NOTICE_BATCH_SAVED_AS_NEW"));
+							}
+						).open();
 					}
 				).open();
 			},

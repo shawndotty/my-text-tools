@@ -88,7 +88,8 @@ export function renderToolSettings(
 	callbacks: SettingsPanelCallbacks,
 	aiToolsConfig?: Record<string, AIToolConfig>,
 	customScripts?: CustomScript[],
-	customActions?: CustomAIAction[]
+	customActions?: CustomAIAction[],
+	options?: { hideRunButton?: boolean }
 ): void {
 	parent.createEl("hr"); // 分隔线
 

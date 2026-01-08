@@ -388,4 +388,20 @@ export default {
 	CONFIRM_DELETE_BATCH: "Are you sure you want to delete this batch process?",
 	BTN_DELETE: "Delete",
 	BTN_SAVE_NEW_BATCH: "Save Batch Process",
+
+	// Edit Batch
+	MODAL_EDIT_BATCH_TITLE: "Edit Batch Process",
+	BTN_EDIT: "Edit",
+	BTN_SAVE_CHANGES: "Save Changes",
+	BTN_SAVE_AS_NEW: "Save as New",
+	BTN_DISCARD: "Discard Changes",
+	BTN_CLOSE: "Close",
+	BTN_MOVE_UP: "Move Up",
+	BTN_MOVE_DOWN: "Move Down",
+	BTN_REMOVE_OP: "Remove",
+	NOTICE_NO_CHANGES: "No changes made.",
+	CONFIRM_DISCARD: "Discard unsaved changes?",
+	NOTICE_BATCH_UPDATED: "Batch process updated.",
+	NOTICE_BATCH_SAVED_AS_NEW: "Batch process saved as new.",
+	NOTICE_BATCH_DELETED: "Batch process deleted.",
 };
