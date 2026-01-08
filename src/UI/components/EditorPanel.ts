@@ -43,6 +43,7 @@ export function renderEditorPanel(
 	canRedo: boolean,
 	hasOriginalEditor: boolean,
 	isSelectionMode: boolean, // 新增参数
+	currentFilePath: string | null,
 	callbacks: EditorPanelCallbacks,
 	app: any
 ): EditorPanelHandle {
@@ -62,6 +63,25 @@ export function renderEditorPanel(
 		badge.style.color = "var(--text-on-accent)";
 		badge.style.padding = "2px 6px";
 		badge.style.borderRadius = "4px";
+	}
+
+	// 显示当前文件路径
+	if (currentFilePath) {
+		const pathContainer = header.createDiv({ cls: "mtt-header-path" });
+		pathContainer.setText(currentFilePath);
+		pathContainer.title = currentFilePath;
+		pathContainer.style.flex = "1";
+		pathContainer.style.textAlign = "center";
+		pathContainer.style.overflow = "hidden";
+		pathContainer.style.textOverflow = "ellipsis";
+		pathContainer.style.whiteSpace = "nowrap";
+		pathContainer.style.margin = "0 10px";
+		pathContainer.style.fontSize = "0.85em";
+		pathContainer.style.color = "var(--text-muted)";
+	} else {
+		// 占位符，保持 flex 布局平衡（可选）
+		const spacer = header.createDiv();
+		spacer.style.flex = "1";
 	}
 
 	// 按钮容器

@@ -35,7 +35,8 @@ export default class MyTextTools extends Plugin {
 			const activeView =
 				this.app.workspace.getActiveViewOfType(MarkdownView);
 			const editor = activeView ? activeView.editor : null;
-			return new MyTextToolsView(leaf, editor, this);
+			const file = activeView ? activeView.file : null;
+			return new MyTextToolsView(leaf, editor, file, this);
 		});
 
 		// 2. 添加触发命令

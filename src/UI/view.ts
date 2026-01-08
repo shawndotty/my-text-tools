@@ -48,12 +48,17 @@ export class MyTextToolsView extends ItemView {
 	private isImporting: boolean = false;
 	private isSaving: boolean = false;
 
-	constructor(leaf: WorkspaceLeaf, originalEditor: any, plugin: MyTextTools) {
+	constructor(
+		leaf: WorkspaceLeaf,
+		originalEditor: any,
+		file: TFile | null,
+		plugin: MyTextTools
+	) {
 		super(leaf);
 		this.plugin = plugin;
 		// 初始加载逻辑将由 updateInput 接管，这里仅做基本初始化
 		if (originalEditor) {
-			this.updateInput(originalEditor);
+			this.updateInput(originalEditor, file);
 		}
 	}
 
@@ -222,6 +227,7 @@ export class MyTextToolsView extends ItemView {
 			this.historyManager.canRedo(),
 			!!this.originalEditor,
 			!!this.selectionRange, // 传递是否为选区模式
+			this.targetFile ? this.targetFile.path : null,
 			editorCallbacks,
 			this.app
 		);
@@ -469,7 +475,6 @@ export class MyTextToolsView extends ItemView {
 	async handleSaveToOriginal() {
 		// 如果正在导入，阻止保存
 		if (this.isImporting) {
-			console.log("MyTextTools: Save blocked due to importing state.");
 			return;
 		}
 
@@ -498,12 +503,6 @@ export class MyTextToolsView extends ItemView {
 			this.isSaving = false;
 			return;
 		}
-
-		console.log("MyTextTools: Saving...", {
-			isSelectionMode: !!this.selectionRange,
-			range: this.selectionRange,
-			contentLength: this.content.length,
-		});
 
 		const range = this.selectionRange;
 		if (range) {
