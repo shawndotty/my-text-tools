@@ -79,12 +79,15 @@ export class AIGenerateScriptModal extends Modal {
 		btn.setButtonText(t("GENERATING_NOTICE"));
 
 		try {
-			const systemPrompt = `You are an expert JavaScript developer for Obsidian plugins. 
+			const systemPrompt = `You are an expert JavaScript developer for Obsidian plugins.
 Your task is to write a JavaScript code snippet based on the user's requirement.
 The code will be used in a text processing tool.
 Available variables:
 - selection: The currently selected text (string).
 - text: The entire text of the document (string).
+- params: User-defined parameters (Record<string, any>), e.g., params.foo, params.count, params.enabled.
+  - Types may be text, number, boolean, or select.
+  - Keys not provided may be undefined; handle defaults safely.
 - app: The Obsidian App instance.
 - console: The console object.
 - Notice: The Obsidian Notice class.
@@ -92,11 +95,11 @@ Available variables:
 You MUST return the new text to replace the ${
 				this.context === "selection" ? "selection" : "whole text"
 			}.
-The code should be a valid JavaScript function body.
+The code should be a valid JavaScript function body (you may use async/await).
 Do not wrap the code in markdown code blocks. Just return the code.
 Ensure the code handles edge cases gracefully.
 If the user wants to process each line, split the text by newline, process, and join back.
-`;
+If parameters are relevant, read them from 'params' and apply sensible defaults.`;
 
 			const fullUserPrompt = `Requirement: ${this.requirement}
 Target: ${
