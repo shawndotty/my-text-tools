@@ -213,9 +213,9 @@ export default {
 	BasicSettings: "基本設定",
 	BasicSettingsDesc:
 		"在此控制 MyTextTools 工作台左側工具欄中預設工具的顯示/隱藏狀態。",
-	AISettings: "AI服務設置",
-	DefaultPromptsSettings: "預設提示詞設置",
-	UserPromptsSettings: "用戶提示詞設定",
+	AISettings: "AI服務",
+	DefaultPromptsSettings: "預設提示詞",
+	UserPromptsSettings: "用戶提示詞",
 	CUSTOM_PROMPTS_TITLE: "自定義 AI 提示詞",
 	CUSTOM_PROMPTS_MANAGE: "管理自定義提示詞",
 	CUSTOM_PROMPTS_DESC: "添加多個自定義 AI 提示詞",
@@ -292,8 +292,8 @@ export default {
 		"你是一個專業的文本潤色助手，擅長改進文本的表達方式，使其更加清晰、專業。",
 
 	// Custom Scripts (missing keys filled to match other locales)
-	CustomScriptsSettings: "自定義 JS 腳本設置",
-	CUSTOM_SCRIPTS_TITLE: "自定義 JS 腳本",
+	CustomScriptsSettings: "用戶JS腳本",
+	CUSTOM_SCRIPTS_TITLE: "自定義JS腳本",
 	CUSTOM_SCRIPTS_MANAGE: "管理自定義腳本",
 	CUSTOM_SCRIPTS_DESC:
 		"使用 JavaScript 創建自定義工具。腳本可以訪問 'selection', 'app', 'text', 'console' 和 'Notice'。請返回新的文字以替換選區或全文。",
@@ -304,7 +304,7 @@ export default {
 	SCRIPT_DESC_LABEL: "描述",
 	SCRIPT_DESC_PLACEHOLDER: "簡短描述",
 	SCRIPT_CODE_LABEL: "JavaScript 程式碼",
-	SCRIPT_CODE_DESC: "可用變數: selection, text, app, console, Notice",
+	SCRIPT_CODE_DESC: "可用變數: selection, text, app, console, Notice, params",
 	SCRIPT_CODE_PLACEHOLDER: "return selection.toUpperCase();",
 	TOOLTIP_DELETE_SCRIPT: "刪除腳本",
 	GROUP_SCRIPTS: "自定義腳本",

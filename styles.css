@@ -458,8 +458,13 @@ input[type="number"].mtt-small-input {
 	cursor: pointer;
 }
 
+.mtt-custom-card .mod-toggle > .setting-item-info {
+	flex-direction: row;
+}
+
 .mtt-custom-card .setting-item-info {
 	display: flex;
+	flex-direction: column;
 }
 
 

@@ -324,7 +324,7 @@ export default {
 	SCRIPT_DESC_PLACEHOLDER: "Short description",
 	SCRIPT_CODE_LABEL: "JavaScript Code",
 	SCRIPT_CODE_DESC:
-		"Available variables: selection, text, app, console, Notice",
+		"Available variables: selection, text, app, console, Notice, params",
 	SCRIPT_CODE_PLACEHOLDER: "return selection.toUpperCase();",
 	TOOLTIP_DELETE_SCRIPT: "Delete script",
 	GROUP_SCRIPTS: "Custom Scripts",
