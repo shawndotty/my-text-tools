@@ -21,7 +21,7 @@ export class ApplyBatchModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
-		contentEl.createEl("h2", { text: t("MODAL_APPLY_BATCH_TITLE") });
+		contentEl.createEl("h3", { text: t("MODAL_APPLY_BATCH_TITLE") });
 
 		if (this.batches.length === 0) {
 			contentEl.createEl("p", { text: t("NOTICE_NO_BATCHES") });

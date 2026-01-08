@@ -376,4 +376,5 @@ export default {
 	NOTICE_NO_BATCHES: "未找到已保存的批处理。",
 	CONFIRM_DELETE_BATCH: "确定要删除该批处理吗？",
 	BTN_DELETE: "删除",
+	BTN_SAVE_NEW_BATCH: "保存批处理",
 };

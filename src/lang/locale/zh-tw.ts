@@ -365,4 +365,5 @@ export default {
 	NOTICE_NO_BATCHES: "未找到已保存的批處理。",
 	CONFIRM_DELETE_BATCH: "確定要刪除該批處理嗎？",
 	BTN_DELETE: "刪除",
+	BTN_SAVE_NEW_BATCH: "儲存批次處理",
 };

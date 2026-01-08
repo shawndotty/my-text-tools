@@ -26,7 +26,7 @@ export class SaveBatchModal extends Modal {
 
 		new Setting(contentEl).addButton((btn) =>
 			btn
-				.setButtonText(t("BTN_SAVE_NEW")) // Reusing Save button text or could add BTN_SAVE
+				.setButtonText(t("BTN_SAVE_NEW_BATCH")) // Reusing Save button text or could add BTN_SAVE
 				.setCta()
 				.onClick(() => {
 					this.close();
