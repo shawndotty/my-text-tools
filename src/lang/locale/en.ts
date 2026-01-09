@@ -8,6 +8,7 @@ export default {
 	GROUP_ANALYSIS: "Extract & Analyze",
 
 	TOOL_REGEX: "Regex Replace",
+	TOOL_REGEX_EXTRACT: "Regex Extract",
 	TOOL_WHITESPACE: "Trim Whitespace",
 	TOOL_DEDUPE: "Remove Duplicate Lines",
 	TOOL_EMPTY_LINE: "Remove Empty Lines",
@@ -59,6 +60,13 @@ export default {
 	SETTING_FIND: "Find (Regex):",
 	SETTING_REPLACE: "Replace with:",
 	BTN_RUN_REPLACE: "Run Replace",
+
+	SETTING_REGEX_EXTRACT_RULE: "Regex Rule:",
+	SETTING_SEPARATOR: "Separator:",
+	OPTION_NEWLINE: "Newline",
+	OPTION_HYPHEN: "Hyphen (-)",
+	OPTION_SPACE: "Space",
+	BTN_RUN_REGEX_EXTRACT: "Run Extract",
 
 	SETTING_PREFIX: "Add to Start (Prefix):",
 	PLACEHOLDER_PREFIX: "e.g.: - [ ] ",
@@ -139,6 +147,8 @@ export default {
 	NOTICE_EMPTY_LINE: "Empty lines removed",
 	NOTICE_REGEX_DONE: "Regex replace done",
 	NOTICE_REGEX_ERROR: "Regex Error!",
+	NOTICE_REGEX_EXTRACT_DONE: "Extracted {0} matches",
+	NOTICE_REGEX_EXTRACT_ERROR: "Regex Extract Error!",
 	NOTICE_WRAP_DONE: "Prefix/Suffix added",
 	NOTICE_FILTER_INPUT: "Please enter filter text",
 	NOTICE_REGEX_INVALID: "Invalid Regex",

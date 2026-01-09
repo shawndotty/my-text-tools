@@ -8,6 +8,7 @@ export default {
 	GROUP_ANALYSIS: "提取與分析",
 
 	TOOL_REGEX: "正則替換",
+	TOOL_REGEX_EXTRACT: "正則提取",
 	TOOL_WHITESPACE: "去除多餘空白",
 	TOOL_DEDUPE: "去除重複行",
 	TOOL_EMPTY_LINE: "刪除空行",
@@ -57,6 +58,13 @@ export default {
 	SETTING_FIND: "查找 (Regex):",
 	SETTING_REPLACE: "替換為:",
 	BTN_RUN_REPLACE: "執行替換",
+
+	SETTING_REGEX_EXTRACT_RULE: "提取規則 (Regex):",
+	SETTING_SEPARATOR: "結果分隔符:",
+	OPTION_NEWLINE: "換行符",
+	OPTION_HYPHEN: "連字符 (-)",
+	OPTION_SPACE: "空格",
+	BTN_RUN_REGEX_EXTRACT: "執行提取",
 
 	SETTING_PREFIX: "在行首添加 (前綴):",
 	PLACEHOLDER_PREFIX: "例如: - [ ] ",
@@ -126,6 +134,8 @@ export default {
 	NOTICE_EMPTY_LINE: "已刪除空行",
 	NOTICE_REGEX_DONE: "正則替換完成",
 	NOTICE_REGEX_ERROR: "正則表達式錯誤！",
+	NOTICE_REGEX_EXTRACT_DONE: "已提取 {0} 項內容",
+	NOTICE_REGEX_EXTRACT_ERROR: "正則提取出錯！",
 	NOTICE_WRAP_DONE: "已完成前後綴添加",
 	NOTICE_FILTER_INPUT: "請輸入要過濾的字符",
 	NOTICE_REGEX_INVALID: "正則表達式有誤",

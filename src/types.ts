@@ -18,6 +18,10 @@ export interface SettingsState {
 	replaceText: string;
 	regexCaseInsensitive: boolean; // 正则替换：是否区分大小写
 	regexMultiline: boolean; // 正则替换：是否多行模式
+	// Regex Extract settings
+	regexExtractRule: string;
+	regexExtractCase: boolean;
+	regexExtractSeparator: "newline" | "hyphen" | "space";
 	prefix: string;
 	suffix: string;
 	filterText: string; // 过滤关键字
@@ -98,6 +102,9 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	replaceText: "",
 	regexCaseInsensitive: false,
 	regexMultiline: false,
+	regexExtractRule: "",
+	regexExtractCase: false,
+	regexExtractSeparator: "newline",
 	prefix: "",
 	suffix: "",
 	filterText: "",
@@ -162,6 +169,7 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
  */
 export type ToolType =
 	| "regex"
+	| "regex-extract"
 	| "remove-whitespace"
 	| "dedupe"
 	| "extract-column"
@@ -197,6 +205,7 @@ export const BUILTIN_TOOLS: ToolInfo[] = [
 	{ id: "ai-polish", nameKey: "TOOL_AI_POLISH", icon: "wand" },
 	{ id: "on-select", nameKey: "TOOL_ON_SELECT", icon: "mouse-pointer-click" },
 	{ id: "regex", nameKey: "TOOL_REGEX", icon: "regex" },
+	{ id: "regex-extract", nameKey: "TOOL_REGEX_EXTRACT", icon: "text-search" },
 	{ id: "remove-whitespace", nameKey: "TOOL_WHITESPACE", icon: "space" },
 	{ id: "clear-format", nameKey: "TOOL_CLEAR_FORMAT", icon: "eraser" },
 	{ id: "dedupe", nameKey: "TOOL_DEDUPE", icon: "list-minus" },

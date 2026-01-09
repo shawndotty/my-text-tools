@@ -259,6 +259,9 @@ export function renderToolSettings(
 		case "regex":
 			renderRegexSettings(settingsContent, settings, callbacks);
 			break;
+		case "regex-extract":
+			renderRegexExtractSettings(settingsContent, settings, callbacks);
+			break;
 		case "add-wrap":
 			renderWrapSettings(settingsContent, settings, callbacks);
 			break;
@@ -461,6 +464,63 @@ function renderRegexSettings(
 		cls: "mtt-run-btn",
 	});
 	runBtn.onclick = () => callbacks.onRun("regex");
+}
+
+function renderRegexExtractSettings(
+	parent: HTMLElement,
+	settings: SettingsState,
+	callbacks: SettingsPanelCallbacks
+): void {
+	parent.createEl("label", { text: t("SETTING_REGEX_EXTRACT_RULE") });
+	const ruleInput = parent.createEl("input", {
+		type: "text",
+		value: settings.regexExtractRule,
+	});
+	ruleInput.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"regexExtractRule",
+			(e.target as HTMLInputElement).value
+		);
+
+	// Case Insensitive
+	const caseLabel = parent.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
+	caseCheck.checked = settings.regexExtractCase;
+	caseCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"regexExtractCase",
+			(e.target as HTMLInputElement).checked
+		);
+	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
+
+	parent.createEl("label", { text: t("SETTING_SEPARATOR") });
+	const sepSelect = parent.createEl("select", { cls: "mtt-select" });
+	sepSelect.createEl("option", {
+		text: t("OPTION_NEWLINE"),
+		value: "newline",
+	});
+	sepSelect.createEl("option", {
+		text: t("OPTION_HYPHEN"),
+		value: "hyphen",
+	});
+	sepSelect.createEl("option", {
+		text: t("OPTION_SPACE"),
+		value: "space",
+	});
+	sepSelect.value = settings.regexExtractSeparator;
+	sepSelect.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"regexExtractSeparator",
+			(e.target as HTMLSelectElement).value
+		);
+
+	const runBtn = parent.createEl("button", {
+		text: t("BTN_RUN_REGEX_EXTRACT"),
+		cls: "mtt-run-btn",
+	});
+	runBtn.onclick = () => callbacks.onRun("regex-extract");
 }
 
 function renderWrapSettings(

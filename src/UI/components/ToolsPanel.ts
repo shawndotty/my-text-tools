@@ -85,6 +85,7 @@ export function getToolGroups(
 			tools: [
 				getBuiltin("on-select"),
 				getBuiltin("regex"),
+				getBuiltin("regex-extract"),
 				getBuiltin("remove-whitespace"),
 				getBuiltin("clear-format"),
 			],

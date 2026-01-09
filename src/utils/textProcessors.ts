@@ -91,6 +91,14 @@ export function processText(
 				settings.regexMultiline
 			);
 			break;
+		case "regex-extract":
+			processedBody = processRegexExtract(
+				textToProcess,
+				settings.regexExtractRule,
+				settings.regexExtractCase,
+				settings.regexExtractSeparator
+			);
+			break;
 		case "add-wrap":
 			processedBody = processAddWrap(
 				lines,
@@ -282,6 +290,39 @@ function processRegex(
 		return result;
 	} catch (e) {
 		new Notice(t("NOTICE_REGEX_ERROR"));
+		return text;
+	}
+}
+
+function processRegexExtract(
+	text: string,
+	rule: string,
+	caseSensitive: boolean,
+	separator: "newline" | "hyphen" | "space"
+): string {
+	if (!rule) {
+		new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+		return text;
+	}
+
+	try {
+		const flags = caseSensitive ? "g" : "gi";
+		const regex = new RegExp(rule, flags);
+		const matches = text.match(regex);
+
+		if (!matches || matches.length === 0) {
+			new Notice(t("NOTICE_NO_MATCH"));
+			return text;
+		}
+
+		let sep = "\n";
+		if (separator === "hyphen") sep = " - ";
+		if (separator === "space") sep = " ";
+
+		new Notice(t("NOTICE_REGEX_EXTRACT_DONE", [matches.length.toString()]));
+		return matches.join(sep);
+	} catch (e) {
+		new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
 		return text;
 	}
 }
