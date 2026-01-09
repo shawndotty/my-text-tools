@@ -9,6 +9,8 @@ import {
 } from "obsidian";
 import {
 	DEFAULT_SETTINGS,
+	CustomAIAction,
+	CustomScript,
 	MyTextToolsSettings,
 	MyTextToolsSettingTab,
 } from "./settings";
@@ -16,6 +18,8 @@ import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
 import { t } from "./lang/helpers";
 import { AIService } from "./utils/aiService";
 import { ScriptExecutor } from "./utils/scriptExecutor";
+import { BatchOperation, BatchProcess, SettingsState, ToolType } from "./types";
+import { processText as processTextCore } from "./utils/textProcessors";
 
 // Remember to rename these classes and interfaces!
 
@@ -59,6 +63,8 @@ export default class MyTextTools extends Plugin {
 
 		// 自定义卡片入口改为工作台左侧工具栏展示，不再添加到 Obsidian 全局侧栏
 
+		await this.syncBatchShortcuts();
+
 		// 4. 添加右键菜单
 		this.registerEvent(
 			this.app.workspace.on("editor-menu", (menu, editor, view) => {
@@ -69,6 +75,46 @@ export default class MyTextTools extends Plugin {
 							await this.activateView();
 						});
 				});
+
+				const enabledBatchIds = this.getEnabledBatchShortcutIds();
+				if (enabledBatchIds.length === 0) return;
+
+				const batches = enabledBatchIds
+					.map((id) =>
+						this.settings.savedBatches.find((b) => b.id === id)
+					)
+					.filter((b): b is BatchProcess => !!b);
+				if (batches.length === 0) return;
+
+				menu.addSeparator();
+				menu.addItem((item) => {
+					item.setTitle(t("MENU_BATCH_SHORTCUTS_LABEL"))
+						.setIcon("zap")
+						.setIsLabel(true);
+				});
+
+				for (const batch of batches) {
+					menu.addItem((item) => {
+						item.setTitle(t("MENU_BATCH_RUN_NOTE", [batch.name]))
+							.setIcon("zap")
+							.onClick(() => {
+								void this.runBatchShortcut(batch.id, "note");
+							});
+					});
+					menu.addItem((item) => {
+						item.setTitle(
+							t("MENU_BATCH_RUN_SELECTION", [batch.name])
+						)
+							.setIcon("zap")
+							.setDisabled(!editor.somethingSelected())
+							.onClick(() => {
+								void this.runBatchShortcut(
+									batch.id,
+									"selection"
+								);
+							});
+					});
+				}
 			})
 		);
 	}
@@ -112,6 +158,393 @@ export default class MyTextTools extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	isBatchShortcutEnabled(batchId: string): boolean {
+		return !!this.settings.batchShortcuts?.[batchId];
+	}
+
+	async enableBatchShortcut(batchId: string) {
+		if (!this.settings.batchShortcuts) this.settings.batchShortcuts = {};
+		this.settings.batchShortcuts[batchId] = true;
+		await this.saveSettings();
+		await this.refreshBatchShortcut(batchId);
+	}
+
+	async disableBatchShortcut(batchId: string) {
+		if (!this.settings.batchShortcuts) return;
+		delete this.settings.batchShortcuts[batchId];
+		this.removeBatchCommands(batchId);
+		await this.saveSettings();
+	}
+
+	async refreshBatchShortcut(batchId: string) {
+		if (!this.isBatchShortcutEnabled(batchId)) return;
+		const batch = this.settings.savedBatches.find((b) => b.id === batchId);
+		if (!batch) {
+			await this.disableBatchShortcut(batchId);
+			return;
+		}
+		this.removeBatchCommands(batchId);
+		this.registerBatchCommands(batch);
+	}
+
+	private getEnabledBatchShortcutIds(): string[] {
+		return Object.entries(this.settings.batchShortcuts || {})
+			.filter(([, enabled]) => !!enabled)
+			.map(([id]) => id);
+	}
+
+	private async syncBatchShortcuts() {
+		const enabledIds = this.getEnabledBatchShortcutIds();
+		let changed = false;
+		for (const id of enabledIds) {
+			const batch = this.settings.savedBatches.find((b) => b.id === id);
+			if (!batch) {
+				this.removeBatchCommands(id);
+				delete this.settings.batchShortcuts[id];
+				changed = true;
+				continue;
+			}
+			this.removeBatchCommands(id);
+			this.registerBatchCommands(batch);
+		}
+		if (changed) {
+			await this.saveSettings();
+		}
+	}
+
+	private getBatchCommandIds(batchId: string) {
+		return {
+			note: `batch-${batchId}-note`,
+			selection: `batch-${batchId}-selection`,
+		};
+	}
+
+	private removeBatchCommands(batchId: string) {
+		const ids = this.getBatchCommandIds(batchId);
+		try {
+			this.removeCommand(ids.note);
+		} catch {}
+		try {
+			this.removeCommand(ids.selection);
+		} catch {}
+	}
+
+	private registerBatchCommands(batch: BatchProcess) {
+		const ids = this.getBatchCommandIds(batch.id);
+
+		this.addCommand({
+			id: ids.note,
+			name: t("COMMAND_BATCH_RUN_NOTE", [batch.name]),
+			editorCallback: async (editor) => {
+				await this.runBatchShortcut(batch.id, "note", editor);
+			},
+		});
+
+		this.addCommand({
+			id: ids.selection,
+			name: t("COMMAND_BATCH_RUN_SELECTION", [batch.name]),
+			editorCheckCallback: (checking, editor) => {
+				if (!editor.somethingSelected()) return false;
+				if (!checking) {
+					void this.runBatchShortcut(
+						batch.id,
+						"selection",
+						editor
+					);
+				}
+				return true;
+			},
+		});
+	}
+
+	private getWorkbenchView(): MyTextToolsView | null {
+		const leaf = this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
+		const view = leaf?.view;
+		return view instanceof MyTextToolsView ? view : null;
+	}
+
+	private getCustomScriptParams(
+		script: CustomScript
+	): Record<string, any> {
+		if (!script.params || script.params.length === 0) return {};
+		const view = this.getWorkbenchView();
+		return script.params.reduce((acc, p) => {
+			const key = `custom:${script.id}:${p.key}`;
+			const val = view ? (view.settingsState as any)[key] : undefined;
+			let finalVal = val !== undefined ? val : p.default;
+
+			if (p.type === "text" && typeof finalVal === "string") {
+				finalVal = finalVal
+					.replace(/\\n/g, "\n")
+					.replace(/\\t/g, "\t")
+					.replace(/\\r/g, "\r");
+			}
+
+			if (p.type === "array" && typeof finalVal === "string") {
+				finalVal = finalVal.split(/\r?\n/);
+			}
+
+			acc[p.key] = finalVal;
+			return acc;
+		}, {} as Record<string, any>);
+	}
+
+	private extractFrontmatterForAI(
+		text: string,
+		preserveFrontmatter: boolean
+	) {
+		if (!preserveFrontmatter) {
+			return { frontmatter: "", body: text };
+		}
+		const fmMatch = text.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
+		if (!fmMatch) {
+			return { frontmatter: "", body: text };
+		}
+		return {
+			frontmatter: fmMatch[0],
+			body: text.substring(fmMatch[0].length),
+		};
+	}
+
+	private extractHeaderForAI(text: string, preserveHeader: boolean) {
+		if (!preserveHeader) {
+			return { header: "", body: text };
+		}
+		const lines = text.split("\n");
+		if (lines.length === 0 || !lines[0]?.trim()) {
+			return { header: "", body: text };
+		}
+		return {
+			header: lines[0]!,
+			body: lines.slice(1).join("\n"),
+		};
+	}
+
+	private getEffectiveSettingsForScope(
+		settings: SettingsState,
+		scope: "note" | "selection"
+	): SettingsState {
+		if (scope === "note") return settings;
+		return {
+			...settings,
+			preserveFrontmatter: false,
+			preserveHeader: false,
+		};
+	}
+
+	private async applyBuiltInAIToolToText(
+		toolId: ToolType,
+		text: string,
+		settings: SettingsState
+	): Promise<string> {
+		const aiService = new AIService(this.settings);
+		if (!aiService.isConfigured()) {
+			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+			return text;
+		}
+
+		const fm = this.extractFrontmatterForAI(
+			text,
+			settings.preserveFrontmatter
+		);
+		const header = this.extractHeaderForAI(fm.body, settings.preserveHeader);
+		const textToProcess = header.body;
+
+		if (!textToProcess.trim()) {
+			new Notice("❌ " + t("NOTICE_NO_TEXT"));
+			return text;
+		}
+
+		let result: { content: string; error?: string };
+		switch (toolId) {
+			case "ai-extract-keypoints":
+				result = await aiService.extractKeyPoints(textToProcess);
+				break;
+			case "ai-summarize":
+				result = await aiService.summarize(textToProcess);
+				break;
+			case "ai-translate":
+				result = await aiService.translate(textToProcess);
+				break;
+			case "ai-polish":
+				result = await aiService.polish(textToProcess);
+				break;
+			default:
+				return text;
+		}
+
+		if (result.error) {
+			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+			return text;
+		}
+
+		let finalContent = result.content;
+		if (settings.preserveHeader && header.header) {
+			finalContent = header.header + "\n" + finalContent;
+		}
+		if (settings.preserveFrontmatter && fm.frontmatter) {
+			finalContent = fm.frontmatter + finalContent;
+		}
+		return finalContent;
+	}
+
+	private async applyCustomAIActionToText(
+		action: CustomAIAction,
+		text: string,
+		settings: SettingsState
+	): Promise<string> {
+		const merged: MyTextToolsSettings = {
+			...this.settings,
+			aiProvider: action.overrideProvider ?? this.settings.aiProvider,
+			aiApiUrl: action.overrideApiUrl ?? this.settings.aiApiUrl,
+			aiApiKey: action.overrideApiKey ?? this.settings.aiApiKey,
+			aiModel: action.overrideModel ?? this.settings.aiModel,
+			aiMaxTokens: action.overrideMaxTokens ?? this.settings.aiMaxTokens,
+			aiTemperature: action.overrideTemperature ?? this.settings.aiTemperature,
+		};
+
+		const aiService = new AIService(merged);
+		if (!aiService.isConfigured()) {
+			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+			return text;
+		}
+
+		const fm = this.extractFrontmatterForAI(
+			text,
+			settings.preserveFrontmatter
+		);
+		const header = this.extractHeaderForAI(fm.body, settings.preserveHeader);
+		const textToProcess = header.body;
+
+		if (!textToProcess.trim()) {
+			new Notice("❌ " + t("NOTICE_NO_TEXT"));
+			return text;
+		}
+
+		const result = await aiService.processText(
+			action.prompt || "",
+			textToProcess,
+			action.systemPrompt || ""
+		);
+		if (result.error) {
+			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+			return text;
+		}
+
+		let finalContent = result.content;
+		if (settings.preserveHeader && header.header) {
+			finalContent = header.header + "\n" + finalContent;
+		}
+		if (settings.preserveFrontmatter && fm.frontmatter) {
+			finalContent = fm.frontmatter + finalContent;
+		}
+		return finalContent;
+	}
+
+	private async applyCustomScriptToText(
+		script: CustomScript,
+		text: string,
+		scope: "note" | "selection"
+	): Promise<string> {
+		const selection = scope === "selection" ? text : "";
+		const usesSelectionOnly =
+			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
+		if (usesSelectionOnly && !selection) {
+			new Notice(t("NOTICE_NO_SELECTION"));
+			return text;
+		}
+
+		const executor = new ScriptExecutor(this.app);
+		const params = this.getCustomScriptParams(script);
+		const result = await executor.execute(script.code, text, selection, params);
+		return typeof result === "string" ? result : text;
+	}
+
+	private async applyBatchOperationToText(
+		op: BatchOperation,
+		text: string,
+		scope: "note" | "selection"
+	): Promise<string> {
+		const settings = this.getEffectiveSettingsForScope(
+			op.settingsSnapshot,
+			scope
+		);
+
+		if (op.toolId.startsWith("custom-ai:")) {
+			const id = op.toolId.split(":")[1]!;
+			const action =
+				this.settings.customActions?.find((a) => a.id === id) || null;
+			if (!action) {
+				new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
+				return text;
+			}
+			return await this.applyCustomAIActionToText(action, text, settings);
+		}
+
+		if (op.toolId.startsWith("custom-script:")) {
+			const id = op.toolId.split(":")[1]!;
+			const script =
+				this.settings.customScripts?.find((s) => s.id === id) || null;
+			if (!script) {
+				new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
+				return text;
+			}
+			return await this.applyCustomScriptToText(script, text, scope);
+		}
+
+		if (
+			op.toolId === "ai-extract-keypoints" ||
+			op.toolId === "ai-summarize" ||
+			op.toolId === "ai-translate" ||
+			op.toolId === "ai-polish"
+		) {
+			return await this.applyBuiltInAIToolToText(
+				op.toolId as ToolType,
+				text,
+				settings
+			);
+		}
+
+		return processTextCore(op.toolId as ToolType, text, settings);
+	}
+
+	async runBatchShortcut(batchId: string, scope: "note" | "selection", editor?: Editor) {
+		const batch = this.settings.savedBatches.find((b) => b.id === batchId);
+		if (!batch) {
+			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
+			await this.disableBatchShortcut(batchId);
+			return;
+		}
+
+		const activeEditor =
+			editor || this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+		if (!activeEditor) {
+			new Notice(t("NOTICE_NO_EDITOR"));
+			return;
+		}
+
+		if (scope === "selection" && !activeEditor.somethingSelected()) {
+			new Notice(t("NOTICE_NO_SELECTION"));
+			return;
+		}
+
+		let text = scope === "selection"
+			? activeEditor.getSelection()
+			: activeEditor.getValue();
+
+		for (const op of batch.operations) {
+			text = await this.applyBatchOperationToText(op, text, scope);
+		}
+
+		if (scope === "selection") {
+			activeEditor.replaceSelection(text);
+		} else {
+			activeEditor.setValue(text);
+		}
+
+		new Notice(t("NOTICE_BATCH_APPLIED"));
 	}
 
 	// 刷新视图

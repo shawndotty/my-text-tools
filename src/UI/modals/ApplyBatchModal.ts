@@ -8,19 +8,31 @@ export class ApplyBatchModal extends Modal {
 	onApply: (batch: BatchProcess) => void;
 	onDelete: (batch: BatchProcess) => void;
 	onEdit: (batch: BatchProcess) => void;
+	isShortcutEnabled: (batch: BatchProcess) => boolean;
+	onToggleShortcut: (
+		batch: BatchProcess,
+		enable: boolean
+	) => void | Promise<void>;
 
 	constructor(
 		app: App,
 		batches: BatchProcess[],
 		onApply: (batch: BatchProcess) => void,
 		onDelete: (batch: BatchProcess) => void,
-		onEdit: (batch: BatchProcess) => void
+		onEdit: (batch: BatchProcess) => void,
+		isShortcutEnabled: (batch: BatchProcess) => boolean,
+		onToggleShortcut: (
+			batch: BatchProcess,
+			enable: boolean
+		) => void | Promise<void>
 	) {
 		super(app);
 		this.batches = batches;
 		this.onApply = onApply;
 		this.onDelete = onDelete;
 		this.onEdit = onEdit;
+		this.isShortcutEnabled = isShortcutEnabled;
+		this.onToggleShortcut = onToggleShortcut;
 	}
 
 	onOpen() {
@@ -60,6 +72,28 @@ export class ApplyBatchModal extends Modal {
 			const btnGroup = row.createDiv({ cls: "mtt-batch-actions" });
 			btnGroup.style.display = "flex";
 			btnGroup.style.gap = "8px";
+
+			const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
+			const updateShortcutBtnUI = () => {
+				const enabled = this.isShortcutEnabled(batch);
+				shortcutBtn.buttonEl.toggleClass("mod-cta", enabled);
+				shortcutBtn.setTooltip(
+					enabled
+						? t("TOOLTIP_BATCH_SHORTCUT_DISABLE")
+						: t("TOOLTIP_BATCH_SHORTCUT_ENABLE")
+				);
+			};
+			updateShortcutBtnUI();
+			shortcutBtn.onClick(async () => {
+				const enabled = this.isShortcutEnabled(batch);
+				shortcutBtn.setDisabled(true);
+				try {
+					await this.onToggleShortcut(batch, !enabled);
+				} finally {
+					shortcutBtn.setDisabled(false);
+					updateShortcutBtnUI();
+				}
+			});
 
 			new ButtonComponent(btnGroup)
 				.setButtonText(t("BTN_APPLY"))

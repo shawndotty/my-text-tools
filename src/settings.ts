@@ -68,6 +68,7 @@ export interface MyTextToolsSettings {
 	aiTools: Record<string, AIToolConfig>;
 	customIcons: Record<string, string>;
 	savedBatches: BatchProcess[];
+	batchShortcuts: Record<string, boolean>;
 }
 
 export interface AIToolConfig {
@@ -93,6 +94,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	aiTools: {},
 	customIcons: {},
 	savedBatches: [],
+	batchShortcuts: {},
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {

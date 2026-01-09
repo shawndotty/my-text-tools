@@ -273,6 +273,7 @@ export class MyTextToolsView extends ItemView {
 					},
 					async (batch) => {
 						// Delete batch
+						await this.plugin.disableBatchShortcut(batch.id);
 						this.plugin.settings.savedBatches =
 							this.plugin.settings.savedBatches.filter(
 								(b) => b.id !== batch.id
@@ -298,6 +299,9 @@ export class MyTextToolsView extends ItemView {
 									this.plugin.settings.savedBatches[index] =
 										updatedBatch;
 									await this.plugin.saveSettings();
+									await this.plugin.refreshBatchShortcut(
+										updatedBatch.id
+									);
 									this.settingsState.savedBatches =
 										this.plugin.settings.savedBatches;
 									new Notice(t("NOTICE_BATCH_UPDATED"));
@@ -316,6 +320,15 @@ export class MyTextToolsView extends ItemView {
 								this.render();
 							}
 						).open();
+					}
+					,
+					(batch) => this.plugin.isBatchShortcutEnabled(batch.id),
+					async (batch, enable) => {
+						if (enable) {
+							await this.plugin.enableBatchShortcut(batch.id);
+						} else {
+							await this.plugin.disableBatchShortcut(batch.id);
+						}
 					}
 				).open();
 			},
