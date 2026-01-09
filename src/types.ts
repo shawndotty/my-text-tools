@@ -92,6 +92,10 @@ export interface SettingsState {
 	// Combination Generator settings
 	combinationInputs: string[];
 	customIcons: Record<string, string>;
+
+	// Custom Tool Overrides
+	customAiPrompt?: string;
+	customAiSystemPrompt?: string;
 }
 
 /**

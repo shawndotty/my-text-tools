@@ -425,9 +425,13 @@ export default class MyTextTools extends Plugin {
 		}
 
 		const result = await aiService.processText(
-			action.prompt || "",
+			settings.customAiPrompt !== undefined
+				? settings.customAiPrompt
+				: action.prompt || "",
 			textToProcess,
-			action.systemPrompt || ""
+			settings.customAiSystemPrompt !== undefined
+				? settings.customAiSystemPrompt
+				: action.systemPrompt || ""
 		);
 		if (result.error) {
 			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));

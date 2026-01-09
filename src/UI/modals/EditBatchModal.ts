@@ -162,6 +162,7 @@ export class EditBatchModal extends Modal {
 			{
 				hideRunButton: true,
 				hasApiKey: !!this.plugin.settings.aiApiKey,
+				isBatchMode: true,
 			}
 		);
 	}

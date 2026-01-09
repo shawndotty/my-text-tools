@@ -92,7 +92,11 @@ export function renderToolSettings(
 	aiToolsConfig?: Record<string, AIToolConfig>,
 	customScripts?: CustomScript[],
 	customActions?: CustomAIAction[],
-	options?: { hideRunButton?: boolean; hasApiKey?: boolean }
+	options?: {
+		hideRunButton?: boolean;
+		hasApiKey?: boolean;
+		isBatchMode?: boolean;
+	}
 ): void {
 	parent.createEl("hr"); // 分隔线
 
@@ -124,14 +128,30 @@ export function renderToolSettings(
 			});
 		}
 		settingsContent.createEl("label", { text: t("SETTING_PROMPT") });
+
+		// Determine initial value based on mode
+		let initialPrompt = action?.prompt || "";
+		let initialSystemPrompt = action?.systemPrompt || "";
+
+		if (options?.isBatchMode) {
+			if (settings.customAiPrompt !== undefined) {
+				initialPrompt = settings.customAiPrompt;
+			}
+			if (settings.customAiSystemPrompt !== undefined) {
+				initialSystemPrompt = settings.customAiSystemPrompt;
+			}
+		}
+
 		const promptArea = settingsContent.createEl("textarea", {
 			cls: "mtt-textarea-small",
-			text: action?.prompt || "",
+			text: initialPrompt,
 			attr: { rows: 4 },
 		});
 		promptArea.onchange = async (e) => {
 			const newVal = (e.target as HTMLTextAreaElement).value;
-			if (callbacks.onSaveCustomAIAction) {
+			if (options?.isBatchMode) {
+				callbacks.onSettingsChange("customAiPrompt", newVal);
+			} else if (callbacks.onSaveCustomAIAction) {
 				await callbacks.onSaveCustomAIAction(id, { prompt: newVal });
 			}
 		};
@@ -140,12 +160,14 @@ export function renderToolSettings(
 		});
 		const sysPromptArea = settingsContent.createEl("textarea", {
 			cls: "mtt-textarea-small",
-			text: action?.systemPrompt || "",
+			text: initialSystemPrompt,
 			attr: { rows: 4 },
 		});
 		sysPromptArea.onchange = async (e) => {
 			const newVal = (e.target as HTMLTextAreaElement).value;
-			if (callbacks.onSaveCustomAIAction) {
+			if (options?.isBatchMode) {
+				callbacks.onSettingsChange("customAiSystemPrompt", newVal);
+			} else if (callbacks.onSaveCustomAIAction) {
 				await callbacks.onSaveCustomAIAction(id, {
 					systemPrompt: newVal,
 				});
