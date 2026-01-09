@@ -417,7 +417,8 @@ export class MyTextToolsView extends ItemView {
 			settingsCallbacks,
 			this.plugin.settings.aiTools,
 			this.plugin.settings.customScripts,
-			this.plugin.settings.customActions
+			this.plugin.settings.customActions,
+			{ hasApiKey: !!this.plugin.settings.aiApiKey }
 		);
 	}
 

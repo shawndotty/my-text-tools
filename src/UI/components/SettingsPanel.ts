@@ -92,7 +92,7 @@ export function renderToolSettings(
 	aiToolsConfig?: Record<string, AIToolConfig>,
 	customScripts?: CustomScript[],
 	customActions?: CustomAIAction[],
-	options?: { hideRunButton?: boolean }
+	options?: { hideRunButton?: boolean; hasApiKey?: boolean }
 ): void {
 	parent.createEl("hr"); // 分隔线
 
@@ -117,10 +117,12 @@ export function renderToolSettings(
 	if (activeTool.startsWith("custom-ai:")) {
 		const id = activeTool.split(":")[1]!;
 		const action = customActions?.find((a) => a.id === id) || undefined;
-		settingsContent.createEl("p", {
-			text: t("AI_HINT"),
-			cls: "mtt-ai-hint",
-		});
+		if (!options?.hasApiKey) {
+			settingsContent.createEl("p", {
+				text: t("AI_HINT"),
+				cls: "mtt-ai-hint",
+			});
+		}
 		settingsContent.createEl("label", { text: t("SETTING_PROMPT") });
 		const promptArea = settingsContent.createEl("textarea", {
 			cls: "mtt-textarea-small",

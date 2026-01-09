@@ -159,7 +159,10 @@ export class EditBatchModal extends Modal {
 			this.plugin.settings.aiTools,
 			this.plugin.settings.customScripts,
 			this.plugin.settings.customActions,
-			{ hideRunButton: true }
+			{
+				hideRunButton: true,
+				hasApiKey: !!this.plugin.settings.aiApiKey,
+			}
 		);
 	}
 
