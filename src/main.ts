@@ -248,11 +248,7 @@ export default class MyTextTools extends Plugin {
 			editorCheckCallback: (checking, editor) => {
 				if (!editor.somethingSelected()) return false;
 				if (!checking) {
-					void this.runBatchShortcut(
-						batch.id,
-						"selection",
-						editor
-					);
+					void this.runBatchShortcut(batch.id, "selection", editor);
 				}
 				return true;
 			},
@@ -265,9 +261,7 @@ export default class MyTextTools extends Plugin {
 		return view instanceof MyTextToolsView ? view : null;
 	}
 
-	private getCustomScriptParams(
-		script: CustomScript
-	): Record<string, any> {
+	private getCustomScriptParams(script: CustomScript): Record<string, any> {
 		if (!script.params || script.params.length === 0) return {};
 		const view = this.getWorkbenchView();
 		return script.params.reduce((acc, p) => {
@@ -349,7 +343,10 @@ export default class MyTextTools extends Plugin {
 			text,
 			settings.preserveFrontmatter
 		);
-		const header = this.extractHeaderForAI(fm.body, settings.preserveHeader);
+		const header = this.extractHeaderForAI(
+			fm.body,
+			settings.preserveHeader
+		);
 		const textToProcess = header.body;
 
 		if (!textToProcess.trim()) {
@@ -402,7 +399,8 @@ export default class MyTextTools extends Plugin {
 			aiApiKey: action.overrideApiKey ?? this.settings.aiApiKey,
 			aiModel: action.overrideModel ?? this.settings.aiModel,
 			aiMaxTokens: action.overrideMaxTokens ?? this.settings.aiMaxTokens,
-			aiTemperature: action.overrideTemperature ?? this.settings.aiTemperature,
+			aiTemperature:
+				action.overrideTemperature ?? this.settings.aiTemperature,
 		};
 
 		const aiService = new AIService(merged);
@@ -415,7 +413,10 @@ export default class MyTextTools extends Plugin {
 			text,
 			settings.preserveFrontmatter
 		);
-		const header = this.extractHeaderForAI(fm.body, settings.preserveHeader);
+		const header = this.extractHeaderForAI(
+			fm.body,
+			settings.preserveHeader
+		);
 		const textToProcess = header.body;
 
 		if (!textToProcess.trim()) {
@@ -458,7 +459,12 @@ export default class MyTextTools extends Plugin {
 
 		const executor = new ScriptExecutor(this.app);
 		const params = this.getCustomScriptParams(script);
-		const result = await executor.execute(script.code, text, selection, params);
+		const result = await executor.execute(
+			script.code,
+			text,
+			selection,
+			params
+		);
 		return typeof result === "string" ? result : text;
 	}
 
@@ -510,7 +516,11 @@ export default class MyTextTools extends Plugin {
 		return processTextCore(op.toolId as ToolType, text, settings);
 	}
 
-	async runBatchShortcut(batchId: string, scope: "note" | "selection", editor?: Editor) {
+	async runBatchShortcut(
+		batchId: string,
+		scope: "note" | "selection",
+		editor?: Editor
+	) {
 		const batch = this.settings.savedBatches.find((b) => b.id === batchId);
 		if (!batch) {
 			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
@@ -519,7 +529,8 @@ export default class MyTextTools extends Plugin {
 		}
 
 		const activeEditor =
-			editor || this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+			editor ||
+			this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
 		if (!activeEditor) {
 			new Notice(t("NOTICE_NO_EDITOR"));
 			return;
@@ -530,9 +541,10 @@ export default class MyTextTools extends Plugin {
 			return;
 		}
 
-		let text = scope === "selection"
-			? activeEditor.getSelection()
-			: activeEditor.getValue();
+		let text =
+			scope === "selection"
+				? activeEditor.getSelection()
+				: activeEditor.getValue();
 
 		for (const op of batch.operations) {
 			text = await this.applyBatchOperationToText(op, text, scope);
@@ -827,21 +839,5 @@ export default class MyTextTools extends Plugin {
 
 		// 情况三：均不可用
 		new Notice(t("NOTICE_NO_EDITOR"));
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let { contentEl } = this;
-		contentEl.setText(t("MODAL_SAMPLE_TEXT"));
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
 	}
 }
