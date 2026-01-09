@@ -40,6 +40,7 @@ const DEFAULT_AI_KEYS: Record<string, { prompt: string; system: string }> = {
  */
 export function renderGlobalSettings(
 	parent: HTMLElement,
+	activeTool: string,
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks
 ): void {
@@ -64,18 +65,20 @@ export function renderGlobalSettings(
 		);
 	fmLabel.appendText(t("CHECKBOX_PRESERVE_FRONTMATTER"));
 
-	// 首行保护
-	const headerLabel = globalSettings.createEl("label", {
-		cls: "mtt-checkbox-label",
-	});
-	const headerCheck = headerLabel.createEl("input", { type: "checkbox" });
-	headerCheck.checked = settings.preserveHeader;
-	headerCheck.onchange = (e) =>
-		callbacks.onSettingsChange(
-			"preserveHeader",
-			(e.target as HTMLInputElement).checked
-		);
-	headerLabel.appendText(t("CHECKBOX_PRESERVE_HEADER"));
+	// 首行保护 - 仅在提取列和交换列工具下显示
+	if (activeTool === "extract-column" || activeTool === "swap-columns") {
+		const headerLabel = globalSettings.createEl("label", {
+			cls: "mtt-checkbox-label",
+		});
+		const headerCheck = headerLabel.createEl("input", { type: "checkbox" });
+		headerCheck.checked = settings.preserveHeader;
+		headerCheck.onchange = (e) =>
+			callbacks.onSettingsChange(
+				"preserveHeader",
+				(e.target as HTMLInputElement).checked
+			);
+		headerLabel.appendText(t("CHECKBOX_PRESERVE_HEADER"));
+	}
 }
 
 /**

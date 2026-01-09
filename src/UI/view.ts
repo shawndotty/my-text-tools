@@ -390,7 +390,12 @@ export class MyTextToolsView extends ItemView {
 				}
 			},
 		};
-		renderGlobalSettings(rightPanel, this.settingsState, settingsCallbacks);
+		renderGlobalSettings(
+			rightPanel,
+			this.activeTool,
+			this.settingsState,
+			settingsCallbacks
+		);
 		renderToolSettings(
 			rightPanel,
 			this.activeTool,
