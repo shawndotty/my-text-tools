@@ -238,7 +238,7 @@ export class MyTextToolsView extends ItemView {
 			onStopRecording: () => {
 				this.isRecording = false;
 				if (this.currentBatchOperations.length === 0) {
-					new Notice("No operations recorded.");
+					new Notice(t("NO_OPERATIONS_RECORDED"));
 					this.render();
 					return;
 				}
@@ -321,8 +321,7 @@ export class MyTextToolsView extends ItemView {
 								this.render();
 							}
 						).open();
-					}
-					,
+					},
 					(batch) => this.plugin.isBatchShortcutEnabled(batch.id),
 					async (batch, enable) => {
 						if (enable) {
@@ -364,7 +363,7 @@ export class MyTextToolsView extends ItemView {
 							JSON.stringify(this.settingsState)
 						),
 					});
-					new Notice(`Recorded: ${toolId}`);
+					new Notice(t("NOTICE_OPERATION_RECORDED", [toolId]));
 				}
 
 				if (toolId.startsWith("custom-ai:")) {

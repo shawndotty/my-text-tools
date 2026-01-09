@@ -423,4 +423,6 @@ export default {
 	CONFIRM_DELETE_BATCH_DESC: "确定要删除批处理“{0}”吗？",
 	CONFIRM_DELETE_STEP_TITLE: "删除步骤",
 	CONFIRM_DELETE_STEP_DESC: "确定要删除此步骤吗？此操作无法撤销。",
+	NO_OPERATIONS_RECORDED: "没有记录任何操作。",
+	NOTICE_OPERATION_RECORDED: "已记录操作：{0}",
 };

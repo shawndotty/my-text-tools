@@ -411,4 +411,6 @@ export default {
 	CONFIRM_DELETE_BATCH_DESC: "確定要刪除批處理 '{0}' 嗎？此操作無法撤銷。",
 	CONFIRM_DELETE_STEP_TITLE: "刪除步驟",
 	CONFIRM_DELETE_STEP_DESC: "確定要刪除此步驟嗎？此操作無法撤銷。",
+	NO_OPERATIONS_RECORDED: "沒有記錄任何操作。",
+	NOTICE_OPERATION_RECORDED: "已記錄操作：{0}",
 };

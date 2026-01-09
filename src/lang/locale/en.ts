@@ -435,4 +435,6 @@ export default {
 	CONFIRM_DELETE_STEP_TITLE: "Delete Step",
 	CONFIRM_DELETE_STEP_DESC:
 		"Are you sure you want to delete this step? This action cannot be undone.",
+	NO_OPERATIONS_RECORDED: "No operations recorded.",
+	NOTICE_OPERATION_RECORDED: "Recorded: {0}",
 };
