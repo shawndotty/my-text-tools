@@ -288,6 +288,7 @@ export class MyTextToolsView extends ItemView {
 						// Edit batch
 						new EditBatchModal(
 							this.app,
+							this.plugin,
 							batch,
 							async (updatedBatch) => {
 								// Save changes

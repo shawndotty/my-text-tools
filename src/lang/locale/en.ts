@@ -421,7 +421,7 @@ export default {
 	BTN_CLOSE: "Close",
 	BTN_MOVE_UP: "Move Up",
 	BTN_MOVE_DOWN: "Move Down",
-	BTN_REMOVE_OP: "Remove",
+	BTN_DELETE_OP: "Delete Step",
 	NOTICE_NO_CHANGES: "No changes made.",
 	CONFIRM_DISCARD: "Discard unsaved changes?",
 	NOTICE_BATCH_UPDATED: "Batch process updated.",
@@ -429,5 +429,8 @@ export default {
 	NOTICE_BATCH_DELETED: "Batch process deleted.",
 	CONFIRM_DELETE_BATCH_TITLE: "Delete Batch Process",
 	CONFIRM_DELETE_BATCH_DESC:
-		'Are you sure you want to delete batch process "{0}"?',
+		"Are you sure you want to delete batch process '{0}'? This action cannot be undone.",
+	CONFIRM_DELETE_STEP_TITLE: "Delete Step",
+	CONFIRM_DELETE_STEP_DESC:
+		"Are you sure you want to delete this step? This action cannot be undone.",
 };

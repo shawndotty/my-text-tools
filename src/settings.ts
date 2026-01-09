@@ -253,6 +253,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				.onClick(() => {
 					new EditBatchModal(
 						this.app,
+						this.plugin,
 						batch,
 						async (updatedBatch) => {
 							const index =

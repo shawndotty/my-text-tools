@@ -410,6 +410,7 @@ export default {
 	BTN_CLOSE: "关闭",
 	BTN_MOVE_UP: "上移",
 	BTN_MOVE_DOWN: "下移",
+	BTN_DELETE_OP: "删除步骤",
 	BTN_REMOVE_OP: "删除",
 	NOTICE_NO_CHANGES: "没有进行任何修改。",
 	CONFIRM_DISCARD: "放弃未保存的修改？",
@@ -418,4 +419,6 @@ export default {
 	NOTICE_BATCH_DELETED: "批处理已删除。",
 	CONFIRM_DELETE_BATCH_TITLE: "删除批处理",
 	CONFIRM_DELETE_BATCH_DESC: "确定要删除批处理“{0}”吗？",
+	CONFIRM_DELETE_STEP_TITLE: "删除步骤",
+	CONFIRM_DELETE_STEP_DESC: "确定要删除此步骤吗？此操作无法撤销。",
 };

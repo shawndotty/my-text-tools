@@ -150,11 +150,13 @@ export function renderToolSettings(
 			}
 		};
 		settingsContent.createEl("hr");
-		const runBtn = settingsContent.createEl("button", {
-			text: t("BTN_RUN_AI"),
-			cls: "mtt-run-btn",
-		});
-		runBtn.onclick = () => callbacks.onRun(activeTool);
+		if (!options?.hideRunButton) {
+			const runBtn = settingsContent.createEl("button", {
+				text: t("BTN_RUN_AI"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => callbacks.onRun(activeTool);
+		}
 		return;
 	}
 
@@ -163,19 +165,23 @@ export function renderToolSettings(
 		const id = activeTool.split(":")[1]!;
 		const script = customScripts?.find((s) => s.id === id) || undefined;
 		if (!script) {
-			const runBtn = settingsContent.createEl("button", {
-				text: t("BTN_RUN_SCRIPT"),
-				cls: "mtt-run-btn",
-			});
-			runBtn.onclick = () => callbacks.onRun(activeTool);
+			if (!options?.hideRunButton) {
+				const runBtn = settingsContent.createEl("button", {
+					text: t("BTN_RUN_SCRIPT"),
+					cls: "mtt-run-btn",
+				});
+				runBtn.onclick = () => callbacks.onRun(activeTool);
+			}
 			return;
 		}
 		if ((script.params || []).length === 0) {
-			const runBtn = settingsContent.createEl("button", {
-				text: t("BTN_RUN_SCRIPT"),
-				cls: "mtt-run-btn",
-			});
-			runBtn.onclick = () => callbacks.onRun(activeTool);
+			if (!options?.hideRunButton) {
+				const runBtn = settingsContent.createEl("button", {
+					text: t("BTN_RUN_SCRIPT"),
+					cls: "mtt-run-btn",
+				});
+				runBtn.onclick = () => callbacks.onRun(activeTool);
+			}
 			return;
 		}
 		(script.params || []).forEach((param) => {
@@ -244,11 +250,13 @@ export function renderToolSettings(
 				valueEl = input;
 			}
 		});
-		const runBtn = settingsContent.createEl("button", {
-			text: t("BTN_RUN_SCRIPT"),
-			cls: "mtt-run-btn",
-		});
-		runBtn.onclick = () => callbacks.onRun(activeTool);
+		if (!options?.hideRunButton) {
+			const runBtn = settingsContent.createEl("button", {
+				text: t("BTN_RUN_SCRIPT"),
+				cls: "mtt-run-btn",
+			});
+			runBtn.onclick = () => callbacks.onRun(activeTool);
+		}
 		return;
 	}
 

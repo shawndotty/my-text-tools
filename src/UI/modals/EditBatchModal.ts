@@ -5,21 +5,26 @@ import {
 	renderToolSettings,
 	SettingsPanelCallbacks,
 } from "../components/SettingsPanel";
+import MyTextTools from "../../main";
 import { SaveBatchModal } from "./SaveBatchModal";
+import { ConfirmModal } from "./ConfirmModal";
 
 export class EditBatchModal extends Modal {
 	originalBatch: BatchProcess;
 	workingBatch: BatchProcess;
+	plugin: MyTextTools;
 	onSave: (batch: BatchProcess) => void;
 	onSaveAsNew: (batch: BatchProcess) => void;
 
 	constructor(
 		app: App,
+		plugin: MyTextTools,
 		batch: BatchProcess,
 		onSave: (batch: BatchProcess) => void,
 		onSaveAsNew: (batch: BatchProcess) => void
 	) {
 		super(app);
+		this.plugin = plugin;
 		this.originalBatch = batch;
 		// Deep clone to track changes
 		this.workingBatch = JSON.parse(JSON.stringify(batch));
@@ -110,14 +115,19 @@ export class EditBatchModal extends Modal {
 
 		// Delete
 		new ButtonComponent(controls)
-			.setIcon("trash-2")
-			.setTooltip(t("BTN_REMOVE_OP"))
+			.setIcon("trash")
+			.setTooltip(t("BTN_DELETE_OP"))
+			.setClass("mtt-text-danger")
 			.onClick(() => {
-				if (confirm(t("CONFIRM_DELETE_BATCH"))) {
-					// Reusing confirm msg or use new one?
-					// Use specific msg if available, or just confirm
-					this.deleteOp(index);
-				}
+				new ConfirmModal(
+					this.app,
+					t("CONFIRM_DELETE_STEP_TITLE"),
+					t("CONFIRM_DELETE_STEP_DESC"),
+					() => this.deleteOp(index),
+					t("BTN_DELETE"),
+					t("BTN_CANCEL"),
+					true
+				).open();
 			});
 
 		// Settings Body
@@ -146,9 +156,9 @@ export class EditBatchModal extends Modal {
 			op.toolId,
 			op.settingsSnapshot,
 			callbacks,
-			undefined, // aiToolsConfig - assuming standard tools for now or load if needed
-			undefined, // customScripts
-			undefined, // customActions
+			this.plugin.settings.aiTools,
+			this.plugin.settings.customScripts,
+			this.plugin.settings.customActions,
 			{ hideRunButton: true }
 		);
 	}
