@@ -188,9 +188,15 @@ export class EditBatchModal extends Modal {
 			new ButtonComponent(footer)
 				.setButtonText(t("BTN_DISCARD"))
 				.onClick(() => {
-					if (confirm(t("CONFIRM_DISCARD"))) {
-						this.close();
-					}
+					new ConfirmModal(
+						this.app,
+						t("CONFIRM_DISCARD_TITLE"),
+						t("CONFIRM_DISCARD_DESC"),
+						() => this.close(),
+						t("BTN_DISCARD"),
+						t("BTN_CANCEL"),
+						true
+					).open();
 				});
 
 			// Save as New

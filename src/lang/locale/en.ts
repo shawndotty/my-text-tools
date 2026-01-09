@@ -424,6 +424,8 @@ export default {
 	BTN_DELETE_OP: "Delete Step",
 	NOTICE_NO_CHANGES: "No changes made.",
 	CONFIRM_DISCARD: "Discard unsaved changes?",
+	CONFIRM_DISCARD_TITLE: "Discard Changes",
+	CONFIRM_DISCARD_DESC: "Are you sure you want to discard unsaved changes?",
 	NOTICE_BATCH_UPDATED: "Batch process updated.",
 	NOTICE_BATCH_SAVED_AS_NEW: "Batch process saved as new.",
 	NOTICE_BATCH_DELETED: "Batch process deleted.",

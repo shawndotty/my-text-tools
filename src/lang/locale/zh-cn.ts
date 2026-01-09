@@ -414,6 +414,8 @@ export default {
 	BTN_REMOVE_OP: "删除",
 	NOTICE_NO_CHANGES: "没有进行任何修改。",
 	CONFIRM_DISCARD: "放弃未保存的修改？",
+	CONFIRM_DISCARD_TITLE: "放弃修改",
+	CONFIRM_DISCARD_DESC: "确定要放弃未保存的修改吗？",
 	NOTICE_BATCH_UPDATED: "批处理已更新。",
 	NOTICE_BATCH_SAVED_AS_NEW: "批处理已另存为新文件。",
 	NOTICE_BATCH_DELETED: "批处理已删除。",

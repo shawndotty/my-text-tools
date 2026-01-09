@@ -402,6 +402,8 @@ export default {
 	BTN_DELETE_OP: "刪除步驟",
 	NOTICE_NO_CHANGES: "未作任何變更。",
 	CONFIRM_DISCARD: "放棄未保存的變更？",
+	CONFIRM_DISCARD_TITLE: "放棄變更",
+	CONFIRM_DISCARD_DESC: "確定要放棄未保存的變更嗎？",
 	NOTICE_BATCH_UPDATED: "批處理已更新。",
 	NOTICE_BATCH_SAVED_AS_NEW: "批處理已另存新檔。",
 	NOTICE_BATCH_DELETED: "批處理已刪除。",
