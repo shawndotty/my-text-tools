@@ -16,6 +16,8 @@ export interface SettingsState {
 	savedBatches: BatchProcess[]; // 保存的批处理
 	findText: string;
 	replaceText: string;
+	regexCaseInsensitive: boolean; // 正则替换：是否区分大小写
+	regexMultiline: boolean; // 正则替换：是否多行模式
 	prefix: string;
 	suffix: string;
 	filterText: string; // 过滤关键字
@@ -94,6 +96,8 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	savedBatches: [],
 	findText: "",
 	replaceText: "",
+	regexCaseInsensitive: false,
+	regexMultiline: false,
 	prefix: "",
 	suffix: "",
 	filterText: "",

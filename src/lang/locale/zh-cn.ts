@@ -51,6 +51,7 @@ export default {
 	OPTION_CONTAINING: "删除包含该字符的行",
 	OPTION_NOT_CONTAINING: "删除不包含该字符的行",
 	CHECKBOX_CASE: " 区分大小写",
+	CHECKBOX_MULTILINE: " 多行匹配模式",
 	CHECKBOX_REGEX: " 启用正则匹配",
 	BTN_RUN_FILTER: "执行过滤",
 

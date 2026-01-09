@@ -52,6 +52,7 @@ export default {
 	OPTION_CONTAINING: "Delete lines CONTAINING this",
 	OPTION_NOT_CONTAINING: "Delete lines NOT CONTAINING this",
 	CHECKBOX_CASE: " Case Sensitive",
+	CHECKBOX_MULTILINE: " Multiline Mode",
 	CHECKBOX_REGEX: " Enable Regex",
 	BTN_RUN_FILTER: "Run Filter",
 

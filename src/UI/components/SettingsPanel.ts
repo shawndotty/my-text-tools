@@ -426,6 +426,36 @@ function renderRegexSettings(
 			(e.target as HTMLInputElement).value
 		);
 
+	const regexOpts = parent.createDiv({ cls: "mtt-setting-row" });
+
+	// Case Insensitive
+	const caseLabel = regexOpts.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
+	caseCheck.checked = settings.regexCaseInsensitive;
+	caseCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"regexCaseInsensitive",
+			(e.target as HTMLInputElement).checked
+		);
+	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
+
+	// Multiline
+	const multilineLabel = regexOpts.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const multilineCheck = multilineLabel.createEl("input", {
+		type: "checkbox",
+	});
+	multilineCheck.checked = settings.regexMultiline;
+	multilineCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"regexMultiline",
+			(e.target as HTMLInputElement).checked
+		);
+	multilineLabel.appendText(" " + t("CHECKBOX_MULTILINE"));
+
 	const runBtn = parent.createEl("button", {
 		text: t("BTN_RUN_REPLACE"),
 		cls: "mtt-run-btn",

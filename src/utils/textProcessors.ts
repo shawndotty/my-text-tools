@@ -86,7 +86,9 @@ export function processText(
 			processedBody = processRegex(
 				textToProcess,
 				settings.findText,
-				settings.replaceText
+				settings.replaceText,
+				settings.regexCaseInsensitive,
+				settings.regexMultiline
 			);
 			break;
 		case "add-wrap":
@@ -266,10 +268,15 @@ function processEmptyLine(lines: string[], mode: "all" | "merge"): string {
 function processRegex(
 	text: string,
 	findText: string,
-	replaceText: string
+	replaceText: string,
+	caseInsensitive: boolean,
+	multiline: boolean
 ): string {
 	try {
-		const regex = new RegExp(findText, "g");
+		let flags = "g";
+		if (caseInsensitive) flags += "i";
+		if (multiline) flags += "m";
+		const regex = new RegExp(findText, flags);
 		const result = text.replace(regex, replaceText);
 		new Notice(t("NOTICE_REGEX_DONE"));
 		return result;
