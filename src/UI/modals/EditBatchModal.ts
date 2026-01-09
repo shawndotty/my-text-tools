@@ -33,9 +33,8 @@ export class EditBatchModal extends Modal {
 
 	renderContent() {
 		const { contentEl } = this;
+		this.titleEl.setText(t("MODAL_EDIT_BATCH_TITLE"));
 		contentEl.empty();
-
-		contentEl.createEl("h2", { text: t("MODAL_EDIT_BATCH_TITLE") });
 
 		// Batch Name (ReadOnly for now, or editable?)
 		// User requirement says: modify parameters, reorder, delete. Doesn't explicitly say rename, but Save As New implies naming.
