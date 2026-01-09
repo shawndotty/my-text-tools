@@ -1,9 +1,17 @@
-import { App, PluginSettingTab, Setting, setIcon } from "obsidian";
+import {
+	App,
+	PluginSettingTab,
+	Setting,
+	setIcon,
+	ButtonComponent,
+} from "obsidian";
 import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
 import { BUILTIN_TOOLS, BatchProcess } from "./types";
 import { AIGenerateScriptModal } from "./UI/modals/AIGenerateScriptModal";
+import { EditBatchModal } from "./UI/modals/EditBatchModal";
+import { ConfirmModal } from "./UI/modals/ConfirmModal";
 import { AIService } from "./utils/aiService";
 
 export interface CustomAIAction {
@@ -151,6 +159,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				renderMethod: (content: HTMLElement) =>
 					this.renderCustomScriptsSettings(content),
 			},
+			{
+				title: "BatchProcessSettings",
+				renderMethod: (content: HTMLElement) =>
+					this.renderBatchProcessSettings(content),
+			},
 		];
 
 		tabConfigs.forEach((config) => {
@@ -159,6 +172,135 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					? config.title
 					: t(config.title as any);
 			tabbedSettings.addTab(title, config.renderMethod);
+		});
+	}
+
+	private renderBatchProcessSettings(containerEl: HTMLElement) {
+		containerEl.empty();
+		containerEl.createEl("p", {
+			text: t("BatchProcessSettings"),
+			cls: "setting-item-description",
+		});
+
+		const batches = this.plugin.settings.savedBatches;
+
+		if (batches.length === 0) {
+			containerEl.createEl("p", { text: t("NOTICE_NO_BATCHES") });
+			return;
+		}
+
+		const listContainer = containerEl.createDiv({ cls: "mtt-batch-list" });
+		listContainer.style.display = "flex";
+		listContainer.style.flexDirection = "column";
+		listContainer.style.gap = "10px";
+
+		batches.forEach((batch) => {
+			const row = listContainer.createDiv({ cls: "mtt-batch-item" });
+			row.style.display = "flex";
+			row.style.justifyContent = "space-between";
+			row.style.alignItems = "center";
+			row.style.padding = "8px";
+			row.style.border = "1px solid var(--background-modifier-border)";
+			row.style.borderRadius = "4px";
+
+			const infoDiv = row.createDiv();
+			infoDiv.createEl("span", {
+				text: batch.name,
+				cls: "mtt-batch-name",
+				attr: { style: "font-weight: bold; margin-right: 10px;" },
+			});
+			infoDiv.createEl("span", {
+				text: `${batch.operations.length} steps`,
+				cls: "mtt-text-muted",
+				attr: { style: "font-size: 0.8em; color: var(--text-muted);" },
+			});
+
+			const btnGroup = row.createDiv({ cls: "mtt-batch-actions" });
+			btnGroup.style.display = "flex";
+			btnGroup.style.gap = "8px";
+
+			// Shortcut Button
+			const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
+			const updateShortcutBtnUI = () => {
+				const enabled = this.plugin.isBatchShortcutEnabled(batch.id);
+				shortcutBtn.buttonEl.toggleClass("mod-cta", enabled);
+				shortcutBtn.setTooltip(
+					enabled
+						? t("TOOLTIP_BATCH_SHORTCUT_DISABLE")
+						: t("TOOLTIP_BATCH_SHORTCUT_ENABLE")
+				);
+			};
+			updateShortcutBtnUI();
+			shortcutBtn.onClick(async () => {
+				const enabled = this.plugin.isBatchShortcutEnabled(batch.id);
+				shortcutBtn.setDisabled(true);
+				try {
+					if (enabled) {
+						await this.plugin.disableBatchShortcut(batch.id);
+					} else {
+						await this.plugin.enableBatchShortcut(batch.id);
+					}
+					updateShortcutBtnUI();
+				} finally {
+					shortcutBtn.setDisabled(false);
+				}
+			});
+
+			// Edit Button
+			new ButtonComponent(btnGroup)
+				.setIcon("pencil")
+				.setTooltip(t("BTN_EDIT"))
+				.onClick(() => {
+					new EditBatchModal(
+						this.app,
+						batch,
+						async (updatedBatch) => {
+							const index =
+								this.plugin.settings.savedBatches.findIndex(
+									(b) => b.id === batch.id
+								);
+							if (index !== -1) {
+								this.plugin.settings.savedBatches[index] =
+									updatedBatch;
+								await this.plugin.saveSettings();
+								if (
+									this.plugin.isBatchShortcutEnabled(batch.id)
+								) {
+									await this.plugin.refreshBatchShortcut(
+										batch.id
+									);
+								}
+								this.renderBatchProcessSettings(containerEl);
+							}
+						},
+						async (newBatch) => {
+							this.plugin.settings.savedBatches.push(newBatch);
+							await this.plugin.saveSettings();
+							this.renderBatchProcessSettings(containerEl);
+						}
+					).open();
+				});
+
+			// Delete Button
+			new ButtonComponent(btnGroup)
+				.setIcon("trash")
+				.setTooltip(t("BTN_DELETE"))
+				.onClick(() => {
+					new ConfirmModal(
+						this.app,
+						t("CONFIRM_DELETE_BATCH_TITLE"),
+						t("CONFIRM_DELETE_BATCH_DESC", [batch.name]),
+						async () => {
+							this.plugin.settings.savedBatches =
+								this.plugin.settings.savedBatches.filter(
+									(b) => b.id !== batch.id
+								);
+							await this.plugin.saveSettings();
+							await this.plugin.disableBatchShortcut(batch.id);
+							this.renderBatchProcessSettings(containerEl);
+						}
+					).open();
+				});
 		});
 	}
 

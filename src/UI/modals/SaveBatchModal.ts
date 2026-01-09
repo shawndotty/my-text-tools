@@ -12,7 +12,8 @@ export class SaveBatchModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
-		contentEl.createEl("h2", { text: t("MODAL_SAVE_BATCH_TITLE") });
+		contentEl.empty();
+		this.titleEl.setText(t("MODAL_SAVE_BATCH_TITLE"));
 
 		new Setting(contentEl)
 			.setName(t("MODAL_SAVE_BATCH_NAME"))

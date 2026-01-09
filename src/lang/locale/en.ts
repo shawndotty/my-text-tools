@@ -43,6 +43,7 @@ export default {
 	MENU_OPEN_PLUGIN: "Open in MyTextTools",
 
 	SETTINGS_TITLE: "Settings",
+	BatchProcessSettings: "Batch Process Management",
 	SETTINGS_EMPTY: "Select a tool from the left to start processing",
 	SETTINGS_NO_CONFIG:
 		"This tool requires no extra settings. Click the left button to trigger.",
@@ -426,4 +427,7 @@ export default {
 	NOTICE_BATCH_UPDATED: "Batch process updated.",
 	NOTICE_BATCH_SAVED_AS_NEW: "Batch process saved as new.",
 	NOTICE_BATCH_DELETED: "Batch process deleted.",
+	CONFIRM_DELETE_BATCH_TITLE: "Delete Batch Process",
+	CONFIRM_DELETE_BATCH_DESC:
+		'Are you sure you want to delete batch process "{0}"?',
 };

@@ -21,8 +21,7 @@ export class AIGenerateScriptModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.empty();
-
-		contentEl.createEl("h2", { text: t("MODAL_GENERATE_SCRIPT_TITLE") });
+		this.titleEl.setText(t("MODAL_GENERATE_SCRIPT_TITLE"));
 
 		// Context Selection
 		new Setting(contentEl)

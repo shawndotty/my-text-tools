@@ -42,6 +42,7 @@ export default {
 	MENU_OPEN_PLUGIN: "在 MyTextTools 中編輯",
 
 	SETTINGS_TITLE: "參數設置",
+	BatchProcessSettings: "批處理管理",
 	SETTINGS_EMPTY: "在左側選擇一個工具開始處理",
 	SETTINGS_NO_CONFIG: "該工具無需額外設置，點擊左側按鈕已直接觸發。",
 
@@ -404,4 +405,6 @@ export default {
 	NOTICE_BATCH_UPDATED: "批處理已更新。",
 	NOTICE_BATCH_SAVED_AS_NEW: "批處理已另存新檔。",
 	NOTICE_BATCH_DELETED: "批處理已刪除。",
+	CONFIRM_DELETE_BATCH_TITLE: "刪除批處理",
+	CONFIRM_DELETE_BATCH_DESC: "確定要刪除批處理「{0}」嗎？",
 };
