@@ -69,6 +69,12 @@ export interface MyTextToolsSettings {
 	customIcons: Record<string, string>;
 	savedBatches: BatchProcess[];
 	batchShortcuts: Record<string, boolean>;
+	regexExtractSeparator: string;
+	prefix: string;
+	suffix: string;
+	wrapExcludeEmptyLines: boolean;
+	filterText: string;
+	filterMode: string;
 }
 
 export interface AIToolConfig {
@@ -95,6 +101,12 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	customIcons: {},
 	savedBatches: [],
 	batchShortcuts: {},
+	regexExtractSeparator: "newline",
+	prefix: "",
+	suffix: "",
+	wrapExcludeEmptyLines: false,
+	filterText: "",
+	filterMode: "containing",
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {

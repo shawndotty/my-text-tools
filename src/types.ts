@@ -24,6 +24,7 @@ export interface SettingsState {
 	regexExtractSeparator: "newline" | "hyphen" | "space";
 	prefix: string;
 	suffix: string;
+	wrapExcludeEmptyLines: boolean; // Add Wrap: exclude empty lines
 	filterText: string; // 过滤关键字
 	filterMode: "containing" | "not-containing"; // containing 或 not-containing
 	filterCase: boolean; // 是否区分大小写
@@ -107,6 +108,7 @@ export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	regexExtractSeparator: "newline",
 	prefix: "",
 	suffix: "",
+	wrapExcludeEmptyLines: false,
 	filterText: "",
 	filterMode: "containing",
 	filterCase: false,

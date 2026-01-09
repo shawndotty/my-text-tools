@@ -556,6 +556,20 @@ function renderWrapSettings(
 			(e.target as HTMLInputElement).value
 		);
 
+	const excludeEmptyLabel = wrapContent.createEl("label", {
+		cls: "mtt-checkbox-label",
+	});
+	const excludeEmptyCheck = excludeEmptyLabel.createEl("input", {
+		type: "checkbox",
+	});
+	excludeEmptyCheck.checked = settings.wrapExcludeEmptyLines;
+	excludeEmptyCheck.onchange = (e) =>
+		callbacks.onSettingsChange(
+			"wrapExcludeEmptyLines",
+			(e.target as HTMLInputElement).checked
+		);
+	excludeEmptyLabel.appendText(t("CHECKBOX_WRAP_EXCLUDE_EMPTY"));
+
 	const runBtn = wrapContent.createEl("button", {
 		text: t("BTN_RUN_WRAP"),
 		cls: "mtt-run-btn",

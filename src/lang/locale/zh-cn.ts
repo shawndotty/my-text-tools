@@ -71,6 +71,7 @@ export default {
 	PLACEHOLDER_PREFIX: "例如: - [ ] ",
 	SETTING_SUFFIX: "在行尾添加 (后缀):",
 	PLACEHOLDER_SUFFIX: "例如: !!",
+	CHECKBOX_WRAP_EXCLUDE_EMPTY: "不包含空行",
 	BTN_RUN_WRAP: "执行添加",
 
 	SETTING_DELIMITER: "选择分隔符:",

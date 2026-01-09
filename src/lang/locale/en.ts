@@ -72,6 +72,7 @@ export default {
 	PLACEHOLDER_PREFIX: "e.g.: - [ ] ",
 	SETTING_SUFFIX: "Add to End (Suffix):",
 	PLACEHOLDER_SUFFIX: "e.g.: !!",
+	CHECKBOX_WRAP_EXCLUDE_EMPTY: "Exclude Empty Lines",
 	BTN_RUN_WRAP: "Run Add",
 
 	SETTING_DELIMITER: "Delimiter:",

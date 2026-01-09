@@ -103,7 +103,8 @@ export function processText(
 			processedBody = processAddWrap(
 				lines,
 				settings.prefix,
-				settings.suffix
+				settings.suffix,
+				settings.wrapExcludeEmptyLines
 			);
 			new Notice(t("NOTICE_WRAP_DONE"));
 			break;
@@ -330,10 +331,14 @@ function processRegexExtract(
 function processAddWrap(
 	lines: string[],
 	prefix: string,
-	suffix: string
+	suffix: string,
+	excludeEmpty: boolean
 ): string {
 	return lines
 		.map((line) => {
+			if (excludeEmpty && line.trim().length === 0) {
+				return line;
+			}
 			return `${prefix || ""}${line}${suffix || ""}`;
 		})
 		.join("\n");
