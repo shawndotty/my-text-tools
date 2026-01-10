@@ -1,15 +1,15 @@
 import { App, Notice, MarkdownView } from "obsidian";
-import { IMyTextToolsPlugin } from "../types";
+import { MyTextToolsPlugin } from "../types";
 import { CustomScript, ScriptParam } from "../settings";
 import { ScriptExecutor } from "../utils/scriptExecutor";
 import { t } from "../lang/helpers";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "../UI/view";
 
 export class ScriptManager {
-	plugin: IMyTextToolsPlugin;
+	plugin: MyTextToolsPlugin;
 	app: App;
 
-	constructor(plugin: IMyTextToolsPlugin) {
+	constructor(plugin: MyTextToolsPlugin) {
 		this.plugin = plugin;
 		this.app = plugin.app;
 	}

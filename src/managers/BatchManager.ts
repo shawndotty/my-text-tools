@@ -1,17 +1,23 @@
 import { Editor, Notice, MarkdownView } from "obsidian";
-import { IMyTextToolsPlugin, BatchOperation, BatchProcess, SettingsState, ToolType } from "../types";
+import {
+	MyTextToolsPlugin,
+	BatchOperation,
+	BatchProcess,
+	SettingsState,
+	ToolType,
+} from "../types";
 import { t } from "../lang/helpers";
 import { processText as processTextCore } from "../utils/textProcessors";
 import { ScriptManager } from "./ScriptManager";
 import { AIManager } from "./AIManager";
 
 export class BatchManager {
-	plugin: IMyTextToolsPlugin;
+	plugin: MyTextToolsPlugin;
 	scriptManager: ScriptManager;
 	aiManager: AIManager;
 
 	constructor(
-		plugin: IMyTextToolsPlugin,
+		plugin: MyTextToolsPlugin,
 		scriptManager: ScriptManager,
 		aiManager: AIManager
 	) {
@@ -24,7 +30,9 @@ export class BatchManager {
 		const enabledIds = this.getEnabledBatchShortcutIds();
 		let changed = false;
 		for (const id of enabledIds) {
-			const batch = this.plugin.settings.savedBatches.find((b) => b.id === id);
+			const batch = this.plugin.settings.savedBatches.find(
+				(b) => b.id === id
+			);
 			if (!batch) {
 				this.removeBatchCommands(id);
 				delete this.plugin.settings.batchShortcuts[id];
@@ -66,7 +74,9 @@ export class BatchManager {
 
 	async refreshBatchShortcut(batchId: string) {
 		if (!this.isBatchShortcutEnabled(batchId)) return;
-		const batch = this.plugin.settings.savedBatches.find((b) => b.id === batchId);
+		const batch = this.plugin.settings.savedBatches.find(
+			(b) => b.id === batchId
+		);
 		if (!batch) {
 			await this.disableBatchShortcut(batchId);
 			return;
@@ -141,23 +151,33 @@ export class BatchManager {
 		if (op.toolId.startsWith("custom-ai:")) {
 			const id = op.toolId.split(":")[1]!;
 			const action =
-				this.plugin.settings.customActions?.find((a) => a.id === id) || null;
+				this.plugin.settings.customActions?.find((a) => a.id === id) ||
+				null;
 			if (!action) {
 				new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
 				return text;
 			}
-			return await this.aiManager.applyCustomAIActionToText(action, text, settings);
+			return await this.aiManager.applyCustomAIActionToText(
+				action,
+				text,
+				settings
+			);
 		}
 
 		if (op.toolId.startsWith("custom-script:")) {
 			const id = op.toolId.split(":")[1]!;
 			const script =
-				this.plugin.settings.customScripts?.find((s) => s.id === id) || null;
+				this.plugin.settings.customScripts?.find((s) => s.id === id) ||
+				null;
 			if (!script) {
 				new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
 				return text;
 			}
-			return await this.scriptManager.applyCustomScriptToText(script, text, scope);
+			return await this.scriptManager.applyCustomScriptToText(
+				script,
+				text,
+				scope
+			);
 		}
 
 		if (
@@ -181,7 +201,9 @@ export class BatchManager {
 		scope: "note" | "selection",
 		editor?: Editor
 	) {
-		const batch = this.plugin.settings.savedBatches.find((b) => b.id === batchId);
+		const batch = this.plugin.settings.savedBatches.find(
+			(b) => b.id === batchId
+		);
 		if (!batch) {
 			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
 			await this.disableBatchShortcut(batchId);

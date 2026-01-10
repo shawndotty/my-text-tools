@@ -1,15 +1,15 @@
 import { Notice, MarkdownView, App } from "obsidian";
-import { IMyTextToolsPlugin, SettingsState, ToolType } from "../types";
+import { MyTextToolsPlugin, SettingsState, ToolType } from "../types";
 import { MyTextToolsSettings, CustomAIAction } from "../settings";
 import { AIService } from "../utils/aiService";
 import { t } from "../lang/helpers";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "../UI/view";
 
 export class AIManager {
-	plugin: IMyTextToolsPlugin;
+	plugin: MyTextToolsPlugin;
 	app: App;
 
-	constructor(plugin: IMyTextToolsPlugin) {
+	constructor(plugin: MyTextToolsPlugin) {
 		this.plugin = plugin;
 		this.app = plugin.app;
 	}

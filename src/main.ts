@@ -14,14 +14,14 @@ import {
 } from "./settings";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
 import { t } from "./lang/helpers";
-import { BatchProcess, IMyTextToolsPlugin } from "./types";
+import { BatchProcess, MyTextToolsPlugin } from "./types";
 import { ScriptManager } from "./managers/ScriptManager";
 import { AIManager } from "./managers/AIManager";
 import { BatchManager } from "./managers/BatchManager";
 
 // Remember to rename these classes and interfaces!
 
-export default class MyTextTools extends Plugin implements IMyTextToolsPlugin {
+export default class MyTextTools extends Plugin implements MyTextToolsPlugin {
 	settings: MyTextToolsSettings;
 	scriptManager: ScriptManager;
 	aiManager: AIManager;

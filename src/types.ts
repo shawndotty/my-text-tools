@@ -238,7 +238,7 @@ export const BUILTIN_TOOLS: ToolInfo[] = [
 	},
 ];
 
-export interface IMyTextToolsPlugin extends Plugin {
+export interface MyTextToolsPlugin extends Plugin {
 	settings: MyTextToolsSettings;
 	saveSettings(): Promise<void>;
 	runBatchShortcut(
