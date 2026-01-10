@@ -9,26 +9,36 @@ import {
 } from "obsidian";
 import {
 	DEFAULT_SETTINGS,
-	CustomAIAction,
-	CustomScript,
 	MyTextToolsSettings,
 	MyTextToolsSettingTab,
 } from "./settings";
 import { MyTextToolsView, MY_TEXT_TOOLS_VIEW } from "./UI/view";
 import { t } from "./lang/helpers";
-import { AIService } from "./utils/aiService";
-import { ScriptExecutor } from "./utils/scriptExecutor";
-import { BatchOperation, BatchProcess, SettingsState, ToolType } from "./types";
-import { processText as processTextCore } from "./utils/textProcessors";
+import { BatchProcess, IMyTextToolsPlugin } from "./types";
+import { ScriptManager } from "./managers/ScriptManager";
+import { AIManager } from "./managers/AIManager";
+import { BatchManager } from "./managers/BatchManager";
 
 // Remember to rename these classes and interfaces!
 
-export default class MyTextTools extends Plugin {
+export default class MyTextTools extends Plugin implements IMyTextToolsPlugin {
 	settings: MyTextToolsSettings;
+	scriptManager: ScriptManager;
+	aiManager: AIManager;
+	batchManager: BatchManager;
 	private customRibbonEls: HTMLElement[] = [];
 
 	async onload() {
 		await this.loadSettings();
+
+		// Initialize Managers
+		this.scriptManager = new ScriptManager(this);
+		this.aiManager = new AIManager(this);
+		this.batchManager = new BatchManager(
+			this,
+			this.scriptManager,
+			this.aiManager
+		);
 
 		// 0. 注册设置标签页
 		this.addSettingTab(new MyTextToolsSettingTab(this.app, this));
@@ -63,7 +73,7 @@ export default class MyTextTools extends Plugin {
 
 		// 自定义卡片入口改为工作台左侧工具栏展示，不再添加到 Obsidian 全局侧栏
 
-		await this.syncBatchShortcuts();
+		await this.batchManager.syncBatchShortcuts();
 
 		// 4. 添加右键菜单
 		this.registerEvent(
@@ -76,7 +86,8 @@ export default class MyTextTools extends Plugin {
 						});
 				});
 
-				const enabledBatchIds = this.getEnabledBatchShortcutIds();
+				const enabledBatchIds =
+					this.batchManager.getEnabledBatchShortcutIds();
 				if (enabledBatchIds.length === 0) return;
 
 				const batches = enabledBatchIds
@@ -160,409 +171,6 @@ export default class MyTextTools extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	isBatchShortcutEnabled(batchId: string): boolean {
-		return !!this.settings.batchShortcuts?.[batchId];
-	}
-
-	async enableBatchShortcut(batchId: string) {
-		if (!this.settings.batchShortcuts) this.settings.batchShortcuts = {};
-		this.settings.batchShortcuts[batchId] = true;
-		await this.saveSettings();
-		await this.refreshBatchShortcut(batchId);
-	}
-
-	async disableBatchShortcut(batchId: string) {
-		if (!this.settings.batchShortcuts) return;
-		delete this.settings.batchShortcuts[batchId];
-		this.removeBatchCommands(batchId);
-		await this.saveSettings();
-	}
-
-	async refreshBatchShortcut(batchId: string) {
-		if (!this.isBatchShortcutEnabled(batchId)) return;
-		const batch = this.settings.savedBatches.find((b) => b.id === batchId);
-		if (!batch) {
-			await this.disableBatchShortcut(batchId);
-			return;
-		}
-		this.removeBatchCommands(batchId);
-		this.registerBatchCommands(batch);
-	}
-
-	private getEnabledBatchShortcutIds(): string[] {
-		return Object.entries(this.settings.batchShortcuts || {})
-			.filter(([, enabled]) => !!enabled)
-			.map(([id]) => id);
-	}
-
-	private async syncBatchShortcuts() {
-		const enabledIds = this.getEnabledBatchShortcutIds();
-		let changed = false;
-		for (const id of enabledIds) {
-			const batch = this.settings.savedBatches.find((b) => b.id === id);
-			if (!batch) {
-				this.removeBatchCommands(id);
-				delete this.settings.batchShortcuts[id];
-				changed = true;
-				continue;
-			}
-			this.removeBatchCommands(id);
-			this.registerBatchCommands(batch);
-		}
-		if (changed) {
-			await this.saveSettings();
-		}
-	}
-
-	private getBatchCommandIds(batchId: string) {
-		return {
-			note: `batch-${batchId}-note`,
-			selection: `batch-${batchId}-selection`,
-		};
-	}
-
-	private removeBatchCommands(batchId: string) {
-		const ids = this.getBatchCommandIds(batchId);
-		try {
-			this.removeCommand(ids.note);
-		} catch {}
-		try {
-			this.removeCommand(ids.selection);
-		} catch {}
-	}
-
-	private registerBatchCommands(batch: BatchProcess) {
-		const ids = this.getBatchCommandIds(batch.id);
-
-		this.addCommand({
-			id: ids.note,
-			name: t("COMMAND_BATCH_RUN_NOTE", [batch.name]),
-			editorCallback: async (editor) => {
-				await this.runBatchShortcut(batch.id, "note", editor);
-			},
-		});
-
-		this.addCommand({
-			id: ids.selection,
-			name: t("COMMAND_BATCH_RUN_SELECTION", [batch.name]),
-			editorCheckCallback: (checking, editor) => {
-				if (!editor.somethingSelected()) return false;
-				if (!checking) {
-					void this.runBatchShortcut(batch.id, "selection", editor);
-				}
-				return true;
-			},
-		});
-	}
-
-	private getWorkbenchView(): MyTextToolsView | null {
-		const leaf = this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
-		const view = leaf?.view;
-		return view instanceof MyTextToolsView ? view : null;
-	}
-
-	private getCustomScriptParams(script: CustomScript): Record<string, any> {
-		if (!script.params || script.params.length === 0) return {};
-		const view = this.getWorkbenchView();
-		return script.params.reduce((acc, p) => {
-			const key = `custom:${script.id}:${p.key}`;
-			const val = view ? (view.settingsState as any)[key] : undefined;
-			let finalVal = val !== undefined ? val : p.default;
-
-			if (p.type === "text" && typeof finalVal === "string") {
-				finalVal = finalVal
-					.replace(/\\n/g, "\n")
-					.replace(/\\t/g, "\t")
-					.replace(/\\r/g, "\r");
-			}
-
-			if (p.type === "array" && typeof finalVal === "string") {
-				finalVal = finalVal.split(/\r?\n/);
-			}
-
-			acc[p.key] = finalVal;
-			return acc;
-		}, {} as Record<string, any>);
-	}
-
-	private extractFrontmatterForAI(
-		text: string,
-		preserveFrontmatter: boolean
-	) {
-		if (!preserveFrontmatter) {
-			return { frontmatter: "", body: text };
-		}
-		const fmMatch = text.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
-		if (!fmMatch) {
-			return { frontmatter: "", body: text };
-		}
-		return {
-			frontmatter: fmMatch[0],
-			body: text.substring(fmMatch[0].length),
-		};
-	}
-
-	private extractHeaderForAI(text: string, preserveHeader: boolean) {
-		if (!preserveHeader) {
-			return { header: "", body: text };
-		}
-		const lines = text.split("\n");
-		if (lines.length === 0 || !lines[0]?.trim()) {
-			return { header: "", body: text };
-		}
-		return {
-			header: lines[0]!,
-			body: lines.slice(1).join("\n"),
-		};
-	}
-
-	private getEffectiveSettingsForScope(
-		settings: SettingsState,
-		scope: "note" | "selection"
-	): SettingsState {
-		if (scope === "note") return settings;
-		return {
-			...settings,
-			preserveFrontmatter: false,
-			preserveHeader: false,
-		};
-	}
-
-	private async applyBuiltInAIToolToText(
-		toolId: ToolType,
-		text: string,
-		settings: SettingsState
-	): Promise<string> {
-		const aiService = new AIService(this.settings);
-		if (!aiService.isConfigured()) {
-			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
-			return text;
-		}
-
-		const fm = this.extractFrontmatterForAI(
-			text,
-			settings.preserveFrontmatter
-		);
-		const header = this.extractHeaderForAI(
-			fm.body,
-			settings.preserveHeader
-		);
-		const textToProcess = header.body;
-
-		if (!textToProcess.trim()) {
-			new Notice("❌ " + t("NOTICE_NO_TEXT"));
-			return text;
-		}
-
-		let result: { content: string; error?: string };
-		switch (toolId) {
-			case "ai-extract-keypoints":
-				result = await aiService.extractKeyPoints(textToProcess);
-				break;
-			case "ai-summarize":
-				result = await aiService.summarize(textToProcess);
-				break;
-			case "ai-translate":
-				result = await aiService.translate(textToProcess);
-				break;
-			case "ai-polish":
-				result = await aiService.polish(textToProcess);
-				break;
-			default:
-				return text;
-		}
-
-		if (result.error) {
-			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
-			return text;
-		}
-
-		let finalContent = result.content;
-		if (settings.preserveHeader && header.header) {
-			finalContent = header.header + "\n" + finalContent;
-		}
-		if (settings.preserveFrontmatter && fm.frontmatter) {
-			finalContent = fm.frontmatter + finalContent;
-		}
-		return finalContent;
-	}
-
-	private async applyCustomAIActionToText(
-		action: CustomAIAction,
-		text: string,
-		settings: SettingsState
-	): Promise<string> {
-		const merged: MyTextToolsSettings = {
-			...this.settings,
-			aiProvider: action.overrideProvider ?? this.settings.aiProvider,
-			aiApiUrl: action.overrideApiUrl ?? this.settings.aiApiUrl,
-			aiApiKey: action.overrideApiKey ?? this.settings.aiApiKey,
-			aiModel: action.overrideModel ?? this.settings.aiModel,
-			aiMaxTokens: action.overrideMaxTokens ?? this.settings.aiMaxTokens,
-			aiTemperature:
-				action.overrideTemperature ?? this.settings.aiTemperature,
-		};
-
-		const aiService = new AIService(merged);
-		if (!aiService.isConfigured()) {
-			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
-			return text;
-		}
-
-		const fm = this.extractFrontmatterForAI(
-			text,
-			settings.preserveFrontmatter
-		);
-		const header = this.extractHeaderForAI(
-			fm.body,
-			settings.preserveHeader
-		);
-		const textToProcess = header.body;
-
-		if (!textToProcess.trim()) {
-			new Notice("❌ " + t("NOTICE_NO_TEXT"));
-			return text;
-		}
-
-		const result = await aiService.processText(
-			settings.customAiPrompt !== undefined
-				? settings.customAiPrompt
-				: action.prompt || "",
-			textToProcess,
-			settings.customAiSystemPrompt !== undefined
-				? settings.customAiSystemPrompt
-				: action.systemPrompt || ""
-		);
-		if (result.error) {
-			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
-			return text;
-		}
-
-		let finalContent = result.content;
-		if (settings.preserveHeader && header.header) {
-			finalContent = header.header + "\n" + finalContent;
-		}
-		if (settings.preserveFrontmatter && fm.frontmatter) {
-			finalContent = fm.frontmatter + finalContent;
-		}
-		return finalContent;
-	}
-
-	private async applyCustomScriptToText(
-		script: CustomScript,
-		text: string,
-		scope: "note" | "selection"
-	): Promise<string> {
-		const selection = scope === "selection" ? text : "";
-		const usesSelectionOnly =
-			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
-		if (usesSelectionOnly && !selection) {
-			new Notice(t("NOTICE_NO_SELECTION"));
-			return text;
-		}
-
-		const executor = new ScriptExecutor(this.app);
-		const params = this.getCustomScriptParams(script);
-		const result = await executor.execute(
-			script.code,
-			text,
-			selection,
-			params
-		);
-		return typeof result === "string" ? result : text;
-	}
-
-	private async applyBatchOperationToText(
-		op: BatchOperation,
-		text: string,
-		scope: "note" | "selection"
-	): Promise<string> {
-		const settings = this.getEffectiveSettingsForScope(
-			op.settingsSnapshot,
-			scope
-		);
-
-		if (op.toolId.startsWith("custom-ai:")) {
-			const id = op.toolId.split(":")[1]!;
-			const action =
-				this.settings.customActions?.find((a) => a.id === id) || null;
-			if (!action) {
-				new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
-				return text;
-			}
-			return await this.applyCustomAIActionToText(action, text, settings);
-		}
-
-		if (op.toolId.startsWith("custom-script:")) {
-			const id = op.toolId.split(":")[1]!;
-			const script =
-				this.settings.customScripts?.find((s) => s.id === id) || null;
-			if (!script) {
-				new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
-				return text;
-			}
-			return await this.applyCustomScriptToText(script, text, scope);
-		}
-
-		if (
-			op.toolId === "ai-extract-keypoints" ||
-			op.toolId === "ai-summarize" ||
-			op.toolId === "ai-translate" ||
-			op.toolId === "ai-polish"
-		) {
-			return await this.applyBuiltInAIToolToText(
-				op.toolId as ToolType,
-				text,
-				settings
-			);
-		}
-
-		return processTextCore(op.toolId as ToolType, text, settings);
-	}
-
-	async runBatchShortcut(
-		batchId: string,
-		scope: "note" | "selection",
-		editor?: Editor
-	) {
-		const batch = this.settings.savedBatches.find((b) => b.id === batchId);
-		if (!batch) {
-			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
-			await this.disableBatchShortcut(batchId);
-			return;
-		}
-
-		const activeEditor =
-			editor ||
-			this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-		if (!activeEditor) {
-			new Notice(t("NOTICE_NO_EDITOR"));
-			return;
-		}
-
-		if (scope === "selection" && !activeEditor.somethingSelected()) {
-			new Notice(t("NOTICE_NO_SELECTION"));
-			return;
-		}
-
-		let text =
-			scope === "selection"
-				? activeEditor.getSelection()
-				: activeEditor.getValue();
-
-		for (const op of batch.operations) {
-			text = await this.applyBatchOperationToText(op, text, scope);
-		}
-
-		if (scope === "selection") {
-			activeEditor.replaceSelection(text);
-		} else {
-			activeEditor.setValue(text);
-		}
-
-		new Notice(t("NOTICE_BATCH_APPLIED"));
-	}
-
 	// 刷新视图
 	refreshCustomRibbons() {
 		const leaves = this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW);
@@ -573,275 +181,37 @@ export default class MyTextTools extends Plugin {
 		});
 	}
 
-	// 执行自定义 JS 脚本
-	async runCustomScript(scriptId: string) {
-		const script = this.settings.customScripts?.find(
-			(s) => s.id === scriptId
-		);
-		if (!script) {
-			new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
-			return;
-		}
+	// Delegated Methods
 
-		// 获取当前内容和选区
-		let content = "";
-		let selection = "";
-		let updateCallback: (newText: string) => void = () => {};
-
-		const mttLeaf =
-			this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-		if (
-			mttLeaf &&
-			mttLeaf.view &&
-			mttLeaf.view instanceof MyTextToolsView
-		) {
-			const view = mttLeaf.view as MyTextToolsView;
-			content = view.content;
-
-			const currentSelection = view.getEditorSelection();
-			if (currentSelection) {
-				selection = currentSelection.text;
-			} else {
-				selection = "";
-			}
-
-			updateCallback = (newText: string) => {
-				view.historyManager.pushToHistory(view.content);
-				if (currentSelection) {
-					view.replaceEditorSelection(newText);
-					view.updateHistoryUI();
-				} else {
-					view.content = newText;
-					view.render();
-					view.updateHistoryUI();
-				}
-			};
-		} else if (activeView && activeView.editor) {
-			const editor = activeView.editor;
-			content = editor.getValue();
-			selection = editor.getSelection();
-			updateCallback = (newText: string) => {
-				if (selection) {
-					editor.replaceSelection(newText);
-				} else {
-					editor.setValue(newText);
-				}
-			};
-		} else {
-			new Notice(t("NOTICE_NO_EDITOR"));
-			return;
-		}
-
-		const usesSelectionOnly =
-			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
-		const hasSelection = !!selection;
-		if (!hasSelection && usesSelectionOnly) {
-			new Notice(t("NOTICE_NO_SELECTION"));
-			return;
-		}
-
-		try {
-			const executor = new ScriptExecutor(this.app);
-			let params: Record<string, any> = {};
-			if (script.params && script.params.length > 0) {
-				if (
-					mttLeaf &&
-					mttLeaf.view &&
-					mttLeaf.view instanceof MyTextToolsView
-				) {
-					const view = mttLeaf.view as MyTextToolsView;
-					params = script.params.reduce((acc, p) => {
-						const key = `custom:${script.id}:${p.key}`;
-						const val = (view.settingsState as any)[key];
-						let finalVal = val !== undefined ? val : p.default;
-
-						// 如果是文本类型，处理转义字符
-						if (p.type === "text" && typeof finalVal === "string") {
-							finalVal = finalVal
-								.replace(/\\n/g, "\n")
-								.replace(/\\t/g, "\t")
-								.replace(/\\r/g, "\r");
-						}
-
-						// 如果是数组类型，按换行符分割
-						if (
-							p.type === "array" &&
-							typeof finalVal === "string"
-						) {
-							finalVal = finalVal.split(/\r?\n/);
-						}
-
-						acc[p.key] = finalVal;
-						return acc;
-					}, {} as Record<string, any>);
-				}
-			}
-			const result = await executor.execute(
-				script.code,
-				content,
-				selection,
-				params
-			);
-
-			if (typeof result === "string") {
-				updateCallback(result);
-				new Notice(t("NOTICE_SCRIPT_SUCCESS"));
-			}
-		} catch (error: any) {
-			console.error("Script execution failed:", error);
-			new Notice(t("NOTICE_SCRIPT_ERROR").replace("{0}", error.message));
-		}
+	isBatchShortcutEnabled(batchId: string): boolean {
+		return this.batchManager.isBatchShortcutEnabled(batchId);
 	}
 
-	// 执行自定义 AI 动作
+	async enableBatchShortcut(batchId: string) {
+		return this.batchManager.enableBatchShortcut(batchId);
+	}
+
+	async disableBatchShortcut(batchId: string) {
+		return this.batchManager.disableBatchShortcut(batchId);
+	}
+
+	async refreshBatchShortcut(batchId: string) {
+		return this.batchManager.refreshBatchShortcut(batchId);
+	}
+
+	async runBatchShortcut(
+		batchId: string,
+		scope: "note" | "selection",
+		editor?: Editor
+	) {
+		return this.batchManager.runBatchShortcut(batchId, scope, editor);
+	}
+
+	async runCustomScript(scriptId: string) {
+		return this.scriptManager.runCustomScript(scriptId);
+	}
+
 	async runCustomAIAction(actionId: string) {
-		const action =
-			this.settings.customActions?.find((a) => a.id === actionId) || null;
-		if (!action) {
-			new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
-			return;
-		}
-
-		const mttLeaf =
-			this.app.workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
-		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-		// 合并设置
-		const merged: MyTextToolsSettings = {
-			...this.settings,
-			aiProvider: action.overrideProvider ?? this.settings.aiProvider,
-			aiApiUrl: action.overrideApiUrl ?? this.settings.aiApiUrl,
-			aiApiKey: action.overrideApiKey ?? this.settings.aiApiKey,
-			aiModel: action.overrideModel ?? this.settings.aiModel,
-			aiMaxTokens: action.overrideMaxTokens ?? this.settings.aiMaxTokens,
-			aiTemperature:
-				action.overrideTemperature ?? this.settings.aiTemperature,
-		};
-
-		const aiService = new AIService(merged);
-		// 情况一：优先工作台视图，支持保护与历史
-		if (
-			mttLeaf &&
-			mttLeaf.view &&
-			mttLeaf.view instanceof MyTextToolsView
-		) {
-			const view = mttLeaf.view as MyTextToolsView;
-			view.showLoading(t("NOTICE_AI_PROCESSING"));
-			const src = view.content || "";
-			if (!src.trim()) {
-				new Notice(t("NOTICE_NO_TEXT"));
-				view.hideLoading();
-				return;
-			}
-			view.historyManager.pushToHistory(view.content);
-
-			let textToProcess = src;
-			const fmMatch = textToProcess.match(
-				/^---\n([\s\S]*?)\n---(?:\n|$)/
-			);
-			if (fmMatch && (view.settingsState as any).preserveFrontmatter) {
-				textToProcess = textToProcess.substring(fmMatch[0].length);
-			}
-			const lines = textToProcess.split("\n");
-			if (
-				(view.settingsState as any).preserveHeader &&
-				lines.length > 0
-			) {
-				textToProcess = lines.slice(1).join("\n");
-			}
-
-			const result = await aiService.processText(
-				action.prompt || "",
-				textToProcess,
-				action.systemPrompt || ""
-			);
-			if (result.error) {
-				new Notice(`❌ ${result.error}`);
-				view.hideLoading();
-				return;
-			}
-			let finalContent = result.content;
-			if (fmMatch && (view.settingsState as any).preserveFrontmatter) {
-				finalContent = fmMatch[0] + finalContent;
-			}
-			if (
-				(view.settingsState as any).preserveHeader &&
-				lines.length > 0 &&
-				lines[0]?.trim()
-			) {
-				finalContent = lines[0] + "\n" + finalContent;
-			}
-			view.content = finalContent;
-			view.render();
-			view.hideLoading();
-			new Notice("✅ " + t("NOTICE_AI_DONE"));
-			return;
-		}
-
-		// 情况二：活动的 Markdown 编辑器
-		if (activeView && activeView.editor) {
-			const editor = activeView.editor;
-			const selection = editor.getSelection();
-			const useSelection =
-				action.applyToSelection && selection && selection.length > 0;
-			if (useSelection) {
-				if (!selection.trim()) {
-					new Notice(t("NOTICE_NO_TEXT"));
-					return;
-				}
-				const result = await aiService.processText(
-					action.prompt || "",
-					selection,
-					action.systemPrompt || ""
-				);
-				if (result.error) {
-					new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
-					return;
-				}
-				editor.replaceSelection(result.content);
-				new Notice(t("NOTICE_AI_DONE"));
-				return;
-			}
-			const fullText = editor.getValue();
-			if (!fullText.trim()) {
-				new Notice(t("NOTICE_NO_TEXT"));
-				return;
-			}
-			let textToProcess = fullText;
-			const fmMatch = textToProcess.match(
-				/^---\n([\s\S]*?)\n---(?:\n|$)/
-			);
-			if (fmMatch) {
-				textToProcess = textToProcess.substring(fmMatch[0].length);
-			}
-			const lines = textToProcess.split("\n");
-			if (lines.length > 0) {
-				textToProcess = lines.slice(1).join("\n");
-			}
-			const result = await aiService.processText(
-				action.prompt || "",
-				textToProcess,
-				action.systemPrompt || ""
-			);
-			if (result.error) {
-				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
-				return;
-			}
-			let finalContent = result.content;
-			if (fmMatch) {
-				finalContent = fmMatch[0] + finalContent;
-			}
-			if (lines.length > 0 && lines[0]?.trim()) {
-				finalContent = lines[0] + "\n" + finalContent;
-			}
-			editor.setValue(finalContent);
-			new Notice(t("NOTICE_AI_DONE"));
-			return;
-		}
-
-		// 情况三：均不可用
-		new Notice(t("NOTICE_NO_EDITOR"));
+		return this.aiManager.runCustomAIAction(actionId);
 	}
 }

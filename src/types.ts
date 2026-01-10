@@ -1,3 +1,6 @@
+import { Plugin } from "obsidian";
+import { MyTextToolsSettings } from "./settings";
+
 export interface BatchOperation {
 	toolId: string;
 	settingsSnapshot: SettingsState;
@@ -234,3 +237,15 @@ export const BUILTIN_TOOLS: ToolInfo[] = [
 		icon: "combine",
 	},
 ];
+
+export interface IMyTextToolsPlugin extends Plugin {
+	settings: MyTextToolsSettings;
+	saveSettings(): Promise<void>;
+	runBatchShortcut(
+		batchId: string,
+		scope: "note" | "selection",
+		editor?: any
+	): Promise<void>;
+	runCustomScript(scriptId: string): Promise<void>;
+	runCustomAIAction(actionId: string): Promise<void>;
+}
