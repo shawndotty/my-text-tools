@@ -46,7 +46,8 @@ export function extractHeader(
 export function processText(
 	type: ToolType,
 	text: string,
-	settings: SettingsState
+	settings: SettingsState,
+	hideNotice: boolean = false
 ): string {
 	let textToProcess = text;
 	let extractedFrontmatter = "";
@@ -72,15 +73,19 @@ export function processText(
 	switch (type) {
 		case "dedupe":
 			processedBody = processDedupe(lines, settings.dedupeIncludeEmpty);
-			new Notice(t("NOTICE_DEDUPE"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_DEDUPE"));
+			}
 			break;
 		case "empty-line":
 			processedBody = processEmptyLine(lines, settings.emptyLineMode);
-			new Notice(
-				settings.emptyLineMode === "all"
-					? t("NOTICE_EMPTY_LINE")
-					: t("NOTICE_EMPTY_LINE_MERGED")
-			);
+			if (!hideNotice) {
+				new Notice(
+					settings.emptyLineMode === "all"
+						? t("NOTICE_EMPTY_LINE")
+						: t("NOTICE_EMPTY_LINE_MERGED")
+				);
+			}
 			break;
 		case "regex":
 			processedBody = processRegex(
@@ -88,7 +93,8 @@ export function processText(
 				settings.findText,
 				settings.replaceText,
 				settings.regexCaseInsensitive,
-				settings.regexMultiline
+				settings.regexMultiline,
+				hideNotice
 			);
 			break;
 		case "regex-extract":
@@ -96,7 +102,8 @@ export function processText(
 				textToProcess,
 				settings.regexExtractRule,
 				settings.regexExtractCase,
-				settings.regexExtractSeparator
+				settings.regexExtractSeparator,
+				hideNotice
 			);
 			break;
 		case "add-wrap":
@@ -106,7 +113,9 @@ export function processText(
 				settings.suffix,
 				settings.wrapExcludeEmptyLines
 			);
-			new Notice(t("NOTICE_WRAP_DONE"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_WRAP_DONE"));
+			}
 			break;
 		case "remove-string":
 			processedBody = processRemoveString(
@@ -122,7 +131,8 @@ export function processText(
 				lines,
 				settings.columnDelimiter,
 				settings.customDelimiter,
-				settings.columnNumber
+				settings.columnNumber,
+				hideNotice
 			);
 			break;
 		case "swap-columns":
@@ -131,7 +141,8 @@ export function processText(
 				settings.columnDelimiterSC,
 				settings.customDelimiterSC,
 				settings.swapCol1,
-				settings.swapCol2
+				settings.swapCol2,
+				hideNotice
 			);
 			break;
 		case "word-frequency":
@@ -139,7 +150,8 @@ export function processText(
 				textToProcess,
 				settings.minWordLength,
 				settings.includeNumbers,
-				settings.sortOrder
+				settings.sortOrder,
+				hideNotice
 			);
 			break;
 		case "number-list":
@@ -150,7 +162,9 @@ export function processText(
 				settings.listSeparator,
 				settings.listPrefix
 			);
-			new Notice(t("NOTICE_NUMBER_DONE"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_NUMBER_DONE"));
+			}
 			break;
 		case "extract-between":
 			processedBody = processExtractBetween(
@@ -168,7 +182,10 @@ export function processText(
 				settings.wsAll,
 				settings.wsTabs
 			);
-			new Notice(t("NOTICE_WS_DONE"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_WS_DONE"));
+			}
+
 			break;
 		case "line-break-tools":
 			processedBody = processLineBreakTools(
@@ -177,7 +194,8 @@ export function processText(
 				settings.lbAction,
 				settings.lbRegex,
 				settings.lbStyle,
-				settings.lbMergeEmpty
+				settings.lbMergeEmpty,
+				hideNotice
 			);
 			break;
 		case "clear-format":
@@ -190,13 +208,17 @@ export function processText(
 				settings.clearCode,
 				settings.clearLinks
 			);
-			new Notice(t("NOTICE_CLEAR_FORMAT_DONE"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_CLEAR_FORMAT_DONE"));
+			}
 			break;
 		case "combination-generator":
 			processedBody = processCombinationGenerator(
 				settings.combinationInputs
 			);
-			new Notice(t("NOTICE_COMBINATION_DONE"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_COMBINATION_DONE"));
+			}
 			break;
 		default:
 			processedBody = lines.join("\n");
@@ -213,7 +235,9 @@ export function processText(
 	else if (extractedHeader) noticeMsg = t("NOTICE_SKIP_HEADER");
 
 	if (type !== "regex" && type !== "extract-between") {
-		new Notice(noticeMsg);
+		if (!hideNotice) {
+			new Notice(noticeMsg);
+		}
 	}
 
 	return result;
@@ -279,7 +303,8 @@ function processRegex(
 	findText: string,
 	replaceText: string,
 	caseInsensitive: boolean,
-	multiline: boolean
+	multiline: boolean,
+	hideNotice: boolean = false
 ): string {
 	try {
 		let flags = "g";
@@ -287,10 +312,14 @@ function processRegex(
 		if (multiline) flags += "m";
 		const regex = new RegExp(findText, flags);
 		const result = text.replace(regex, replaceText);
-		new Notice(t("NOTICE_REGEX_DONE"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_REGEX_DONE"));
+		}
 		return result;
 	} catch (e) {
-		new Notice(t("NOTICE_REGEX_ERROR"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_REGEX_ERROR"));
+		}
 		return text;
 	}
 }
@@ -299,10 +328,13 @@ function processRegexExtract(
 	text: string,
 	rule: string,
 	caseSensitive: boolean,
-	separator: "newline" | "hyphen" | "space"
+	separator: "newline" | "hyphen" | "space",
+	hideNotice: boolean = false
 ): string {
 	if (!rule) {
-		new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+		}
 		return text;
 	}
 
@@ -312,7 +344,9 @@ function processRegexExtract(
 		const matches = text.match(regex);
 
 		if (!matches || matches.length === 0) {
-			new Notice(t("NOTICE_NO_MATCH"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_NO_MATCH"));
+			}
 			return text;
 		}
 
@@ -320,10 +354,16 @@ function processRegexExtract(
 		if (separator === "hyphen") sep = " - ";
 		if (separator === "space") sep = " ";
 
-		new Notice(t("NOTICE_REGEX_EXTRACT_DONE", [matches.length.toString()]));
+		if (!hideNotice) {
+			new Notice(
+				t("NOTICE_REGEX_EXTRACT_DONE", [matches.length.toString()])
+			);
+		}
 		return matches.join(sep);
 	} catch (e) {
-		new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+		}
 		return text;
 	}
 }
@@ -349,10 +389,13 @@ function processRemoveString(
 	filterText: string,
 	filterMode: "containing" | "not-containing",
 	filterCase: boolean,
-	filterRegex: boolean
+	filterRegex: boolean,
+	hideNotice: boolean = false
 ): string {
 	if (!filterText) {
-		new Notice(t("NOTICE_FILTER_INPUT"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_FILTER_INPUT"));
+		}
 		return lines.join("\n");
 	}
 
@@ -365,7 +408,9 @@ function processRemoveString(
 				const regex = new RegExp(filterText, flags);
 				isMatch = regex.test(line);
 			} catch (e) {
-				new Notice(t("NOTICE_REGEX_INVALID"));
+				if (!hideNotice) {
+					new Notice(t("NOTICE_REGEX_INVALID"));
+				}
 				return true; // 保持行不变
 			}
 		} else {
@@ -377,8 +422,9 @@ function processRemoveString(
 		// 根据"包含"或"不包含"决定是否移除该行
 		return filterMode === "containing" ? !isMatch : isMatch;
 	});
-
-	new Notice(t("NOTICE_FILTER_DONE"));
+	if (!hideNotice) {
+		new Notice(t("NOTICE_FILTER_DONE"));
+	}
 	return result.join("\n");
 }
 
@@ -386,14 +432,17 @@ function processExtractColumn(
 	lines: string[],
 	columnDelimiter: string,
 	customDelimiter: string,
-	columnNumber: number
+	columnNumber: number,
+	hideNotice: boolean = false
 ): string {
 	// 确定最终使用的分隔符
 	const actualDelim =
 		columnDelimiter === "custom" ? customDelimiter : columnDelimiter;
 
 	if (!actualDelim && columnDelimiter === "custom") {
-		new Notice(t("NOTICE_CUSTOM_DELIM"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_CUSTOM_DELIM"));
+		}
 		return lines.join("\n");
 	}
 
@@ -407,7 +456,9 @@ function processExtractColumn(
 		.filter((val) => val !== "") // 可选：过滤掉无法提取的行（空结果）
 		.join("\n");
 
-	new Notice(t("NOTICE_EXTRACT_COL_DONE", [columnNumber.toString()]));
+	if (!hideNotice) {
+		new Notice(t("NOTICE_EXTRACT_COL_DONE", [columnNumber.toString()]));
+	}
 	return result;
 }
 
@@ -416,13 +467,16 @@ function processSwapColumns(
 	columnDelimiterSC: string,
 	customDelimiterSC: string,
 	swapCol1: number,
-	swapCol2: number
+	swapCol2: number,
+	hideNotice: boolean = false
 ): string {
 	const delim =
 		columnDelimiterSC === "custom" ? customDelimiterSC : columnDelimiterSC;
 
 	if (!delim) {
-		new Notice(t("NOTICE_DELIM_REQUIRED"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_DELIM_REQUIRED"));
+		}
 		return lines.join("\n");
 	}
 
@@ -438,9 +492,11 @@ function processSwapColumns(
 		return parts.join(delim);
 	});
 
-	new Notice(
-		t("NOTICE_SWAP_DONE", [swapCol1.toString(), swapCol2.toString()])
-	);
+	if (!hideNotice) {
+		new Notice(
+			t("NOTICE_SWAP_DONE", [swapCol1.toString(), swapCol2.toString()])
+		);
+	}
 	return result.join("\n");
 }
 
@@ -448,7 +504,8 @@ function processWordFrequency(
 	text: string,
 	minWordLength: number,
 	includeNumbers: boolean,
-	sortOrder: "asc" | "desc"
+	sortOrder: "asc" | "desc",
+	hideNotice: boolean = false
 ): string {
 	// 1. 预处理：将非字符（根据设置决定是否包含数字）替换为空格，并转为小写
 	const regex = includeNumbers
@@ -478,7 +535,9 @@ function processWordFrequency(
 		.map(([word, count]) => `${word} (${count})`)
 		.join("\n");
 
-	new Notice(t("NOTICE_FREQ_DONE", [sortedWords.length.toString()]));
+	if (!hideNotice) {
+		new Notice(t("NOTICE_FREQ_DONE", [sortedWords.length.toString()]));
+	}
 	return result;
 }
 
@@ -504,10 +563,13 @@ function processExtractBetween(
 	text: string,
 	extractStart: string,
 	extractEnd: string,
-	extractRegex: boolean
+	extractRegex: boolean,
+	hideNotice: boolean = false
 ): string {
 	if (!extractStart && !extractEnd) {
-		new Notice(t("NOTICE_EXTRACT_BOUNDS"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_EXTRACT_BOUNDS"));
+		}
 		return text;
 	}
 
@@ -539,14 +601,22 @@ function processExtractBetween(
 
 		if (matches.length > 0) {
 			const result = matches.join("\n");
-			new Notice(t("NOTICE_EXTRACT_DONE", [matches.length.toString()]));
+			if (!hideNotice) {
+				new Notice(
+					t("NOTICE_EXTRACT_DONE", [matches.length.toString()])
+				);
+			}
 			return result;
 		} else {
-			new Notice(t("NOTICE_NO_MATCH"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_NO_MATCH"));
+			}
 			return text;
 		}
 	} catch (e) {
-		new Notice(t("NOTICE_EXTRACT_ERROR"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_EXTRACT_ERROR"));
+		}
 		return text;
 	}
 }
@@ -598,7 +668,8 @@ function processLineBreakTools(
 		| "remove-all",
 	lbRegex: boolean,
 	lbStyle: "auto" | "LF" | "CRLF",
-	lbMergeEmpty: boolean
+	lbMergeEmpty: boolean,
+	hideNotice: boolean = false
 ): string {
 	const detected = /\r\n/.test(text)
 		? "\r\n"
@@ -611,7 +682,9 @@ function processLineBreakTools(
 		return text.replace(/\r\n|\n|\r/g, "");
 	}
 	if (!lbTrigger) {
-		new Notice(t("NOTICE_LB_TRIGGER"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_LB_TRIGGER"));
+		}
 		return text;
 	}
 
@@ -654,7 +727,9 @@ function processLineBreakTools(
 			return lbMergeEmpty ? out.replace(/(?:\r\n|\n|\r){2,}/g, eol) : out;
 		}
 	} catch (e) {
-		new Notice(t("NOTICE_LB_ERROR"));
+		if (!hideNotice) {
+			new Notice(t("NOTICE_LB_ERROR"));
+		}
 		return text;
 	}
 }

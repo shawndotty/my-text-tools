@@ -452,7 +452,8 @@ export class BatchManager {
 			return await this.aiManager.applyCustomAIActionToText(
 				action,
 				text,
-				settings
+				settings,
+				true
 			);
 		}
 
@@ -468,7 +469,8 @@ export class BatchManager {
 			return await this.scriptManager.applyCustomScriptToText(
 				script,
 				text,
-				scope
+				scope,
+				true
 			);
 		}
 
@@ -481,11 +483,12 @@ export class BatchManager {
 			return await this.aiManager.applyBuiltInAIToolToText(
 				op.toolId as ToolType,
 				text,
-				settings
+				settings,
+				true
 			);
 		}
 
-		return processTextCore(op.toolId as ToolType, text, settings);
+		return processTextCore(op.toolId as ToolType, text, settings, true);
 	}
 
 	async runBatchShortcut(

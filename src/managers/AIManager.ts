@@ -48,11 +48,14 @@ export class AIManager {
 	async applyBuiltInAIToolToText(
 		toolId: ToolType,
 		text: string,
-		settings: SettingsState
+		settings: SettingsState,
+		hideNotice: boolean = false
 	): Promise<string> {
 		const aiService = new AIService(this.plugin.settings);
 		if (!aiService.isConfigured()) {
-			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+			if (!hideNotice) {
+				new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+			}
 			return text;
 		}
 
@@ -67,7 +70,9 @@ export class AIManager {
 		const textToProcess = header.body;
 
 		if (!textToProcess.trim()) {
-			new Notice("❌ " + t("NOTICE_NO_TEXT"));
+			if (!hideNotice) {
+				new Notice("❌ " + t("NOTICE_NO_TEXT"));
+			}
 			return text;
 		}
 
@@ -90,7 +95,9 @@ export class AIManager {
 		}
 
 		if (result.error) {
-			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+			if (!hideNotice) {
+				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+			}
 			return text;
 		}
 
@@ -107,7 +114,8 @@ export class AIManager {
 	async applyCustomAIActionToText(
 		action: CustomAIAction,
 		text: string,
-		settings: SettingsState
+		settings: SettingsState,
+		hideNotice: boolean = false
 	): Promise<string> {
 		const merged: MyTextToolsSettings = {
 			...this.plugin.settings,
@@ -125,7 +133,9 @@ export class AIManager {
 
 		const aiService = new AIService(merged);
 		if (!aiService.isConfigured()) {
-			new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+			if (!hideNotice) {
+				new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+			}
 			return text;
 		}
 
@@ -140,7 +150,9 @@ export class AIManager {
 		const textToProcess = header.body;
 
 		if (!textToProcess.trim()) {
-			new Notice("❌ " + t("NOTICE_NO_TEXT"));
+			if (!hideNotice) {
+				new Notice("❌ " + t("NOTICE_NO_TEXT"));
+			}
 			return text;
 		}
 
@@ -154,7 +166,9 @@ export class AIManager {
 				: action.systemPrompt || ""
 		);
 		if (result.error) {
-			new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+			if (!hideNotice) {
+				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+			}
 			return text;
 		}
 
@@ -175,6 +189,7 @@ export class AIManager {
 			) || null;
 		if (!action) {
 			new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
+
 			return;
 		}
 

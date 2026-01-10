@@ -47,13 +47,16 @@ export class ScriptManager {
 	async applyCustomScriptToText(
 		script: CustomScript,
 		text: string,
-		scope: "note" | "selection"
+		scope: "note" | "selection",
+		hideNotice: boolean = false
 	): Promise<string> {
 		const selection = scope === "selection" ? text : "";
 		const usesSelectionOnly =
 			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
 		if (usesSelectionOnly && !selection) {
-			new Notice(t("NOTICE_NO_SELECTION"));
+			if (!hideNotice) {
+				new Notice(t("NOTICE_NO_SELECTION"));
+			}
 			return text;
 		}
 

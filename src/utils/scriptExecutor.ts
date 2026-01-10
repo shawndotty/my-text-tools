@@ -54,7 +54,14 @@ export async function executeCustomScript(
 		);
 
 		// 执行函数
-		const result = await func(selection, text, params, app, console, Notice);
+		const result = await func(
+			selection,
+			text,
+			params,
+			app,
+			console,
+			Notice
+		);
 
 		// 如果结果是字符串，返回它
 		if (typeof result === "string") {
