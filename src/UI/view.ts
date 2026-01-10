@@ -16,7 +16,7 @@ import MyTextTools from "../main";
 import { AIToolConfig, CustomAIAction } from "../settings";
 import { renderToolsPanel } from "./components/ToolsPanel";
 import {
-	renderEditorPanel,
+	EditorPanel,
 	EditorPanelCallbacks,
 	EditorPanelHandle,
 } from "./components/EditorPanel";
@@ -349,7 +349,7 @@ export class MyTextToolsView extends ItemView {
 				).open();
 			},
 		};
-		this.editorPanelHandle = renderEditorPanel(
+		this.editorPanelHandle = new EditorPanel(
 			centerPanel,
 			this.content,
 			this.editMode,
@@ -362,7 +362,7 @@ export class MyTextToolsView extends ItemView {
 			this.targetFile ? this.targetFile.path : null,
 			editorCallbacks,
 			this.app
-		);
+		).render();
 
 		// --- 3. 右侧：动态设置区域 ---
 		const rightPanel = container.createDiv({ cls: "mtt-right-panel" });
@@ -672,11 +672,14 @@ export class MyTextToolsView extends ItemView {
 		if (this.isSaving) return;
 		this.isSaving = true;
 
+		const range = this.selectionRange;
+
 		// 1. 如果有明确的目标文件 (例如通过导入或初始化获得)
-		if (this.targetFile) {
+		if (this.targetFile && !range) {
 			try {
 				await this.app.vault.modify(this.targetFile, this.content);
 				new Notice(t("NOTICE_SAVE_SUCCESS"), 2000);
+
 				this.isSaving = false;
 				return;
 			} catch (error) {
@@ -694,7 +697,6 @@ export class MyTextToolsView extends ItemView {
 			return;
 		}
 
-		const range = this.selectionRange;
 		if (range) {
 			// 选区模式：只替换选中的内容
 			this.originalEditor.replaceRange(
