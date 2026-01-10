@@ -387,16 +387,19 @@
 }
 
 /* Obsidian 默认 mod-cta 覆盖 */
+button.mod-cta-size{
+	padding: 6px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
 button.mod-cta {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border: none;
 	box-shadow: none;
 	cursor: pointer;
-	padding: 6px;
-	border-radius: 4px;
-	display: flex;
-	align-items: center;
 	transition: all 0.2s;
 }
 

@@ -223,6 +223,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 			// Shortcut Button
 			const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
+			shortcutBtn.setClass("mod-cta-size");
 			const updateShortcutBtnUI = () => {
 				const enabled = this.plugin.isBatchShortcutEnabled(batch.id);
 				shortcutBtn.buttonEl.toggleClass("mod-cta", enabled);

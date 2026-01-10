@@ -74,6 +74,7 @@ export class ApplyBatchModal extends Modal {
 			btnGroup.style.gap = "10px";
 
 			const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
+			shortcutBtn.setClass("mod-cta-size");
 			const updateShortcutBtnUI = () => {
 				const enabled = this.isShortcutEnabled(batch);
 				shortcutBtn.buttonEl.toggleClass("mod-cta", enabled);
