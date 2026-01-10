@@ -1,4 +1,4 @@
-import { setIcon } from "obsidian";
+import { setIcon, setTooltip } from "obsidian";
 import { t } from "../../lang/helpers";
 import { BUILTIN_TOOLS } from "../../types";
 
@@ -145,12 +145,29 @@ export function renderToolsPanel(
 	customActions: CustomActionBrief[] = [],
 	customScripts: CustomScriptBrief[] = [],
 	enabledTools?: Record<string, boolean>,
-	customIcons?: Record<string, string>
+	customIcons?: Record<string, string>,
+	isCollapsed: boolean = false,
+	onToggleCollapse?: () => void
 ): void {
-	parent.createEl("h4", {
+	// 创建头部容器
+	const header = parent.createDiv({ cls: "mtt-tools-header" });
+
+	header.createEl("h4", {
 		text: t("TEXT_TOOLS"),
 		cls: "mtt-panel-title",
 	});
+
+	if (onToggleCollapse) {
+		const toggleBtn = header.createEl("button", {
+			cls: "mtt-collapse-btn",
+		});
+		setIcon(toggleBtn, isCollapsed ? "chevrons-right" : "chevrons-left");
+		setTooltip(
+			toggleBtn,
+			isCollapsed ? t("BTN_EXPAND_PANEL") : t("BTN_COLLAPSE_PANEL")
+		);
+		toggleBtn.onclick = onToggleCollapse;
+	}
 
 	const groups = getToolGroups(
 		customActions,
@@ -160,7 +177,7 @@ export function renderToolsPanel(
 	);
 
 	groups.forEach((group) => {
-		const isCollapsed = collapsedGroups.has(group.name);
+		const isGroupCollapsed = collapsedGroups.has(group.name);
 
 		const groupHeader = parent.createDiv({
 			cls: "mtt-group-header",
@@ -173,7 +190,7 @@ export function renderToolsPanel(
 		const iconSpan = groupHeader.createSpan({ cls: "mtt-collapse-icon" });
 		iconSpan.style.marginRight = "4px";
 		iconSpan.style.display = "flex";
-		setIcon(iconSpan, isCollapsed ? "chevron-right" : "chevron-down");
+		setIcon(iconSpan, isGroupCollapsed ? "chevron-right" : "chevron-down");
 
 		groupHeader.createEl("h6", {
 			text: group.name,
@@ -186,7 +203,7 @@ export function renderToolsPanel(
 		const toolList = parent.createDiv({
 			cls: "mtt-tool-list",
 		});
-		if (isCollapsed) {
+		if (isGroupCollapsed) {
 			toolList.style.display = "none";
 		}
 
@@ -211,6 +228,11 @@ export function renderToolsPanel(
 			const iconSpan = btn.createSpan({ cls: "mtt-tool-icon" });
 			setIcon(iconSpan, tool.icon); // 设置内置图标
 			btn.createSpan({ text: tool.name });
+
+			// 如果是折叠模式，添加 Tooltip
+			if (isCollapsed) {
+				setTooltip(btn, tool.name);
+			}
 
 			btn.onclick = () => {
 				onToolSelect(tool.id);

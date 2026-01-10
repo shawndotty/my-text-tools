@@ -59,14 +59,105 @@
 	gap: 2px;
 	overflow: auto;
     border-radius: 8px;
+	transition: flex-basis 0.2s ease, width 0.2s ease;
+}
+
+.mtt-left-panel.is-collapsed {
+	flex: 0 0 60px; /* 最小化宽度 */
+	padding: 1.5rem 0.5rem;
+	align-items: center;
+}
+
+/* 顶部标题栏容器 (用于放置标题和切换按钮) */
+.mtt-tools-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+	width: 100%;
+}
+
+.mtt-left-panel.is-collapsed .mtt-tools-header {
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 0.5rem;
+	justify-content: center;
+}
+
+/* 标题通用样式 */
+.mtt-panel-title {
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-muted);
+	margin: 0; /* 移除 margin，由 header 控制 */
+}
+
+.mtt-left-panel.is-collapsed .mtt-panel-title {
+	display: none;
+}
+
+/* 切换按钮 */
+.mtt-collapse-btn {
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.mtt-collapse-btn:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
 }
 
 /* 分组标题 */
+.mtt-group-header {
+	width: 100%;
+}
+
 .mtt-group-label {
 	font-weight: bold;
 	text-transform: uppercase;
 	margin: 15px 0 5px 0;
 	letter-spacing: 1px;
+}
+
+.mtt-left-panel.is-collapsed .mtt-group-header {
+	/* 最小化时隐藏分组标题交互区，或者只保留一条线 */
+	justify-content: center;
+	margin: 10px 0 5px 0;
+	pointer-events: none; /* 禁用点击折叠 */
+}
+
+.mtt-left-panel.is-collapsed .mtt-group-label,
+.mtt-left-panel.is-collapsed .mtt-collapse-icon {
+	display: none !important;
+}
+
+.mtt-left-panel.is-collapsed .mtt-group-header::after {
+	/* 分组分隔线 */
+	content: "";
+	display: block;
+	width: 20px;
+	height: 1px;
+	background-color: var(--background-modifier-border);
+}
+
+/* 工具列表容器 */
+.mtt-tool-list {
+	width: 100%;
+}
+
+.mtt-left-panel.is-collapsed .mtt-tool-list {
+	display: flex !important; /* 强制显示，忽略折叠状态 */
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
 }
 
 /* 工具项 */
@@ -80,6 +171,15 @@
 	font-size: 0.9rem;
 	transition: all 0.2s ease;
 	color: var(--text-secondary);
+	width: 100%;
+}
+
+.mtt-left-panel.is-collapsed .mtt-tool-item {
+	padding: 8px;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 6px;
 }
 
 .mtt-tool-item:hover {
@@ -96,6 +196,21 @@
 	display: flex;
 	align-items: center;
 	opacity: 0.8;
+}
+
+.mtt-left-panel.is-collapsed .mtt-tool-icon {
+	opacity: 1;
+}
+
+/* 隐藏文字标签 */
+.mtt-tool-item span:not(.mtt-tool-icon) {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.mtt-left-panel.is-collapsed .mtt-tool-item span:not(.mtt-tool-icon) {
+	display: none !important;
 }
 
 

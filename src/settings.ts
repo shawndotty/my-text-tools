@@ -83,6 +83,7 @@ export interface MyTextToolsSettings {
 	wrapExcludeEmptyLines: boolean;
 	filterText: string;
 	filterMode: string;
+	isToolsPanelCollapsed?: boolean;
 }
 
 export interface AIToolConfig {
@@ -115,6 +116,7 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	wrapExcludeEmptyLines: false,
 	filterText: "",
 	filterMode: "containing",
+	isToolsPanelCollapsed: false,
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {

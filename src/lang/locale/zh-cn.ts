@@ -32,6 +32,8 @@ export default {
 	BTN_CLEAR: "清空编辑器内容",
 	EDITOR_PLACEHOLDER: "在此输入或处理文本...",
 	BTN_SAVE_NEW: "存为新笔记",
+	BTN_EXPAND_PANEL: "展开工具面板",
+	BTN_COLLAPSE_PANEL: "折叠工具面板",
 	BTN_UPDATE_SELECTION: "更新选区",
 	BTN_SAVE_ORIGINAL: "应用并覆盖原笔记",
 	BTN_IMPORT: "导入笔记",

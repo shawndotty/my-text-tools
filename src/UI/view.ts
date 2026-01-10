@@ -47,6 +47,7 @@ export class MyTextToolsView extends ItemView {
 	activeTool: string | "" = ""; // 当前选中的工具 ID
 	settingsState: SettingsState = { ...DEFAULT_SETTINGS_STATE };
 	plugin: MyTextTools; // 插件实例引用
+	isToolsPanelCollapsed: boolean = false; // 工具面板折叠状态
 	private loadingEl: HTMLElement | null = null;
 	private editorPanelHandle: EditorPanelHandle | null = null;
 	private isImporting: boolean = false;
@@ -155,7 +156,12 @@ export class MyTextToolsView extends ItemView {
 		container.addClass("mtt-layout-container");
 
 		// --- 1. 左侧：工具导航栏 ---
-		const leftPanel = container.createDiv({ cls: "mtt-left-panel" });
+		const leftPanel = container.createDiv({
+			cls: [
+				"mtt-left-panel",
+				this.isToolsPanelCollapsed ? "is-collapsed" : "",
+			].filter(Boolean),
+		});
 		renderToolsPanel(
 			leftPanel,
 			this.activeTool,
@@ -166,7 +172,17 @@ export class MyTextToolsView extends ItemView {
 			this.plugin.settings.customActions,
 			this.plugin.settings.customScripts,
 			this.plugin.settings.enabledTools,
-			this.plugin.settings.customIcons
+			this.plugin.settings.customIcons,
+			this.isToolsPanelCollapsed,
+			async () => {
+				this.isToolsPanelCollapsed = !this.isToolsPanelCollapsed;
+				// Update UI immediately
+				this.render();
+				// Save state asynchronously
+				this.plugin.settings.isToolsPanelCollapsed =
+					this.isToolsPanelCollapsed;
+				await this.plugin.saveSettings();
+			}
 		);
 
 		// 恢复左侧面板的滚动位置

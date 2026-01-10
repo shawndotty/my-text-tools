@@ -32,6 +32,8 @@ export default {
 	BTN_CLEAR: "Clear Editor Content",
 	EDITOR_PLACEHOLDER: "Enter or process text here...",
 	BTN_SAVE_NEW: "Save as New Note",
+	BTN_EXPAND_PANEL: "Expand Tools Panel",
+	BTN_COLLAPSE_PANEL: "Collapse Tools Panel",
 	BTN_UPDATE_SELECTION: "Update Selection",
 	BTN_SAVE_ORIGINAL: "Apply & Overwrite Original",
 	BTN_IMPORT: "Import Note",

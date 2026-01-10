@@ -31,6 +31,8 @@ export default {
 	BTN_REDO: "重做 (Ctrl+Y)",
 	EDITOR_PLACEHOLDER: "在此輸入或處理文字...",
 	BTN_SAVE_NEW: "存為新筆記",
+	BTN_EXPAND_PANEL: "展開工具面板",
+	BTN_COLLAPSE_PANEL: "摺疊工具面板",
 	BTN_UPDATE_SELECTION: "更新選區",
 	BTN_SAVE_ORIGINAL: "應用並覆蓋原筆記",
 	BTN_IMPORT: "匯入筆記",
