@@ -364,30 +364,34 @@ export function renderEditorPanel(
 		recIndicator.style.marginRight = "4px";
 
 		const cancelRecBtn = centerBtnGroup.createEl("button", {
-			text: t("BTN_CANCEL_RECORDING"),
-			cls: "mtt-secondary-btn",
+			cls: "mtt-icon-btn",
+			attr: { "aria-label": t("BTN_CANCEL_RECORDING") },
 		});
+		setIcon(cancelRecBtn, "x");
 		cancelRecBtn.onclick = callbacks.onCancelRecording;
 
 		const stopRecBtn = centerBtnGroup.createEl("button", {
-			text: t("BTN_STOP_RECORDING"),
-			cls: "mod-warning",
+			cls: "mtt-icon-btn mod-warning",
+			attr: { "aria-label": t("BTN_STOP_RECORDING") },
 		});
+		setIcon(stopRecBtn, "square");
 		stopRecBtn.onclick = callbacks.onStopRecording;
 	} else {
 		// 未录制：显示应用批处理（如果有）和开始录制
 		if (hasBatches) {
 			const applyBatchBtn = centerBtnGroup.createEl("button", {
-				text: t("BTN_APPLY_BATCH"),
-				cls: "mtt-secondary-btn",
+				cls: "mtt-icon-btn",
+				attr: { "aria-label": t("BTN_APPLY_BATCH") },
 			});
+			setIcon(applyBatchBtn, "play");
 			applyBatchBtn.onclick = callbacks.onApplyBatch;
 		}
 
 		const startRecBtn = centerBtnGroup.createEl("button", {
-			text: t("BTN_START_RECORDING"),
-			cls: "mtt-secondary-btn",
+			cls: "mtt-icon-btn",
+			attr: { "aria-label": t("BTN_START_RECORDING") },
 		});
+		setIcon(startRecBtn, "circle");
 		startRecBtn.onclick = callbacks.onStartRecording;
 	}
 
@@ -396,9 +400,10 @@ export function renderEditorPanel(
 
 	// 1. 复制到剪贴板按钮
 	const copyClipboardBtn = btnGroup.createEl("button", {
-		text: t("BTN_COPY_CLIPBOARD"),
-		cls: "mtt-secondary-btn",
+		cls: "mtt-icon-btn",
+		attr: { "aria-label": t("BTN_COPY_CLIPBOARD") },
 	});
+	setIcon(copyClipboardBtn, "copy");
 
 	copyClipboardBtn.onclick = async () => {
 		try {
@@ -411,19 +416,23 @@ export function renderEditorPanel(
 
 	// 按钮 1：存为新笔记
 	const saveNewBtn = btnGroup.createEl("button", {
-		text: t("BTN_SAVE_NEW"),
-		cls: "mtt-secondary-btn",
+		cls: "mtt-icon-btn",
+		attr: { "aria-label": t("BTN_SAVE_NEW") },
 	});
+	setIcon(saveNewBtn, "file-plus");
 	saveNewBtn.onclick = () => callbacks.onSaveNew();
 
 	// 按钮 2：覆盖原笔记
 	if (hasOriginalEditor) {
 		const saveOverBtn = btnGroup.createEl("button", {
-			text: isSelectionMode
-				? t("BTN_UPDATE_SELECTION" as any)
-				: t("BTN_SAVE_ORIGINAL"),
-			cls: "mod-cta",
+			cls: "mtt-icon-btn mod-cta",
+			attr: {
+				"aria-label": isSelectionMode
+					? t("BTN_UPDATE_SELECTION" as any)
+					: t("BTN_SAVE_ORIGINAL"),
+			},
 		});
+		setIcon(saveOverBtn, "save");
 		saveOverBtn.onclick = () => callbacks.onSaveOriginal();
 	}
 
