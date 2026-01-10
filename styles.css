@@ -53,7 +53,7 @@
 	flex: 0 0 220px;
 	background-color: var(--background-secondary);
 	border-right: 1px solid var(--background-modifier-border);
-	padding: 1.5rem 0.75rem;
+	padding: 1rem 0.75rem;
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
@@ -85,13 +85,7 @@
 }
 
 /* 标题通用样式 */
-.mtt-panel-title {
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	color: var(--text-muted);
-	margin: 0; /* 移除 margin，由 header 控制 */
-}
+
 
 .mtt-left-panel.is-collapsed .mtt-panel-title {
 	display: none;
@@ -103,8 +97,8 @@
 	border: none;
 	color: var(--text-muted);
 	cursor: pointer;
-	padding: 4px;
-	border-radius: 4px;
+	padding: 6px;
+	border-radius: 6px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -238,7 +232,7 @@
 
 .mtt-action-group {
 	display: flex;
-	gap: 4px;
+	gap: 10px;
 }
 
 /* 编辑器容器 */
@@ -396,6 +390,14 @@
 button.mod-cta {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
+	border: none;
+	box-shadow: none;
+	cursor: pointer;
+	padding: 6px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	transition: all 0.2s;
 }
 
 /* 按钮悬停提示 (Tooltip) */
@@ -422,7 +424,7 @@ button.mod-cta {
 	flex: 0 0 280px;
 	background-color: var(--background-secondary);
 	border-left: 1px solid var(--background-modifier-border);
-	padding: 1.5rem;
+	padding: 1rem 0.75rem;
     overflow: auto;
     border-radius: 8px;
 }
@@ -474,6 +476,12 @@ button.mod-cta {
 	gap: 8px;
 	font-size: 0.9rem;
 	margin: 10px 0;
+}
+ 
+.mtt-setting-desc {
+	font-size: 0.9rem;
+	color: var(--text-muted);
+	margin-bottom: 0;
 }
 
 /* 选择框样式 */
@@ -600,7 +608,7 @@ input[type="number"].mtt-small-input {
 .mtt-batch-op-header .mtt-batch-op-controls {
 	display: flex;
 	align-items: center;
-	gap: 0.5em;
+	gap: 10px;
 }
 
 

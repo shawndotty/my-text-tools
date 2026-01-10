@@ -71,7 +71,7 @@ export class ApplyBatchModal extends Modal {
 
 			const btnGroup = row.createDiv({ cls: "mtt-batch-actions" });
 			btnGroup.style.display = "flex";
-			btnGroup.style.gap = "8px";
+			btnGroup.style.gap = "10px";
 
 			const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
 			const updateShortcutBtnUI = () => {
@@ -106,6 +106,7 @@ export class ApplyBatchModal extends Modal {
 			new ButtonComponent(btnGroup)
 				.setIcon("pencil")
 				.setTooltip(t("BTN_EDIT"))
+				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					this.close();
 					this.onEdit(batch);
@@ -114,6 +115,7 @@ export class ApplyBatchModal extends Modal {
 			new ButtonComponent(btnGroup)
 				.setIcon("trash-2")
 				.setTooltip(t("BTN_DELETE"))
+				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					new ConfirmModal(
 						this.app,

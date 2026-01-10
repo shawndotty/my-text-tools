@@ -245,8 +245,8 @@ export function renderEditorPanel(
 	leftBtnGroup.style.gap = "8px";
 
 	const importBtn = leftBtnGroup.createEl("button", {
-		text: t("BTN_IMPORT"),
-		cls: "mtt-secondary-btn",
+		cls: "mtt-icon-btn",
+		attr: { "aria-label": t("BTN_IMPORT") },
 	});
 	setIcon(importBtn, "import");
 

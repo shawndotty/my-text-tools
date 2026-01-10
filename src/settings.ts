@@ -219,7 +219,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 
 			const btnGroup = row.createDiv({ cls: "mtt-batch-actions" });
 			btnGroup.style.display = "flex";
-			btnGroup.style.gap = "8px";
+			btnGroup.style.gap = "10px";
 
 			// Shortcut Button
 			const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
@@ -252,6 +252,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			new ButtonComponent(btnGroup)
 				.setIcon("pencil")
 				.setTooltip(t("BTN_EDIT"))
+				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					new EditBatchModal(
 						this.app,
@@ -288,6 +289,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			new ButtonComponent(btnGroup)
 				.setIcon("trash")
 				.setTooltip(t("BTN_DELETE"))
+				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					new ConfirmModal(
 						this.app,
@@ -1022,6 +1024,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			new Setting(bodyEl).addButton((btn) =>
 				btn
 					.setButtonText(t("BTN_GENERATE_SCRIPT_AI"))
+					.setClass("mtt-icon-btn")
+					.setTooltip(t("BTN_GENERATE_SCRIPT_AI"))
 					.setIcon("sparkles")
 					.onClick(() => {
 						const aiService = new AIService(this.plugin.settings);

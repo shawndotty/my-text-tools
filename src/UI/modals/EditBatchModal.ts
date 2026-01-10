@@ -99,6 +99,7 @@ export class EditBatchModal extends Modal {
 		new ButtonComponent(controls)
 			.setIcon("arrow-up")
 			.setTooltip(t("BTN_MOVE_UP"))
+			.setClass("mtt-icon-btn")
 			.setDisabled(index === 0)
 			.onClick(() => {
 				this.moveOp(index, -1);
@@ -108,6 +109,7 @@ export class EditBatchModal extends Modal {
 		new ButtonComponent(controls)
 			.setIcon("arrow-down")
 			.setTooltip(t("BTN_MOVE_DOWN"))
+			.setClass("mtt-icon-btn")
 			.setDisabled(index === this.workingBatch.operations.length - 1)
 			.onClick(() => {
 				this.moveOp(index, 1);
@@ -117,6 +119,7 @@ export class EditBatchModal extends Modal {
 		new ButtonComponent(controls)
 			.setIcon("trash")
 			.setTooltip(t("BTN_DELETE_OP"))
+			.setClass("mtt-icon-btn")
 			.setClass("mtt-text-danger")
 			.onClick(() => {
 				new ConfirmModal(
