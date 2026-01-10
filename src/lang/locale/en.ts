@@ -406,6 +406,8 @@ export default {
 	MENU_BATCH_RUN_NOTE: "Run “{0}” on note",
 	MENU_BATCH_RUN_SELECTION: "Run “{0}” on selection",
 	MENU_BATCH_RUN_FILES: "Run “{0}” on {1} files",
+	MENU_BATCH_RUN_FOLDER: "Run “{0}” in this folder",
+	MENU_BATCH_RUN_FOLDER_RECURSIVE: "Run “{0}” in this folder (recursive)",
 	NOTICE_BATCH_APPLIED: "Batch process applied.",
 	NOTICE_PROCESSING_FILES: "Processing {0} files...",
 	NOTICE_BATCH_APPLIED_FILES: "Batch process applied to {0} of {1} files.",

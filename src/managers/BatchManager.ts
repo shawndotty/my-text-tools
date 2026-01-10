@@ -5,6 +5,7 @@ import {
 	TFile,
 	TAbstractFile,
 	Menu,
+	TFolder,
 } from "obsidian";
 import {
 	MyTextToolsPlugin,
@@ -142,6 +143,56 @@ export class BatchManager {
 							});
 						}
 					}
+
+					// Folder Context
+					if (file instanceof TFolder) {
+						menu.addSeparator();
+						menu.addItem((item) => {
+							item.setTitle(t("MENU_BATCH_SHORTCUTS_LABEL"))
+								.setIcon("zap")
+								.setIsLabel(true);
+						});
+
+						for (const batch of batches) {
+							// 1. Current folder only
+							menu.addItem((item) => {
+								item.setTitle(
+									t("MENU_BATCH_RUN_FOLDER", [batch.name])
+								)
+									.setIcon("folder")
+									.onClick(async () => {
+										const files = this.getFilesInFolder(
+											file,
+											false
+										);
+										await this.runBatchOnFiles(
+											batch.id,
+											files
+										);
+									});
+							});
+
+							// 2. Recursive
+							menu.addItem((item) => {
+								item.setTitle(
+									t("MENU_BATCH_RUN_FOLDER_RECURSIVE", [
+										batch.name,
+									])
+								)
+									.setIcon("folder-open")
+									.onClick(async () => {
+										const files = this.getFilesInFolder(
+											file,
+											true
+										);
+										await this.runBatchOnFiles(
+											batch.id,
+											files
+										);
+									});
+							});
+						}
+					}
 				}
 			)
 		);
@@ -195,6 +246,24 @@ export class BatchManager {
 				}
 			)
 		);
+	}
+
+	private getFilesInFolder(folder: TFolder, recursive: boolean): TFile[] {
+		let files: TFile[] = [];
+
+		for (const child of folder.children) {
+			if (child instanceof TFile) {
+				if (child.extension === "md") {
+					files.push(child);
+				}
+			} else if (child instanceof TFolder) {
+				if (recursive) {
+					files = files.concat(this.getFilesInFolder(child, true));
+				}
+			}
+		}
+
+		return files;
 	}
 
 	private getSelectedFiles(activeFile: TAbstractFile): TFile[] {

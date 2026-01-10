@@ -397,6 +397,8 @@ export default {
 	MENU_BATCH_RUN_NOTE: "对笔记运行「{0}」",
 	MENU_BATCH_RUN_SELECTION: "对选区运行「{0}」",
 	MENU_BATCH_RUN_FILES: "对 {1} 个文件运行「{0}」",
+	MENU_BATCH_RUN_FOLDER: "在当前文件夹运行「{0}」",
+	MENU_BATCH_RUN_FOLDER_RECURSIVE: "在当前文件夹及子文件夹运行「{0}」",
 	BTN_DELETE: "删除",
 	BTN_CANCEL: "取消",
 	BTN_CONFIRM: "确认",

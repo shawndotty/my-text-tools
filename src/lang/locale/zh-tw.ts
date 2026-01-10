@@ -384,6 +384,8 @@ export default {
 	MENU_BATCH_RUN_NOTE: "對筆記運行「{0}」",
 	MENU_BATCH_RUN_SELECTION: "對選區運行「{0}」",
 	MENU_BATCH_RUN_FILES: "對 {1} 個檔案運行「{0}」",
+	MENU_BATCH_RUN_FOLDER: "在目前資料夾運行「{0}」",
+	MENU_BATCH_RUN_FOLDER_RECURSIVE: "在目前資料夾及子資料夾運行「{0}」",
 	NOTICE_BATCH_APPLIED: "批處理已執行。",
 	NOTICE_PROCESSING_FILES: "正在處理 {0} 個檔案...",
 	NOTICE_BATCH_APPLIED_FILES: "已對 {0}/{1} 個檔案應用批處理。",
