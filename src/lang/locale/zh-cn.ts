@@ -396,11 +396,14 @@ export default {
 	MENU_BATCH_SHORTCUTS_LABEL: "MyTextTools 批处理快捷命令",
 	MENU_BATCH_RUN_NOTE: "对笔记运行「{0}」",
 	MENU_BATCH_RUN_SELECTION: "对选区运行「{0}」",
+	MENU_BATCH_RUN_FILES: "对 {1} 个文件运行「{0}」",
 	BTN_DELETE: "删除",
 	BTN_CANCEL: "取消",
 	BTN_CONFIRM: "确认",
 	CONFIRM_DELETE_BATCH: "确定要删除这个批处理吗？",
 	NOTICE_BATCH_APPLIED: "批处理应用成功。",
+	NOTICE_PROCESSING_FILES: "正在处理 {0} 个文件...",
+	NOTICE_BATCH_APPLIED_FILES: "已对 {0}/{1} 个文件应用批处理。",
 	NOTICE_BATCH_NOT_FOUND: "找不到该批处理。",
 
 	// Edit Batch

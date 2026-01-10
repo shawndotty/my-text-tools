@@ -1,4 +1,11 @@
-import { Editor, Notice, MarkdownView } from "obsidian";
+import {
+	Editor,
+	Notice,
+	MarkdownView,
+	TFile,
+	TAbstractFile,
+	Menu,
+} from "obsidian";
 import {
 	MyTextToolsPlugin,
 	BatchOperation,
@@ -24,6 +31,7 @@ export class BatchManager {
 		this.plugin = plugin;
 		this.scriptManager = scriptManager;
 		this.aiManager = aiManager;
+		this.registerFileMenuEvent();
 	}
 
 	async syncBatchShortcuts() {
@@ -83,6 +91,196 @@ export class BatchManager {
 		}
 		this.removeBatchCommands(batchId);
 		this.registerBatchCommands(batch);
+	}
+
+	private registerFileMenuEvent() {
+		// Event for single file or when file-menu is triggered
+		this.plugin.registerEvent(
+			this.plugin.app.workspace.on(
+				"file-menu",
+				(menu: Menu, file: TAbstractFile) => {
+					const enabledIds = this.getEnabledBatchShortcutIds();
+					if (enabledIds.length === 0) return;
+
+					const batches = enabledIds
+						.map((id) =>
+							this.plugin.settings.savedBatches.find(
+								(b) => b.id === id
+							)
+						)
+						.filter((b): b is BatchProcess => !!b);
+					if (batches.length === 0) return;
+
+					// Check if we can find multiple selected files via DOM (fallback)
+					const selectedFiles = this.getSelectedFiles(file);
+
+					// If we found multiple files via DOM, use them
+					// But if it's just the single file context, use that
+					if (selectedFiles.length > 0) {
+						menu.addSeparator();
+						menu.addItem((item) => {
+							item.setTitle(t("MENU_BATCH_SHORTCUTS_LABEL"))
+								.setIcon("zap")
+								.setIsLabel(true);
+						});
+
+						for (const batch of batches) {
+							menu.addItem((item) => {
+								item.setTitle(
+									t("MENU_BATCH_RUN_FILES", [
+										batch.name,
+										String(selectedFiles.length),
+									])
+								)
+									.setIcon("zap")
+									.onClick(async () => {
+										await this.runBatchOnFiles(
+											batch.id,
+											selectedFiles
+										);
+									});
+							});
+						}
+					}
+				}
+			)
+		);
+
+		// Event for multiple files (files-menu)
+		this.plugin.registerEvent(
+			(this.plugin.app.workspace as any).on(
+				"files-menu",
+				(menu: Menu, files: TAbstractFile[]) => {
+					const enabledIds = this.getEnabledBatchShortcutIds();
+					if (enabledIds.length === 0) return;
+
+					const batches = enabledIds
+						.map((id) =>
+							this.plugin.settings.savedBatches.find(
+								(b) => b.id === id
+							)
+						)
+						.filter((b): b is BatchProcess => !!b);
+					if (batches.length === 0) return;
+
+					const validFiles = files.filter(
+						(f) => f instanceof TFile
+					) as TFile[];
+					if (validFiles.length === 0) return;
+
+					menu.addSeparator();
+					menu.addItem((item) => {
+						item.setTitle(t("MENU_BATCH_SHORTCUTS_LABEL"))
+							.setIcon("zap")
+							.setIsLabel(true);
+					});
+
+					for (const batch of batches) {
+						menu.addItem((item) => {
+							item.setTitle(
+								t("MENU_BATCH_RUN_FILES", [
+									batch.name,
+									String(validFiles.length),
+								])
+							)
+								.setIcon("zap")
+								.onClick(async () => {
+									await this.runBatchOnFiles(
+										batch.id,
+										validFiles
+									);
+								});
+						});
+					}
+				}
+			)
+		);
+	}
+
+	private getSelectedFiles(activeFile: TAbstractFile): TFile[] {
+		const fileExplorerLeaf =
+			this.plugin.app.workspace.getLeavesOfType("file-explorer")[0];
+		if (!fileExplorerLeaf) {
+			return activeFile instanceof TFile ? [activeFile] : [];
+		}
+
+		const fileExplorer = fileExplorerLeaf.view as any;
+		if (!fileExplorer.fileItems) {
+			return activeFile instanceof TFile ? [activeFile] : [];
+		}
+
+		const selectedFiles: TFile[] = [];
+		for (const path in fileExplorer.fileItems) {
+			const item = fileExplorer.fileItems[path];
+			if (
+				item.selfEl &&
+				item.selfEl.classList.contains("is-selected") &&
+				item.file instanceof TFile
+			) {
+				selectedFiles.push(item.file);
+			}
+		}
+
+		// If the context file is in the selection, use the selection.
+		// Otherwise (e.g. right-clicked a link or a file outside selection), use the context file.
+		if (
+			activeFile instanceof TFile &&
+			!selectedFiles.some((f) => f.path === activeFile.path)
+		) {
+			return [activeFile];
+		}
+
+		if (selectedFiles.length > 0) {
+			return selectedFiles;
+		}
+
+		if (activeFile instanceof TFile) {
+			return [activeFile];
+		}
+
+		return [];
+	}
+
+	async runBatchOnFiles(batchId: string, files: TFile[]) {
+		const batch = this.plugin.settings.savedBatches.find(
+			(b) => b.id === batchId
+		);
+		if (!batch) {
+			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
+			return;
+		}
+
+		new Notice(t("NOTICE_PROCESSING_FILES", [String(files.length)]));
+
+		let successCount = 0;
+		for (const file of files) {
+			try {
+				const content = await this.plugin.app.vault.read(file);
+				let newContent = content;
+
+				for (const op of batch.operations) {
+					newContent = await this.applyBatchOperationToText(
+						op,
+						newContent,
+						"note"
+					);
+				}
+
+				if (newContent !== content) {
+					await this.plugin.app.vault.modify(file, newContent);
+					successCount++;
+				}
+			} catch (e) {
+				console.error(`Failed to process file ${file.path}`, e);
+			}
+		}
+
+		new Notice(
+			t("NOTICE_BATCH_APPLIED_FILES", [
+				String(successCount),
+				String(files.length),
+			])
+		);
 	}
 
 	private getBatchCommandIds(batchId: string) {
