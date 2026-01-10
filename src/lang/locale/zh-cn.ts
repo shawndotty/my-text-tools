@@ -399,6 +399,9 @@ export default {
 	MENU_BATCH_RUN_FILES: "对 {1} 个文件运行「{0}」",
 	MENU_BATCH_RUN_FOLDER: "在当前文件夹运行「{0}」",
 	MENU_BATCH_RUN_FOLDER_RECURSIVE: "在当前文件夹及子文件夹运行「{0}」",
+	CONFIRM_BATCH_FOLDER_TITLE: "确认批量操作",
+	CONFIRM_BATCH_FOLDER_DESC:
+		"确定要对文件夹中的 {1} 个文件运行批处理「{0}」吗？",
 	BTN_DELETE: "删除",
 	BTN_CANCEL: "取消",
 	BTN_CONFIRM: "确认",

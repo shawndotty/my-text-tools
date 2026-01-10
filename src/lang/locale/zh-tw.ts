@@ -386,6 +386,9 @@ export default {
 	MENU_BATCH_RUN_FILES: "對 {1} 個檔案運行「{0}」",
 	MENU_BATCH_RUN_FOLDER: "在目前資料夾運行「{0}」",
 	MENU_BATCH_RUN_FOLDER_RECURSIVE: "在目前資料夾及子資料夾運行「{0}」",
+	CONFIRM_BATCH_FOLDER_TITLE: "確認批量操作",
+	CONFIRM_BATCH_FOLDER_DESC:
+		"確定要對資料夾中的 {1} 個檔案運行批處理「{0}」嗎？",
 	NOTICE_BATCH_APPLIED: "批處理已執行。",
 	NOTICE_PROCESSING_FILES: "正在處理 {0} 個檔案...",
 	NOTICE_BATCH_APPLIED_FILES: "已對 {0}/{1} 個檔案應用批處理。",

@@ -18,6 +18,7 @@ import { t } from "../lang/helpers";
 import { processText as processTextCore } from "../utils/textProcessors";
 import { ScriptManager } from "./ScriptManager";
 import { AIManager } from "./AIManager";
+import { ConfirmModal } from "../UI/modals/ConfirmModal";
 
 export class BatchManager {
 	plugin: MyTextToolsPlugin;
@@ -165,10 +166,22 @@ export class BatchManager {
 											file,
 											false
 										);
-										await this.runBatchOnFiles(
-											batch.id,
-											files
-										);
+										if (files.length === 0) return;
+
+										new ConfirmModal(
+											this.plugin.app,
+											t("CONFIRM_BATCH_FOLDER_TITLE"),
+											t("CONFIRM_BATCH_FOLDER_DESC", [
+												batch.name,
+												String(files.length),
+											]),
+											async () => {
+												await this.runBatchOnFiles(
+													batch.id,
+													files
+												);
+											}
+										).open();
 									});
 							});
 
@@ -185,10 +198,22 @@ export class BatchManager {
 											file,
 											true
 										);
-										await this.runBatchOnFiles(
-											batch.id,
-											files
-										);
+										if (files.length === 0) return;
+
+										new ConfirmModal(
+											this.plugin.app,
+											t("CONFIRM_BATCH_FOLDER_TITLE"),
+											t("CONFIRM_BATCH_FOLDER_DESC", [
+												batch.name,
+												String(files.length),
+											]),
+											async () => {
+												await this.runBatchOnFiles(
+													batch.id,
+													files
+												);
+											}
+										).open();
 									});
 							});
 						}
