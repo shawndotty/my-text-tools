@@ -315,10 +315,12 @@ export class EditorPanel {
 			cls: "dropdown",
 		});
 		modeSelect.style.maxWidth = "130px";
-		modeSelect.createEl("option", {
-			value: "overwrite",
-			text: t("OPTION_IMPORT_OVERWRITE"),
-		});
+		if (!this.isSelectionMode) {
+			modeSelect.createEl("option", {
+				value: "overwrite",
+				text: t("OPTION_IMPORT_OVERWRITE"),
+			});
+		}
 		modeSelect.createEl("option", {
 			value: "insert",
 			text: t("OPTION_IMPORT_INSERT"),
