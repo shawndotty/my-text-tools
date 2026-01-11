@@ -111,7 +111,10 @@ Generate the System Prompt and User Prompt JSON.`;
 
 				try {
 					const result = JSON.parse(content) as PromptResult;
-					if (result.systemPrompt && result.userPrompt !== undefined) {
+					if (
+						result.systemPrompt &&
+						result.userPrompt !== undefined
+					) {
 						this.onGenerate(result);
 						new Notice(t("GENERATE_SUCCESS"));
 						this.close();

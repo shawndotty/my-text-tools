@@ -14,8 +14,7 @@ export class IconPickerModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.empty();
-
-		contentEl.createEl("h2", { text: t("MODAL_ICON_PICKER_TITLE") });
+		this.titleEl.setText(t("MODAL_ICON_PICKER_TITLE"));
 
 		const searchContainer = contentEl.createDiv();
 		const searchInput = new TextComponent(searchContainer);
@@ -71,7 +70,8 @@ export class IconPickerModal extends Modal {
 			};
 
 			iconItem.onmouseenter = () =>
-				(iconItem.style.backgroundColor = "var(--background-secondary)");
+				(iconItem.style.backgroundColor =
+					"var(--background-secondary)");
 			iconItem.onmouseleave = () => (iconItem.style.backgroundColor = "");
 		});
 	}

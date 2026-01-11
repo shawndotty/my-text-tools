@@ -296,7 +296,7 @@
    ========================================================================== */
 
 /* 图标按钮通用样式 */
-.mtt-icon-btn {
+.mtt-icon-btn, .mtt-ai-btn {
 	background: transparent;
 	border: none;
 	box-shadow: none;
@@ -309,17 +309,17 @@
 	transition: all 0.2s;
 }
 
-.mtt-icon-btn:hover:not(.is-disabled) {
+.mtt-icon-btn:hover:not(.is-disabled), .mtt-ai-btn:hover:not(.is-disabled) {
 	color: var(--text-normal);
 	background: var(--background-modifier-hover);
 }
 
-.mtt-icon-btn.is-disabled {
+.mtt-icon-btn.is-disabled, .mtt-ai-btn.is-disabled {
 	opacity: 0.25;
 	cursor: not-allowed;
 }
 
-.mtt-icon-btn svg {
+.mtt-icon-btn svg, .mtt-ai-btn svg {
 	width: 18px;
 	height: 18px;
 }

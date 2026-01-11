@@ -715,13 +715,6 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			iconContainer.style.alignItems = "center";
 			iconContainer.style.marginBottom = "10px";
 
-			const iconInput = iconContainer.createEl("input", {
-				type: "text",
-				placeholder: t("ICON_PLACEHOLDER"),
-				value: card.icon || "sparkles",
-			});
-			iconInput.style.flex = "1";
-
 			const iconBtn = new ButtonComponent(iconContainer)
 				.setIcon(card.icon || "sparkles")
 				.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
@@ -734,6 +727,14 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						(this.plugin as any).refreshCustomRibbons?.();
 					}).open();
 				});
+			iconBtn.setClass("mtt-icon-btn");
+
+			const iconInput = iconContainer.createEl("input", {
+				type: "text",
+				placeholder: t("ICON_PLACEHOLDER"),
+				value: card.icon || "sparkles",
+			});
+			iconInput.style.flex = "1";
 
 			iconInput.onchange = async (e) => {
 				const val = (e.target as HTMLInputElement).value || "sparkles";
@@ -743,33 +744,42 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				(this.plugin as any).refreshCustomRibbons?.();
 			};
 
-			new Setting(bodyEl).addButton((btn) =>
-				btn
-					.setButtonText(t("BTN_GENERATE_PROMPT_AI"))
-					.setClass("mtt-icon-btn")
-					.setTooltip(t("TOOLTIP_GENERATE_PROMPT_AI"))
-					.setIcon("sparkles")
-					.onClick(() => {
-						const aiService = new AIService(this.plugin.settings);
-						new AIGeneratePromptModal(
-							this.app,
-							aiService,
-							async (result) => {
-								card.prompt = result.userPrompt;
-								card.systemPrompt = result.systemPrompt;
-								promptArea.value = result.userPrompt;
-								sysArea.value = result.systemPrompt;
-								await this.plugin.saveSettings();
-							}
-						).open();
-					})
-			);
+			const promptContainer = bodyEl.createDiv();
+			promptContainer.style.display = "flex";
+			promptContainer.style.gap = "8px";
+			promptContainer.style.alignItems = "flex-start";
+			promptContainer.style.justifyContent = "space-between";
 
-			bodyEl.createEl("label", { text: t("PROMPT_FIELD_LABEL") });
-			bodyEl.createEl("p", {
+			const promptLeftDiv = promptContainer.createDiv();
+			promptLeftDiv.createEl("label", {
+				text: t("PROMPT_FIELD_LABEL"),
+			});
+			promptLeftDiv.createEl("p", {
 				text: t("PROMPT_FIELD_DESC"),
 				cls: "setting-item-description",
 			});
+
+			const promptAiBtn = new ButtonComponent(promptContainer)
+				.setIcon("sparkles")
+				.setTooltip(t("TOOLTIP_GENERATE_PROMPT_AI"))
+				.onClick(() => {
+					const aiService = new AIService(this.plugin.settings);
+					new AIGeneratePromptModal(
+						this.app,
+						aiService,
+						async (result) => {
+							card.prompt = result.userPrompt;
+							card.systemPrompt = result.systemPrompt;
+							promptArea.value = result.userPrompt;
+							sysArea.value = result.systemPrompt;
+							await this.plugin.saveSettings();
+						}
+					).open();
+				});
+
+			promptAiBtn.setClass("mtt-ai-btn");
+			promptAiBtn.setCta();
+
 			const promptArea = bodyEl.createEl("textarea");
 			promptArea.rows = 4;
 			promptArea.style.width = "100%";
@@ -1059,16 +1069,10 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			iconContainer.style.alignItems = "center";
 			iconContainer.style.marginBottom = "10px";
 
-			const iconInput = iconContainer.createEl("input", {
-				type: "text",
-				placeholder: t("ICON_PLACEHOLDER"),
-				value: script.icon || "scroll",
-			});
-			iconInput.style.flex = "1";
-
 			const iconBtn = new ButtonComponent(iconContainer)
 				.setIcon(script.icon || "scroll")
 				.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					new IconPickerModal(this.app, async (newIcon) => {
 						script.icon = newIcon;
@@ -1078,6 +1082,13 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						(this.plugin as any).refreshCustomRibbons?.();
 					}).open();
 				});
+
+			const iconInput = iconContainer.createEl("input", {
+				type: "text",
+				placeholder: t("ICON_PLACEHOLDER"),
+				value: script.icon || "scroll",
+			});
+			iconInput.style.flex = "1";
 
 			iconInput.onchange = async (e) => {
 				const val = (e.target as HTMLInputElement).value || "scroll";
@@ -1125,6 +1136,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				btn
 					.setButtonText(t("BTN_GENERATE_SCRIPT_AI"))
 					.setClass("mtt-icon-btn")
+					.setCta()
 					.setTooltip(t("BTN_GENERATE_SCRIPT_AI"))
 					.setIcon("sparkles")
 					.onClick(() => {
