@@ -50,10 +50,15 @@ export class ScriptManager {
 		scope: "note" | "selection",
 		hideNotice: boolean = false
 	): Promise<string> {
-		const selection = scope === "selection" ? text : "";
+		// If scope is "note" (batch file processing), treat the entire text as the selection.
+		// This prevents scripts that rely on 'selection' from returning empty strings and wiping files.
+		const selection = scope === "note" ? text : (scope === "selection" ? text : "");
+		
 		const usesSelectionOnly =
 			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
-		if (usesSelectionOnly && !selection) {
+		
+		// If it's a selection-scope run (not a full note run) and there's no selection, warn the user.
+		if (scope === "selection" && !selection && usesSelectionOnly) {
 			if (!hideNotice) {
 				new Notice(t("NOTICE_NO_SELECTION"));
 			}
