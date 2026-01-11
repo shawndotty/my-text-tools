@@ -10,6 +10,7 @@ import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
 import { BUILTIN_TOOLS, BatchProcess } from "./types";
 import { AIGenerateScriptModal } from "./UI/modals/AIGenerateScriptModal";
+import { AIGeneratePromptModal } from "./UI/modals/AIGeneratePromptModal";
 import { EditBatchModal } from "./UI/modals/EditBatchModal";
 import { ConfirmModal } from "./UI/modals/ConfirmModal";
 import { AIService } from "./utils/aiService";
@@ -687,6 +688,28 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				await this.plugin.saveSettings();
 				(this.plugin as any).refreshCustomRibbons?.();
 			};
+
+			new Setting(bodyEl).addButton((btn) =>
+				btn
+					.setButtonText(t("BTN_GENERATE_PROMPT_AI"))
+					.setClass("mtt-icon-btn")
+					.setTooltip(t("TOOLTIP_GENERATE_PROMPT_AI"))
+					.setIcon("sparkles")
+					.onClick(() => {
+						const aiService = new AIService(this.plugin.settings);
+						new AIGeneratePromptModal(
+							this.app,
+							aiService,
+							async (result) => {
+								card.prompt = result.userPrompt;
+								card.systemPrompt = result.systemPrompt;
+								promptArea.value = result.userPrompt;
+								sysArea.value = result.systemPrompt;
+								await this.plugin.saveSettings();
+							}
+						).open();
+					})
+			);
 
 			bodyEl.createEl("label", { text: t("PROMPT_FIELD_LABEL") });
 			bodyEl.createEl("p", {

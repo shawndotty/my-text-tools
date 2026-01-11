@@ -40,18 +40,22 @@ export class AIGenerateScriptModal extends Modal {
 			});
 
 		// Requirement Input
-		new Setting(contentEl)
-			.setName(t("MODAL_GENERATE_REQ_LABEL"))
-			.addTextArea((text) => {
-				text.setPlaceholder(
-					t("MODAL_GENERATE_REQ_PLACEHOLDER")
-				).setValue(this.requirement);
-				text.inputEl.rows = 5;
-				text.inputEl.style.width = "100%";
-				text.onChange((value) => {
-					this.requirement = value;
-				});
-			});
+		const reqContainer = contentEl.createDiv({ cls: "mtt-setting-row" });
+		reqContainer.createEl("label", {
+			text: t("MODAL_GENERATE_REQ_LABEL"),
+			cls: "mtt-panel-title",
+		});
+
+		const textArea = reqContainer.createEl("textarea", {
+			cls: "mtt-textarea-small",
+		});
+		textArea.placeholder = t("MODAL_GENERATE_REQ_PLACEHOLDER");
+		textArea.value = this.requirement;
+		textArea.rows = 5;
+		textArea.style.width = "100%";
+		textArea.oninput = (e) => {
+			this.requirement = (e.target as HTMLTextAreaElement).value;
+		};
 
 		// Generate Button
 		new Setting(contentEl).addButton((btn) => {

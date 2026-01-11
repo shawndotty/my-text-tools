@@ -331,6 +331,13 @@ export default {
 	NOTICE_SCRIPT_ERROR: "腳本執行失敗: {0}",
 	NOTICE_SCRIPT_NOT_FOUND: "找不到該腳本！",
 	BTN_GENERATE_SCRIPT_AI: "使用 AI 生成腳本",
+	MODAL_GENERATE_PROMPT_TITLE: "使用 AI 生成自定義提示詞",
+	MODAL_GENERATE_PROMPT_REQ_DESC:
+		"描述您希望 AI 做什麼（例如：“將文本總結為 3 個要點”，“翻譯成正式的法語”）。",
+	MODAL_GENERATE_PROMPT_REQ_PLACEHOLDER:
+		"例如：“從文本中提取所有日期和時間，並按時間順序排列。”",
+	BTN_GENERATE_PROMPT_AI: "AI 生成提示詞",
+	TOOLTIP_GENERATE_PROMPT_AI: "根據您的需求生成系統提示詞和用戶提示詞",
 	MODAL_GENERATE_SCRIPT_TITLE: "生成自定義腳本",
 	MODAL_GENERATE_CONTEXT_LABEL: "上下文",
 	MODAL_GENERATE_CONTEXT_SELECTION: "選中文字",

@@ -351,7 +351,15 @@ export default {
 	NOTICE_SCRIPT_ERROR: "Script execution failed: {0}",
 	NOTICE_SCRIPT_NOT_FOUND: "Script not found!",
 	BTN_GENERATE_SCRIPT_AI: "Generate Script By Using AI",
-	MODAL_GENERATE_SCRIPT_TITLE: "Generate Custom Script",
+	MODAL_GENERATE_PROMPT_TITLE: "Generate Custom Prompt with AI",
+	MODAL_GENERATE_PROMPT_REQ_DESC:
+		"Describe what you want the AI to do (e.g., 'Summarize text into 3 bullet points', 'Translate to French with formal tone').",
+	MODAL_GENERATE_PROMPT_REQ_PLACEHOLDER:
+		"E.g., 'Extract all dates and times from the text and list them chronologically.'",
+	BTN_GENERATE_PROMPT_AI: "Generate with AI",
+	TOOLTIP_GENERATE_PROMPT_AI:
+		"Generate System & User prompts based on your requirement",
+	MODAL_GENERATE_SCRIPT_TITLE: "Generate Custom Script with AI",
 	MODAL_GENERATE_CONTEXT_LABEL: "Context",
 	MODAL_GENERATE_CONTEXT_SELECTION: "Selection",
 	MODAL_GENERATE_CONTEXT_WHOLE: "Whole Text",
