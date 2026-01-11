@@ -348,7 +348,9 @@ export class BatchManager {
 		new Notice(t("NOTICE_PROCESSING_FILES", [String(files.length)]));
 
 		let successCount = 0;
-		for (const file of files) {
+		const CONCURRENCY_LIMIT = 5;
+
+		await this.processInBatches(files, CONCURRENCY_LIMIT, async (file) => {
 			try {
 				const content = await this.plugin.app.vault.read(file);
 				let newContent = content;
@@ -368,7 +370,7 @@ export class BatchManager {
 			} catch (e) {
 				console.error(`Failed to process file ${file.path}`, e);
 			}
-		}
+		});
 
 		new Notice(
 			t("NOTICE_BATCH_APPLIED_FILES", [
@@ -377,6 +379,25 @@ export class BatchManager {
 			])
 		);
 	}
+
+	private async processInBatches<T>(
+		items: T[],
+		limit: number,
+		task: (item: T) => Promise<void>
+	) {
+		const active = new Set<Promise<void>>();
+		for (const item of items) {
+			const promise = task(item).then(() => {
+				active.delete(promise);
+			});
+			active.add(promise);
+			if (active.size >= limit) {
+				await Promise.race(active);
+			}
+		}
+		await Promise.all(active);
+	}
+
 
 	private getBatchCommandIds(batchId: string) {
 		return {
