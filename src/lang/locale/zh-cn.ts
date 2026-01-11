@@ -251,6 +251,8 @@ export default {
 	PROMPT_NAME_AND_ICON: "名称与图标",
 	PROMPT_NAME_PLACEHOLDER: "提示词名称",
 	ICON_PLACEHOLDER: "图标，如 sparkles",
+	MODAL_ICON_PICKER_TITLE: "选择图标",
+	MODAL_ICON_PICKER_SEARCH_PLACEHOLDER: "搜索图标...",
 	TOGGLE_SHOW_IN_LEFT: "显示在左侧工具栏",
 	TOOLTIP_DELETE_PROMPT: "删除提示词",
 

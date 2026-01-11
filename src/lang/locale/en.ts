@@ -258,6 +258,8 @@ export default {
 	PROMPT_NAME_AND_ICON: "Name & Icon",
 	PROMPT_NAME_PLACEHOLDER: "Prompt name",
 	ICON_PLACEHOLDER: "Icon, e.g. sparkles",
+	MODAL_ICON_PICKER_TITLE: "Select Icon",
+	MODAL_ICON_PICKER_SEARCH_PLACEHOLDER: "Search icons...",
 	TOGGLE_SHOW_IN_LEFT: "Show in left tools panel",
 	TOOLTIP_DELETE_PROMPT: "Delete prompt",
 	PROMPT_FIELD_LABEL: "Prompt",

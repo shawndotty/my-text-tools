@@ -13,6 +13,7 @@ import { AIGenerateScriptModal } from "./UI/modals/AIGenerateScriptModal";
 import { AIGeneratePromptModal } from "./UI/modals/AIGeneratePromptModal";
 import { EditBatchModal } from "./UI/modals/EditBatchModal";
 import { ConfirmModal } from "./UI/modals/ConfirmModal";
+import { IconPickerModal } from "./UI/modals/IconPickerModal";
 import { AIService } from "./utils/aiService";
 
 export interface CustomAIAction {
@@ -318,9 +319,35 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 		});
 
 		BUILTIN_TOOLS.forEach((tool) => {
-			new Setting(containerEl)
-				.setName(t(tool.nameKey as any))
+			const setting = new Setting(containerEl).setName(
+				t(tool.nameKey as any)
+			);
 
+			setting
+				.addExtraButton((btn) => {
+					const currentIcon =
+						this.plugin.settings.customIcons?.[tool.id] ||
+						tool.icon;
+					btn.setIcon(currentIcon)
+						.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+						.onClick(() => {
+							new IconPickerModal(this.app, async (newIcon) => {
+								if (!this.plugin.settings.customIcons) {
+									this.plugin.settings.customIcons = {};
+								}
+								this.plugin.settings.customIcons[tool.id] =
+									newIcon;
+								await this.plugin.saveSettings();
+								btn.setIcon(newIcon);
+								// Update text input value
+								const inputEl = setting.controlEl.querySelector(
+									"input[type='text']"
+								) as HTMLInputElement;
+								if (inputEl) inputEl.value = newIcon;
+								(this.plugin as any).refreshCustomRibbons?.();
+							}).open();
+						});
+				})
 				.addText((text) =>
 					text
 						.setPlaceholder(tool.icon)
@@ -333,7 +360,12 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 							}
 							this.plugin.settings.customIcons[tool.id] = value;
 							await this.plugin.saveSettings();
-							// 触发视图更新
+							// Update button icon if valid (basic check)
+							// We won't validate if it's a valid icon ID here, just try to set it
+							const btnEl = setting.controlEl.querySelector(
+								".clickable-icon"
+							) as HTMLElement;
+							if (btnEl && value) setIcon(btnEl, value);
 							(this.plugin as any).refreshCustomRibbons?.();
 						})
 				)
@@ -677,14 +709,36 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			};
 
 			bodyEl.createEl("label", { text: t("ICON_PLACEHOLDER") });
-			const iconInput = bodyEl.createEl("input", {
+			const iconContainer = bodyEl.createDiv();
+			iconContainer.style.display = "flex";
+			iconContainer.style.gap = "8px";
+			iconContainer.style.alignItems = "center";
+			iconContainer.style.marginBottom = "10px";
+
+			const iconInput = iconContainer.createEl("input", {
 				type: "text",
 				placeholder: t("ICON_PLACEHOLDER"),
 				value: card.icon || "sparkles",
 			});
-			iconInput.style.width = "100%";
+			iconInput.style.flex = "1";
+
+			const iconBtn = new ButtonComponent(iconContainer)
+				.setIcon(card.icon || "sparkles")
+				.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+				.onClick(() => {
+					new IconPickerModal(this.app, async (newIcon) => {
+						card.icon = newIcon;
+						iconInput.value = newIcon;
+						iconBtn.setIcon(newIcon);
+						await this.plugin.saveSettings();
+						(this.plugin as any).refreshCustomRibbons?.();
+					}).open();
+				});
+
 			iconInput.onchange = async (e) => {
-				card.icon = (e.target as HTMLInputElement).value || "sparkles";
+				const val = (e.target as HTMLInputElement).value || "sparkles";
+				card.icon = val;
+				iconBtn.setIcon(val);
 				await this.plugin.saveSettings();
 				(this.plugin as any).refreshCustomRibbons?.();
 			};
@@ -999,14 +1053,36 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			bodyEl.createEl("label", {
 				text: t("ICON_PLACEHOLDER"),
 			});
-			const iconInput = bodyEl.createEl("input", {
+			const iconContainer = bodyEl.createDiv();
+			iconContainer.style.display = "flex";
+			iconContainer.style.gap = "8px";
+			iconContainer.style.alignItems = "center";
+			iconContainer.style.marginBottom = "10px";
+
+			const iconInput = iconContainer.createEl("input", {
 				type: "text",
 				placeholder: t("ICON_PLACEHOLDER"),
 				value: script.icon || "scroll",
 			});
-			iconInput.style.width = "100%";
+			iconInput.style.flex = "1";
+
+			const iconBtn = new ButtonComponent(iconContainer)
+				.setIcon(script.icon || "scroll")
+				.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+				.onClick(() => {
+					new IconPickerModal(this.app, async (newIcon) => {
+						script.icon = newIcon;
+						iconInput.value = newIcon;
+						iconBtn.setIcon(newIcon);
+						await this.plugin.saveSettings();
+						(this.plugin as any).refreshCustomRibbons?.();
+					}).open();
+				});
+
 			iconInput.onchange = async (e) => {
-				script.icon = (e.target as HTMLInputElement).value || "scroll";
+				const val = (e.target as HTMLInputElement).value || "scroll";
+				script.icon = val;
+				iconBtn.setIcon(val);
 				await this.plugin.saveSettings();
 				(this.plugin as any).refreshCustomRibbons?.();
 			};
