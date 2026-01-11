@@ -86,6 +86,8 @@ export interface MyTextToolsSettings {
 	filterText: string;
 	filterMode: string;
 	isToolsPanelCollapsed?: boolean;
+	preserveFrontmatter: boolean;
+	preserveHeader: boolean;
 }
 
 export interface AIToolConfig {
@@ -119,6 +121,8 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	filterText: "",
 	filterMode: "containing",
 	isToolsPanelCollapsed: false,
+	preserveFrontmatter: true,
+	preserveHeader: false,
 };
 
 export class MyTextToolsSettingTab extends PluginSettingTab {

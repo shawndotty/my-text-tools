@@ -279,6 +279,7 @@ export class AIManager {
 			const selection = editor.getSelection();
 			const useSelection =
 				action.applyToSelection && selection && selection.length > 0;
+			
 			if (useSelection) {
 				if (!selection.trim()) {
 					new Notice(t("NOTICE_NO_TEXT"));
@@ -297,22 +298,24 @@ export class AIManager {
 				new Notice(t("NOTICE_AI_DONE"));
 				return;
 			}
+
 			const fullText = editor.getValue();
 			if (!fullText.trim()) {
 				new Notice(t("NOTICE_NO_TEXT"));
 				return;
 			}
-			let textToProcess = fullText;
-			const fmMatch = textToProcess.match(
-				/^---\n([\s\S]*?)\n---(?:\n|$)/
+
+			// Respect global settings for frontmatter and header preservation
+			const fm = this.extractFrontmatterForAI(
+				fullText,
+				this.plugin.settings.preserveFrontmatter
 			);
-			if (fmMatch) {
-				textToProcess = textToProcess.substring(fmMatch[0].length);
-			}
-			const lines = textToProcess.split("\n");
-			if (lines.length > 0) {
-				textToProcess = lines.slice(1).join("\n");
-			}
+			const header = this.extractHeaderForAI(
+				fm.body,
+				this.plugin.settings.preserveHeader
+			);
+			const textToProcess = header.body;
+
 			const result = await aiService.processText(
 				action.prompt || "",
 				textToProcess,
@@ -322,13 +325,15 @@ export class AIManager {
 				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
 				return;
 			}
+			
 			let finalContent = result.content;
-			if (fmMatch) {
-				finalContent = fmMatch[0] + finalContent;
+			if (this.plugin.settings.preserveHeader && header.header) {
+				finalContent = header.header + "\n" + finalContent;
 			}
-			if (lines.length > 0 && lines[0]?.trim()) {
-				finalContent = lines[0] + "\n" + finalContent;
+			if (this.plugin.settings.preserveFrontmatter && fm.frontmatter) {
+				finalContent = fm.frontmatter + finalContent;
 			}
+			
 			editor.setValue(finalContent);
 			new Notice(t("NOTICE_AI_DONE"));
 			return;
