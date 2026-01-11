@@ -457,7 +457,7 @@ export class MyTextToolsView extends ItemView {
 		if (
 			!(
 				this.activeTool === "on-select" &&
-				this.settingsState.onSelectEnabled
+				this.settingsState.onSelect.enabled
 			)
 		)
 			return null;
@@ -472,20 +472,20 @@ export class MyTextToolsView extends ItemView {
 			);
 		}
 
-		const s = this.settingsState;
+		const s = this.settingsState.onSelect;
 		let result = text;
 
 		try {
-			switch (s.onSelectAction) {
+			switch (s.action) {
 				case "wrap":
-					result = `${s.onSelectPrefix}${text}${s.onSelectSuffix}`;
+					result = `${s.prefix}${text}${s.suffix}`;
 					break;
 				case "regex":
-					const flags = s.onSelectCaseInsensitive ? "gi" : "g";
-					if (s.onSelectRegex) {
+					const flags = s.caseInsensitive ? "gi" : "g";
+					if (s.useRegex) {
 						try {
-							const re = new RegExp(s.onSelectFind, flags);
-							result = text.replace(re, s.onSelectReplace);
+							const re = new RegExp(s.find, flags);
+							result = text.replace(re, s.replace);
 						} catch (e) {
 							new Notice(t("NOTICE_REGEX_ERROR"));
 							return null;
@@ -494,15 +494,12 @@ export class MyTextToolsView extends ItemView {
 						// 普通查找替换 (转义正则字符)
 						const escapeRegExp = (str: string) =>
 							str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-						const re = new RegExp(
-							escapeRegExp(s.onSelectFind),
-							flags
-						);
-						result = text.replace(re, s.onSelectReplace);
+						const re = new RegExp(escapeRegExp(s.find), flags);
+						result = text.replace(re, s.replace);
 					}
 					break;
 				case "replace-all":
-					result = s.onSelectReplace;
+					result = s.replace;
 					break;
 				case "delete":
 					result = "";
