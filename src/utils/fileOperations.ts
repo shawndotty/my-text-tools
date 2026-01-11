@@ -1,38 +1,32 @@
-import { App, TFile, normalizePath, Notice } from "obsidian";
+import { App, TFile, normalizePath, Notice, debounce } from "obsidian";
 import { t } from "../lang/helpers";
 
 /**
  * 保存内容到原编辑器
  */
-export function saveToOriginal(
-	content: string,
-	originalEditor: any
-): boolean {
-	if (originalEditor) {
-		originalEditor.setValue(content);
-		new Notice(t("NOTICE_SAVE_SUCCESS"), 2000);
-		return true;
-	} else {
-		new Notice(t("NOTICE_SAVE_ERROR"), 2000);
-		return false;
-	}
-}
+export const saveToOriginal = debounce(
+	(content: string, originalEditor: any) => {
+		if (originalEditor) {
+			originalEditor.setValue(content);
+			new Notice(t("NOTICE_SAVE_SUCCESS"), 2000);
+		} else {
+			new Notice(t("NOTICE_SAVE_ERROR"), 2000);
+		}
+	},
+	500,
+	true
+);
 
 /**
  * 保存内容为新文件
  */
-export async function saveToNewFile(
-	app: App,
-	content: string
-): Promise<void> {
+export async function saveToNewFile(app: App, content: string): Promise<void> {
 	const activeFile = app.workspace.getActiveFile();
 
 	// 1. 确定基础路径和文件名
 	// 如果没有打开的笔记，则定位到根目录，文件名为 "未命名"
 	const folderPath = activeFile?.parent ? activeFile.parent.path : "/";
-	const baseName = activeFile
-		? activeFile.basename
-		: t("DEFAULT_FILENAME");
+	const baseName = activeFile ? activeFile.basename : t("DEFAULT_FILENAME");
 	const extension = activeFile ? activeFile.extension : "md";
 
 	let newFileName = "";
@@ -69,4 +63,3 @@ export async function saveToNewFile(
 		new Notice(t("NOTICE_COPY_ERROR"), 2000);
 	}
 }
-

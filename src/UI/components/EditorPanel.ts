@@ -290,9 +290,8 @@ export class EditorPanel {
 		footer.style.width = "100%";
 		footer.style.display = "flex";
 
-		if (!this.isSelectionMode) {
-			this.renderLeftBtnGroup(footer);
-		}
+		this.renderLeftBtnGroup(footer);
+
 		this.renderCenterBtnGroup(footer);
 
 		this.renderRightBtnGroup(footer);
