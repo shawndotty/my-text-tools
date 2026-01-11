@@ -12,72 +12,99 @@ export interface BatchProcess {
 	operations: BatchOperation[];
 }
 
-/**
- * 设置状态类型定义
- */
-export interface SettingsState {
-	savedBatches: BatchProcess[]; // 保存的批处理
+// --- Modular Settings Interfaces ---
+
+export interface RegexSettings {
 	findText: string;
 	replaceText: string;
-	regexCaseInsensitive: boolean; // 正则替换：是否区分大小写
-	regexMultiline: boolean; // 正则替换：是否多行模式
-	// Regex Extract settings
-	regexExtractRule: string;
-	regexExtractCase: boolean;
-	regexExtractSeparator: "newline" | "hyphen" | "space";
+	caseInsensitive: boolean;
+	multiline: boolean;
+}
+
+export interface RegexExtractSettings {
+	rule: string;
+	caseSensitive: boolean;
+	separator: "newline" | "hyphen" | "space";
+}
+
+export interface WrapSettings {
 	prefix: string;
 	suffix: string;
-	wrapExcludeEmptyLines: boolean; // Add Wrap: exclude empty lines
-	filterText: string; // 过滤关键字
-	filterMode: "containing" | "not-containing"; // containing 或 not-containing
-	filterCase: boolean; // 是否区分大小写
-	filterRegex: boolean; // 是否开启正则匹配
-	columnDelimiter: string; // 分隔符，默认是逗号
-	columnNumber: number; // 提取第几列
-	customDelimiter: string; // 自定义分隔符存储
-	swapCol1: number; // 第一列序号
-	swapCol2: number; // 第二列序号
-	columnDelimiterSC: string; // 复用之前的分隔符设置
-	customDelimiterSC: string;
-	minWordLength: number; // 忽略过短的词（比如只统计3个字母以上的词）
-	includeNumbers: boolean; // 是否包含纯数字
+	excludeEmptyLines: boolean;
+}
+
+export interface FilterSettings {
+	text: string;
+	mode: "containing" | "not-containing";
+	caseSensitive: boolean;
+	useRegex: boolean;
+}
+
+export interface ColumnSettings {
+	delimiter: string;
+	customDelimiter: string;
+	number: number;
+}
+
+export interface SwapSettings {
+	col1: number;
+	col2: number;
+	delimiter: string;
+	customDelimiter: string;
+}
+
+export interface WordFrequencySettings {
+	minWordLength: number;
+	includeNumbers: boolean;
 	sortOrder: "asc" | "desc";
-	startNumber: number; // 起始数字
-	stepNumber: number; // 增量步长
-	listSeparator: string; // 数字后的分隔符
-	listPrefix: string; // 数字前的字符（可选）
-	extractStart: string; // 开始标记
-	extractEnd: string; // 结束标记
-	extractRegex: boolean; // 是否启用正则
-	extractJoin: string; // 提取结果的分隔符
-	wsCompress: boolean; // 压缩连续空格为一个
-	wsTrim: boolean; // 删除每行首尾空格
-	wsAll: boolean; // 删除所有空格
-	wsTabs: boolean; // 删除所有制表符
-	lbTrigger: string; // 触发内容（字符或正则）
-	lbAction:
+}
+
+export interface NumberListSettings {
+	startNumber: number;
+	stepNumber: number;
+	separator: string;
+	prefix: string;
+}
+
+export interface ExtractBetweenSettings {
+	start: string;
+	end: string;
+	useRegex: boolean;
+	joinSeparator: string;
+}
+
+export interface WhitespaceSettings {
+	compress: boolean;
+	trim: boolean;
+	removeAll: boolean;
+	removeTabs: boolean;
+}
+
+export interface LineBreakSettings {
+	trigger: string;
+	action:
 		| "add-after"
 		| "add-before"
 		| "remove-after"
 		| "remove-before"
 		| "remove-all";
-	lbRegex: boolean; // 是否启用正则
-	lbStyle: "auto" | "LF" | "CRLF";
-	lbMergeEmpty: boolean;
-	preserveFrontmatter: boolean; // 默认开启保护
-	preserveHeader: boolean; // 默认不开启，用户按需勾选
-	dedupeIncludeEmpty: boolean; // 默认不包含空行，即：空行不参与去重，原样保留
-	emptyLineMode: "all" | "merge"; // "all" 为删除所有空行，"merge" 为合并相邻空行为一个
-	clearBold: boolean; // 清理加粗 ** 或 __
-	clearItalic: boolean; // 清理斜体 * 或 _
-	clearHighlight: boolean; // 清理高亮 ==
-	clearStrikethrough: boolean; // 清理删除线 ~~
-	clearCode: boolean; // 清理行内代码 `
-	clearLinks: boolean; // 清理链接 [text](url) -> text
+	useRegex: boolean;
+	style: "auto" | "LF" | "CRLF";
+	mergeEmpty: boolean;
+}
 
-	// On-select tool settings
-	onSelectEnabled: boolean;
-	onSelectAction:
+export interface ClearFormatSettings {
+	bold: boolean;
+	italic: boolean;
+	highlight: boolean;
+	strikethrough: boolean;
+	code: boolean;
+	links: boolean;
+}
+
+export interface OnSelectSettings {
+	enabled: boolean;
+	action:
 		| "wrap"
 		| "regex"
 		| "replace-all"
@@ -85,12 +112,40 @@ export interface SettingsState {
 		| "html-entity"
 		| "lowercase"
 		| "uppercase";
-	onSelectFind: string;
-	onSelectReplace: string;
-	onSelectPrefix: string;
-	onSelectSuffix: string;
-	onSelectCaseInsensitive: boolean;
-	onSelectRegex: boolean;
+	find: string;
+	replace: string;
+	prefix: string;
+	suffix: string;
+	caseInsensitive: boolean;
+	useRegex: boolean;
+}
+
+/**
+ * 设置状态类型定义
+ */
+export interface SettingsState {
+	savedBatches: BatchProcess[]; // 保存的批处理
+
+	// Modularized Settings
+	regex: RegexSettings;
+	regexExtract: RegexExtractSettings;
+	wrap: WrapSettings;
+	filter: FilterSettings;
+	column: ColumnSettings;
+	swap: SwapSettings;
+	frequency: WordFrequencySettings;
+	numberList: NumberListSettings;
+	extractBetween: ExtractBetweenSettings;
+	whitespace: WhitespaceSettings;
+	lineBreak: LineBreakSettings;
+	clearFormat: ClearFormatSettings;
+	onSelect: OnSelectSettings;
+
+	// Common / Global
+	preserveFrontmatter: boolean;
+	preserveHeader: boolean;
+	dedupeIncludeEmpty: boolean; // 默认不包含空行
+	emptyLineMode: "all" | "merge"; // "all" | "merge"
 
 	// Combination Generator settings
 	combinationInputs: string[];
@@ -106,72 +161,243 @@ export interface SettingsState {
  */
 export const DEFAULT_SETTINGS_STATE: SettingsState = {
 	savedBatches: [],
-	findText: "",
-	replaceText: "",
-	regexCaseInsensitive: false,
-	regexMultiline: false,
-	regexExtractRule: "",
-	regexExtractCase: false,
-	regexExtractSeparator: "newline",
-	prefix: "",
-	suffix: "",
-	wrapExcludeEmptyLines: false,
-	filterText: "",
-	filterMode: "containing",
-	filterCase: false,
-	filterRegex: false,
-	columnDelimiter: ",",
-	columnNumber: 1,
-	customDelimiter: "",
-	swapCol1: 1,
-	swapCol2: 2,
-	columnDelimiterSC: ",",
-	customDelimiterSC: "",
-	minWordLength: 1,
-	includeNumbers: false,
-	sortOrder: "desc",
-	startNumber: 1,
-	stepNumber: 1,
-	listSeparator: ". ",
-	listPrefix: "",
-	extractStart: "",
-	extractEnd: "",
-	extractRegex: false,
-	extractJoin: "\n",
-	wsCompress: true,
-	wsTrim: true,
-	wsAll: false,
-	wsTabs: false,
-	lbTrigger: "",
-	lbAction: "add-after",
-	lbRegex: false,
-	lbStyle: "auto",
-	lbMergeEmpty: false,
+
+	regex: {
+		findText: "",
+		replaceText: "",
+		caseInsensitive: false,
+		multiline: false,
+	},
+	regexExtract: {
+		rule: "",
+		caseSensitive: false,
+		separator: "newline",
+	},
+	wrap: {
+		prefix: "",
+		suffix: "",
+		excludeEmptyLines: false,
+	},
+	filter: {
+		text: "",
+		mode: "containing",
+		caseSensitive: false,
+		useRegex: false,
+	},
+	column: {
+		delimiter: ",",
+		customDelimiter: "",
+		number: 1,
+	},
+	swap: {
+		col1: 1,
+		col2: 2,
+		delimiter: ",",
+		customDelimiter: "",
+	},
+	frequency: {
+		minWordLength: 1,
+		includeNumbers: false,
+		sortOrder: "desc",
+	},
+	numberList: {
+		startNumber: 1,
+		stepNumber: 1,
+		separator: ". ",
+		prefix: "",
+	},
+	extractBetween: {
+		start: "",
+		end: "",
+		useRegex: false,
+		joinSeparator: "\n",
+	},
+	whitespace: {
+		compress: true,
+		trim: true,
+		removeAll: false,
+		removeTabs: false,
+	},
+	lineBreak: {
+		trigger: "",
+		action: "add-after",
+		useRegex: false,
+		style: "auto",
+		mergeEmpty: false,
+	},
+	clearFormat: {
+		bold: true,
+		italic: true,
+		highlight: true,
+		strikethrough: true,
+		code: false,
+		links: false,
+	},
+	onSelect: {
+		enabled: false,
+		action: "wrap",
+		find: "",
+		replace: "",
+		prefix: "",
+		suffix: "",
+		caseInsensitive: false,
+		useRegex: false,
+	},
+
+	// Common
 	preserveFrontmatter: true,
 	preserveHeader: false,
 	dedupeIncludeEmpty: false,
 	emptyLineMode: "all",
-	clearBold: true,
-	clearItalic: true,
-	clearHighlight: true,
-	clearStrikethrough: true,
-	clearCode: false,
-	clearLinks: false,
 
-	// On-select defaults
-	onSelectEnabled: false,
-	onSelectAction: "wrap",
-	onSelectFind: "",
-	onSelectReplace: "",
-	onSelectPrefix: "",
-	onSelectSuffix: "",
-	onSelectCaseInsensitive: false,
-	onSelectRegex: false,
-
-	// Combination Generator defaults
+	// Misc
 	combinationInputs: ["", ""],
 	customIcons: {},
 };
+
+/**
+ * Helper to migrate flat settings to nested settings
+ */
+export function migrateToNestedSettings(flat: any): SettingsState {
+	// If it already looks nested (has 'regex' property), return as is (shallow check)
+	if (flat.regex && flat.whitespace) {
+		return flat as SettingsState;
+	}
+
+	const s = { ...DEFAULT_SETTINGS_STATE };
+	// Safely copy properties from flat object if they exist
+	if (flat.savedBatches) s.savedBatches = flat.savedBatches;
+
+	// Regex
+	if (flat.findText !== undefined) s.regex.findText = flat.findText;
+	if (flat.replaceText !== undefined) s.regex.replaceText = flat.replaceText;
+	if (flat.regexCaseInsensitive !== undefined)
+		s.regex.caseInsensitive = flat.regexCaseInsensitive;
+	if (flat.regexMultiline !== undefined)
+		s.regex.multiline = flat.regexMultiline;
+
+	// Regex Extract
+	if (flat.regexExtractRule !== undefined)
+		s.regexExtract.rule = flat.regexExtractRule;
+	if (flat.regexExtractCase !== undefined)
+		s.regexExtract.caseSensitive = flat.regexExtractCase;
+	if (flat.regexExtractSeparator !== undefined)
+		s.regexExtract.separator = flat.regexExtractSeparator;
+
+	// Wrap
+	if (flat.prefix !== undefined) s.wrap.prefix = flat.prefix;
+	if (flat.suffix !== undefined) s.wrap.suffix = flat.suffix;
+	if (flat.wrapExcludeEmptyLines !== undefined)
+		s.wrap.excludeEmptyLines = flat.wrapExcludeEmptyLines;
+
+	// Filter
+	if (flat.filterText !== undefined) s.filter.text = flat.filterText;
+	if (flat.filterMode !== undefined) s.filter.mode = flat.filterMode;
+	if (flat.filterCase !== undefined)
+		s.filter.caseSensitive = flat.filterCase;
+	if (flat.filterRegex !== undefined) s.filter.useRegex = flat.filterRegex;
+
+	// Column
+	if (flat.columnDelimiter !== undefined)
+		s.column.delimiter = flat.columnDelimiter;
+	if (flat.customDelimiter !== undefined)
+		s.column.customDelimiter = flat.customDelimiter;
+	if (flat.columnNumber !== undefined) s.column.number = flat.columnNumber;
+
+	// Swap
+	if (flat.swapCol1 !== undefined) s.swap.col1 = flat.swapCol1;
+	if (flat.swapCol2 !== undefined) s.swap.col2 = flat.swapCol2;
+	if (flat.columnDelimiterSC !== undefined)
+		s.swap.delimiter = flat.columnDelimiterSC;
+	if (flat.customDelimiterSC !== undefined)
+		s.swap.customDelimiter = flat.customDelimiterSC;
+
+	// Frequency
+	if (flat.minWordLength !== undefined)
+		s.frequency.minWordLength = flat.minWordLength;
+	if (flat.includeNumbers !== undefined)
+		s.frequency.includeNumbers = flat.includeNumbers;
+	if (flat.sortOrder !== undefined) s.frequency.sortOrder = flat.sortOrder;
+
+	// Number List
+	if (flat.startNumber !== undefined)
+		s.numberList.startNumber = flat.startNumber;
+	if (flat.stepNumber !== undefined)
+		s.numberList.stepNumber = flat.stepNumber;
+	if (flat.listSeparator !== undefined)
+		s.numberList.separator = flat.listSeparator;
+	if (flat.listPrefix !== undefined) s.numberList.prefix = flat.listPrefix;
+
+	// Extract Between
+	if (flat.extractStart !== undefined)
+		s.extractBetween.start = flat.extractStart;
+	if (flat.extractEnd !== undefined) s.extractBetween.end = flat.extractEnd;
+	if (flat.extractRegex !== undefined)
+		s.extractBetween.useRegex = flat.extractRegex;
+	if (flat.extractJoin !== undefined)
+		s.extractBetween.joinSeparator = flat.extractJoin;
+
+	// Whitespace
+	if (flat.wsCompress !== undefined) s.whitespace.compress = flat.wsCompress;
+	if (flat.wsTrim !== undefined) s.whitespace.trim = flat.wsTrim;
+	if (flat.wsAll !== undefined) s.whitespace.removeAll = flat.wsAll;
+	if (flat.wsTabs !== undefined) s.whitespace.removeTabs = flat.wsTabs;
+
+	// Line Break
+	if (flat.lbTrigger !== undefined) s.lineBreak.trigger = flat.lbTrigger;
+	if (flat.lbAction !== undefined) s.lineBreak.action = flat.lbAction;
+	if (flat.lbRegex !== undefined) s.lineBreak.useRegex = flat.lbRegex;
+	if (flat.lbStyle !== undefined) s.lineBreak.style = flat.lbStyle;
+	if (flat.lbMergeEmpty !== undefined)
+		s.lineBreak.mergeEmpty = flat.lbMergeEmpty;
+
+	// Clear Format
+	if (flat.clearBold !== undefined) s.clearFormat.bold = flat.clearBold;
+	if (flat.clearItalic !== undefined)
+		s.clearFormat.italic = flat.clearItalic;
+	if (flat.clearHighlight !== undefined)
+		s.clearFormat.highlight = flat.clearHighlight;
+	if (flat.clearStrikethrough !== undefined)
+		s.clearFormat.strikethrough = flat.clearStrikethrough;
+	if (flat.clearCode !== undefined) s.clearFormat.code = flat.clearCode;
+	if (flat.clearLinks !== undefined) s.clearFormat.links = flat.clearLinks;
+
+	// On Select
+	if (flat.onSelectEnabled !== undefined)
+		s.onSelect.enabled = flat.onSelectEnabled;
+	if (flat.onSelectAction !== undefined)
+		s.onSelect.action = flat.onSelectAction;
+	if (flat.onSelectFind !== undefined) s.onSelect.find = flat.onSelectFind;
+	if (flat.onSelectReplace !== undefined)
+		s.onSelect.replace = flat.onSelectReplace;
+	if (flat.onSelectPrefix !== undefined)
+		s.onSelect.prefix = flat.onSelectPrefix;
+	if (flat.onSelectSuffix !== undefined)
+		s.onSelect.suffix = flat.onSelectSuffix;
+	if (flat.onSelectCaseInsensitive !== undefined)
+		s.onSelect.caseInsensitive = flat.onSelectCaseInsensitive;
+	if (flat.onSelectRegex !== undefined)
+		s.onSelect.useRegex = flat.onSelectRegex;
+
+	// Global
+	if (flat.preserveFrontmatter !== undefined)
+		s.preserveFrontmatter = flat.preserveFrontmatter;
+	if (flat.preserveHeader !== undefined)
+		s.preserveHeader = flat.preserveHeader;
+	if (flat.dedupeIncludeEmpty !== undefined)
+		s.dedupeIncludeEmpty = flat.dedupeIncludeEmpty;
+	if (flat.emptyLineMode !== undefined)
+		s.emptyLineMode = flat.emptyLineMode;
+	if (flat.combinationInputs !== undefined)
+		s.combinationInputs = flat.combinationInputs;
+	if (flat.customIcons !== undefined) s.customIcons = flat.customIcons;
+	if (flat.customAiPrompt !== undefined)
+		s.customAiPrompt = flat.customAiPrompt;
+	if (flat.customAiSystemPrompt !== undefined)
+		s.customAiSystemPrompt = flat.customAiSystemPrompt;
+
+	return s;
+}
 
 /**
  * 工具类型

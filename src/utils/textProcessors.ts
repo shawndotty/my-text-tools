@@ -63,28 +63,28 @@ export class TextProcessor {
 			case "regex":
 				processedBody = this.processRegex(
 					textToProcess,
-					settings.findText,
-					settings.replaceText,
-					settings.regexCaseInsensitive,
-					settings.regexMultiline,
+					settings.regex.findText,
+					settings.regex.replaceText,
+					settings.regex.caseInsensitive,
+					settings.regex.multiline,
 					hideNotice
 				);
 				break;
 			case "regex-extract":
 				processedBody = this.processRegexExtract(
 					textToProcess,
-					settings.regexExtractRule,
-					settings.regexExtractCase,
-					settings.regexExtractSeparator,
+					settings.regexExtract.rule,
+					settings.regexExtract.caseSensitive,
+					settings.regexExtract.separator,
 					hideNotice
 				);
 				break;
 			case "add-wrap":
 				processedBody = this.processAddWrap(
 					lines,
-					settings.prefix,
-					settings.suffix,
-					settings.wrapExcludeEmptyLines
+					settings.wrap.prefix,
+					settings.wrap.suffix,
+					settings.wrap.excludeEmptyLines
 				);
 				if (!hideNotice) {
 					new Notice(t("NOTICE_WRAP_DONE"));
@@ -93,48 +93,48 @@ export class TextProcessor {
 			case "remove-string":
 				processedBody = this.processRemoveString(
 					lines,
-					settings.filterText,
-					settings.filterMode,
-					settings.filterCase,
-					settings.filterRegex,
+					settings.filter.text,
+					settings.filter.mode,
+					settings.filter.caseSensitive,
+					settings.filter.useRegex,
 					hideNotice
 				);
 				break;
 			case "extract-column":
 				processedBody = this.processExtractColumn(
 					lines,
-					settings.columnDelimiter,
-					settings.customDelimiter,
-					settings.columnNumber,
+					settings.column.delimiter,
+					settings.column.customDelimiter,
+					settings.column.number,
 					hideNotice
 				);
 				break;
 			case "swap-columns":
 				processedBody = this.processSwapColumns(
 					lines,
-					settings.columnDelimiterSC,
-					settings.customDelimiterSC,
-					settings.swapCol1,
-					settings.swapCol2,
+					settings.swap.delimiter,
+					settings.swap.customDelimiter,
+					settings.swap.col1,
+					settings.swap.col2,
 					hideNotice
 				);
 				break;
 			case "word-frequency":
 				processedBody = this.processWordFrequency(
 					textToProcess,
-					settings.minWordLength,
-					settings.includeNumbers,
-					settings.sortOrder,
+					settings.frequency.minWordLength,
+					settings.frequency.includeNumbers,
+					settings.frequency.sortOrder,
 					hideNotice
 				);
 				break;
 			case "number-list":
 				processedBody = this.processNumberList(
 					lines,
-					settings.startNumber,
-					settings.stepNumber,
-					settings.listSeparator,
-					settings.listPrefix
+					settings.numberList.startNumber,
+					settings.numberList.stepNumber,
+					settings.numberList.separator,
+					settings.numberList.prefix
 				);
 				if (!hideNotice) {
 					new Notice(t("NOTICE_NUMBER_DONE"));
@@ -143,19 +143,19 @@ export class TextProcessor {
 			case "extract-between":
 				processedBody = this.processExtractBetween(
 					textToProcess,
-					settings.extractStart,
-					settings.extractEnd,
-					settings.extractRegex,
+					settings.extractBetween.start,
+					settings.extractBetween.end,
+					settings.extractBetween.useRegex,
 					hideNotice
 				);
 				break;
 			case "remove-whitespace":
 				processedBody = this.processRemoveWhitespace(
 					textToProcess,
-					settings.wsCompress,
-					settings.wsTrim,
-					settings.wsAll,
-					settings.wsTabs
+					settings.whitespace.compress,
+					settings.whitespace.trim,
+					settings.whitespace.removeAll,
+					settings.whitespace.removeTabs
 				);
 				if (!hideNotice) {
 					new Notice(t("NOTICE_WS_DONE"));
@@ -164,23 +164,23 @@ export class TextProcessor {
 			case "line-break-tools":
 				processedBody = this.processLineBreakTools(
 					textToProcess,
-					settings.lbTrigger,
-					settings.lbAction,
-					settings.lbRegex,
-					settings.lbStyle,
-					settings.lbMergeEmpty,
+					settings.lineBreak.trigger,
+					settings.lineBreak.action,
+					settings.lineBreak.useRegex,
+					settings.lineBreak.style,
+					settings.lineBreak.mergeEmpty,
 					hideNotice
 				);
 				break;
 			case "clear-format":
 				processedBody = this.processClearFormat(
 					textToProcess,
-					settings.clearBold,
-					settings.clearItalic,
-					settings.clearHighlight,
-					settings.clearStrikethrough,
-					settings.clearCode,
-					settings.clearLinks
+					settings.clearFormat.bold,
+					settings.clearFormat.italic,
+					settings.clearFormat.highlight,
+					settings.clearFormat.strikethrough,
+					settings.clearFormat.code,
+					settings.clearFormat.links
 				);
 				if (!hideNotice) {
 					new Notice(t("NOTICE_CLEAR_FORMAT_DONE"));

@@ -13,6 +13,7 @@ import {
 	BatchProcess,
 	SettingsState,
 	ToolType,
+	migrateToNestedSettings,
 } from "../types";
 import { t } from "../lang/helpers";
 import { processText as processTextCore } from "../utils/textProcessors";
@@ -435,8 +436,9 @@ export class BatchManager {
 		text: string,
 		scope: "note" | "selection"
 	): Promise<string> {
+		const migratedSettings = migrateToNestedSettings(op.settingsSnapshot);
 		const settings = this.getEffectiveSettingsForScope(
-			op.settingsSnapshot,
+			migratedSettings,
 			scope
 		);
 
@@ -536,3 +538,4 @@ export class BatchManager {
 		new Notice(t("NOTICE_BATCH_APPLIED"));
 	}
 }
+

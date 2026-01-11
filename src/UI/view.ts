@@ -8,7 +8,12 @@ import {
 	debounce,
 } from "obsidian";
 import { t } from "../lang/helpers";
-import { SettingsState, DEFAULT_SETTINGS_STATE, ToolType } from "../types";
+import {
+	SettingsState,
+	DEFAULT_SETTINGS_STATE,
+	ToolType,
+	migrateToNestedSettings,
+} from "../types";
 import { HistoryManager } from "../utils/historyManager";
 import { processText } from "../utils/textProcessors";
 import { saveToOriginal, saveToNewFile } from "../utils/fileOperations";
@@ -368,7 +373,17 @@ export class MyTextToolsView extends ItemView {
 		const rightPanel = container.createDiv({ cls: "mtt-right-panel" });
 		const settingsCallbacks: SettingsPanelCallbacks = {
 			onSettingsChange: (key: string, value: any) => {
-				(this.settingsState as any)[key] = value;
+				const keys = key.split(".");
+				if (keys.length === 1) {
+					(this.settingsState as any)[key] = value;
+					return;
+				}
+				let current: any = this.settingsState;
+				for (let i = 0; i < keys.length - 1; i++) {
+					if (!current[keys[i]!]) current[keys[i]!] = {};
+					current = current[keys[i]!];
+				}
+				current[keys[keys.length - 1]!] = value;
 			},
 			onRun: async (toolId: string) => {
 				if (this.isRecording) {
@@ -557,8 +572,12 @@ export class MyTextToolsView extends ItemView {
 		for (const op of batch.operations) {
 			// Restore settings snapshot, but preserve savedBatches
 			const currentBatches = this.settingsState.savedBatches;
+			// Migrate potentially old settings
+			const migratedSnapshot = migrateToNestedSettings(
+				op.settingsSnapshot
+			);
 			this.settingsState = {
-				...op.settingsSnapshot,
+				...migratedSnapshot,
 				savedBatches: currentBatches,
 			};
 

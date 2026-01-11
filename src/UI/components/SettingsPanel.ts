@@ -368,11 +368,11 @@ function renderFilterSettings(
 	const filterInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_FILTER"),
-		value: settings.filterText,
+		value: settings.filter.text,
 	});
 	filterInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"filterText",
+			"filter.text",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -390,10 +390,10 @@ function renderFilterSettings(
 		text: t("OPTION_NOT_CONTAINING"),
 		value: "not-containing",
 	});
-	modeSelect.value = settings.filterMode;
+	modeSelect.value = settings.filter.mode;
 	modeSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"filterMode",
+			"filter.mode",
 			(e.target as HTMLSelectElement).value
 		);
 
@@ -402,10 +402,10 @@ function renderFilterSettings(
 		cls: "mtt-checkbox-label",
 	});
 	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
-	caseCheck.checked = settings.filterCase;
+	caseCheck.checked = settings.filter.caseSensitive;
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"filterCase",
+			"filter.caseSensitive",
 			(e.target as HTMLInputElement).checked
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
@@ -417,10 +417,10 @@ function renderFilterSettings(
 	const regexCheck = regexLabel.createEl("input", {
 		type: "checkbox",
 	});
-	regexCheck.checked = settings.filterRegex;
+	regexCheck.checked = settings.filter.useRegex;
 	regexCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"filterRegex",
+			"filter.useRegex",
 			(e.target as HTMLInputElement).checked
 		);
 	regexLabel.appendText(" " + t("CHECKBOX_REGEX"));
@@ -440,11 +440,11 @@ function renderRegexSettings(
 	parent.createEl("label", { text: t("SETTING_FIND") });
 	const findInput = parent.createEl("input", {
 		type: "text",
-		value: settings.findText,
+		value: settings.regex.findText,
 	});
 	findInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"findText",
+			"regex.findText",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -453,11 +453,11 @@ function renderRegexSettings(
 	});
 	const replaceInput = parent.createEl("input", {
 		type: "text",
-		value: settings.replaceText,
+		value: settings.regex.replaceText,
 	});
 	replaceInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"replaceText",
+			"regex.replaceText",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -468,10 +468,10 @@ function renderRegexSettings(
 		cls: "mtt-checkbox-label",
 	});
 	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
-	caseCheck.checked = settings.regexCaseInsensitive;
+	caseCheck.checked = settings.regex.caseInsensitive;
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"regexCaseInsensitive",
+			"regex.caseInsensitive",
 			(e.target as HTMLInputElement).checked
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
@@ -483,10 +483,10 @@ function renderRegexSettings(
 	const multilineCheck = multilineLabel.createEl("input", {
 		type: "checkbox",
 	});
-	multilineCheck.checked = settings.regexMultiline;
+	multilineCheck.checked = settings.regex.multiline;
 	multilineCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"regexMultiline",
+			"regex.multiline",
 			(e.target as HTMLInputElement).checked
 		);
 	multilineLabel.appendText(" " + t("CHECKBOX_MULTILINE"));
@@ -506,11 +506,11 @@ function renderRegexExtractSettings(
 	parent.createEl("label", { text: t("SETTING_REGEX_EXTRACT_RULE") });
 	const ruleInput = parent.createEl("input", {
 		type: "text",
-		value: settings.regexExtractRule,
+		value: settings.regexExtract.rule,
 	});
 	ruleInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"regexExtractRule",
+			"regexExtract.rule",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -519,10 +519,10 @@ function renderRegexExtractSettings(
 		cls: "mtt-checkbox-label",
 	});
 	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
-	caseCheck.checked = settings.regexExtractCase;
+	caseCheck.checked = settings.regexExtract.caseSensitive;
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"regexExtractCase",
+			"regexExtract.caseSensitive",
 			(e.target as HTMLInputElement).checked
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
@@ -541,10 +541,10 @@ function renderRegexExtractSettings(
 		text: t("OPTION_SPACE"),
 		value: "space",
 	});
-	sepSelect.value = settings.regexExtractSeparator;
+	sepSelect.value = settings.regexExtract.separator;
 	sepSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"regexExtractSeparator",
+			"regexExtract.separator",
 			(e.target as HTMLSelectElement).value
 		);
 
@@ -568,11 +568,11 @@ function renderWrapSettings(
 	const preInput = wrapContent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_PREFIX"),
-		value: settings.prefix,
+		value: settings.wrap.prefix,
 	});
 	preInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"prefix",
+			"wrap.prefix",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -580,11 +580,11 @@ function renderWrapSettings(
 	const sufInput = wrapContent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_SUFFIX"),
-		value: settings.suffix,
+		value: settings.wrap.suffix,
 	});
 	sufInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"suffix",
+			"wrap.suffix",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -594,10 +594,10 @@ function renderWrapSettings(
 	const excludeEmptyCheck = excludeEmptyLabel.createEl("input", {
 		type: "checkbox",
 	});
-	excludeEmptyCheck.checked = settings.wrapExcludeEmptyLines;
+	excludeEmptyCheck.checked = settings.wrap.excludeEmptyLines;
 	excludeEmptyCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"wrapExcludeEmptyLines",
+			"wrap.excludeEmptyLines",
 			(e.target as HTMLInputElement).checked
 		);
 	excludeEmptyLabel.appendText(t("CHECKBOX_WRAP_EXCLUDE_EMPTY"));
@@ -641,26 +641,26 @@ function renderExtractColumnSettings(
 		value: "custom",
 	});
 
-	delimSelect.value = settings.columnDelimiter;
+	delimSelect.value = settings.column.delimiter;
 
 	// 如果是自定义，显示输入框
 	const customInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_CUSTOM_DELIMITER"),
 		cls: "mtt-small-input",
-		value: settings.customDelimiter,
+		value: settings.column.customDelimiter,
 	});
 	customInput.style.display =
-		settings.columnDelimiter === "custom" ? "block" : "none";
+		settings.column.delimiter === "custom" ? "block" : "none";
 
 	delimSelect.onchange = (e) => {
 		const val = (e.target as HTMLSelectElement).value;
-		callbacks.onSettingsChange("columnDelimiter", val);
+		callbacks.onSettingsChange("column.delimiter", val);
 		customInput.style.display = val === "custom" ? "block" : "none";
 	};
 	customInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"customDelimiter",
+			"column.customDelimiter",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -670,11 +670,11 @@ function renderExtractColumnSettings(
 	const numInput = parent.createEl("input", {
 		type: "number",
 		attr: { min: 1 },
-		value: settings.columnNumber.toString(),
+		value: settings.column.number.toString(),
 	});
 	numInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"columnNumber",
+			"column.number",
 			parseInt((e.target as HTMLInputElement).value) || 1
 		);
 
@@ -717,26 +717,26 @@ function renderSwapColumnsSettings(
 		value: "custom",
 	});
 
-	delimSelect.value = settings.columnDelimiterSC;
+	delimSelect.value = settings.swap.delimiter;
 
 	// 如果是自定义，显示输入框
 	const customInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_CUSTOM_DELIMITER"),
 		cls: "mtt-small-input",
-		value: settings.customDelimiterSC,
+		value: settings.swap.customDelimiter,
 	});
 	customInput.style.display =
-		settings.columnDelimiterSC === "custom" ? "block" : "none";
+		settings.swap.delimiter === "custom" ? "block" : "none";
 
 	delimSelect.onchange = (e) => {
 		const val = (e.target as HTMLSelectElement).value;
-		callbacks.onSettingsChange("columnDelimiterSC", val);
+		callbacks.onSettingsChange("swap.delimiter", val);
 		customInput.style.display = val === "custom" ? "block" : "none";
 	};
 	customInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"customDelimiterSC",
+			"swap.customDelimiter",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -748,11 +748,11 @@ function renderSwapColumnsSettings(
 	const input1 = colInputGroup.createEl("input", {
 		type: "number",
 		cls: "mtt-number-input",
-		value: settings.swapCol1.toString(),
+		value: settings.swap.col1.toString(),
 	});
 	input1.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"swapCol1",
+			"swap.col1",
 			parseInt((e.target as HTMLInputElement).value) || 1
 		);
 
@@ -760,11 +760,11 @@ function renderSwapColumnsSettings(
 	const input2 = colInputGroup.createEl("input", {
 		type: "number",
 		cls: "mtt-number-input",
-		value: settings.swapCol2.toString(),
+		value: settings.swap.col2.toString(),
 	});
 	input2.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"swapCol2",
+			"swap.col2",
 			parseInt((e.target as HTMLInputElement).value) || 1
 		);
 
@@ -787,11 +787,11 @@ function renderWordFrequencySettings(
 	});
 	const minLenInput = parent.createEl("input", {
 		type: "number",
-		value: settings.minWordLength.toString(),
+		value: settings.frequency.minWordLength.toString(),
 	});
 	minLenInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"minWordLength",
+			"frequency.minWordLength",
 			parseInt((e.target as HTMLInputElement).value) || 1
 		);
 
@@ -799,10 +799,10 @@ function renderWordFrequencySettings(
 		cls: "mtt-checkbox-label",
 	});
 	const numCheck = numLabel.createEl("input", { type: "checkbox" });
-	numCheck.checked = settings.includeNumbers;
+	numCheck.checked = settings.frequency.includeNumbers;
 	numCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"includeNumbers",
+			"frequency.includeNumbers",
 			(e.target as HTMLInputElement).checked
 		);
 	numLabel.appendText(" " + t("CHECKBOX_INCLUDE_NUM"));
@@ -819,10 +819,10 @@ function renderWordFrequencySettings(
 		text: t("OPTION_ASC"),
 		value: "asc",
 	});
-	sortSelect.value = settings.sortOrder;
+	sortSelect.value = settings.frequency.sortOrder;
 	sortSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"sortOrder",
+			"frequency.sortOrder",
 			(e.target as HTMLSelectElement).value
 		);
 
@@ -841,22 +841,22 @@ function renderNumberListSettings(
 	parent.createEl("label", { text: t("SETTING_START_NUM") });
 	const startInput = parent.createEl("input", {
 		type: "number",
-		value: settings.startNumber.toString(),
+		value: settings.numberList.startNumber.toString(),
 	});
 	startInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"startNumber",
+			"numberList.startNumber",
 			parseInt((e.target as HTMLInputElement).value) || 1
 		);
 
 	parent.createEl("label", { text: t("SETTING_STEP_NUM") });
 	const stepInput = parent.createEl("input", {
 		type: "number",
-		value: settings.stepNumber.toString(),
+		value: settings.numberList.stepNumber.toString(),
 	});
 	stepInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"stepNumber",
+			"numberList.stepNumber",
 			parseInt((e.target as HTMLInputElement).value) || 1
 		);
 
@@ -866,11 +866,11 @@ function renderNumberListSettings(
 	const preInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_LIST_PREFIX"),
-		value: settings.listPrefix,
+		value: settings.numberList.prefix,
 	});
 	preInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"listPrefix",
+			"numberList.prefix",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -880,11 +880,11 @@ function renderNumberListSettings(
 	const sepInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_LIST_SUFFIX"),
-		value: settings.listSeparator,
+		value: settings.numberList.separator,
 	});
 	sepInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"listSeparator",
+			"numberList.separator",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -906,11 +906,11 @@ function renderExtractBetweenSettings(
 	const startInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_EXTRACT_START"),
-		value: settings.extractStart,
+		value: settings.extractBetween.start,
 	});
 	startInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"extractStart",
+			"extractBetween.start",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -920,11 +920,11 @@ function renderExtractBetweenSettings(
 	const endInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_EXTRACT_END"),
-		value: settings.extractEnd,
+		value: settings.extractBetween.end,
 	});
 	endInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"extractEnd",
+			"extractBetween.end",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -934,10 +934,10 @@ function renderExtractBetweenSettings(
 	const regexCheck = regexLabel.createEl("input", {
 		type: "checkbox",
 	});
-	regexCheck.checked = settings.extractRegex;
+	regexCheck.checked = settings.extractBetween.useRegex;
 	regexCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"extractRegex",
+			"extractBetween.useRegex",
 			(e.target as HTMLInputElement).checked
 		);
 	regexLabel.appendText(" " + t("CHECKBOX_EXTRACT_REGEX"));
@@ -958,12 +958,12 @@ function renderWhitespaceSettings(
 		cls: "mtt-settings-content",
 	});
 
-	const createCheck = (label: string, key: string) => {
+	const createCheck = (label: string, key: string, val: boolean) => {
 		const lbl = wsContent.createEl("label", {
 			cls: "mtt-checkbox-label",
 		});
 		const chk = lbl.createEl("input", { type: "checkbox" });
-		chk.checked = (settings as any)[key];
+		chk.checked = val;
 		chk.onchange = (e) =>
 			callbacks.onSettingsChange(
 				key,
@@ -972,10 +972,26 @@ function renderWhitespaceSettings(
 		lbl.appendText(` ${label}`);
 	};
 
-	createCheck(t("CHECKBOX_WS_COMPRESS"), "wsCompress");
-	createCheck(t("CHECKBOX_WS_TRIM"), "wsTrim");
-	createCheck(t("CHECKBOX_WS_ALL"), "wsAll");
-	createCheck(t("CHECKBOX_WS_TABS"), "wsTabs");
+	createCheck(
+		t("CHECKBOX_WS_COMPRESS"),
+		"whitespace.compress",
+		settings.whitespace.compress
+	);
+	createCheck(
+		t("CHECKBOX_WS_TRIM"),
+		"whitespace.trim",
+		settings.whitespace.trim
+	);
+	createCheck(
+		t("CHECKBOX_WS_ALL"),
+		"whitespace.removeAll",
+		settings.whitespace.removeAll
+	);
+	createCheck(
+		t("CHECKBOX_WS_TABS"),
+		"whitespace.removeTabs",
+		settings.whitespace.removeTabs
+	);
 
 	const runBtn = parent.createEl("button", {
 		text: t("BTN_RUN_CLEAN"),
@@ -995,11 +1011,11 @@ function renderLineBreakSettings(
 	const triggerInput = parent.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_LB_TRIGGER"),
-		value: settings.lbTrigger,
+		value: settings.lineBreak.trigger,
 	});
 	triggerInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"lbTrigger",
+			"lineBreak.trigger",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -1009,10 +1025,10 @@ function renderLineBreakSettings(
 	const regexCheck = regexLabel.createEl("input", {
 		type: "checkbox",
 	});
-	regexCheck.checked = settings.lbRegex;
+	regexCheck.checked = settings.lineBreak.useRegex;
 	regexCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"lbRegex",
+			"lineBreak.useRegex",
 			(e.target as HTMLInputElement).checked
 		);
 	regexLabel.appendText(" " + t("CHECKBOX_LB_REGEX"));
@@ -1044,10 +1060,10 @@ function renderLineBreakSettings(
 		value: "remove-all",
 	});
 
-	actionSelect.value = settings.lbAction;
+	actionSelect.value = settings.lineBreak.action;
 	actionSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"lbAction",
+			"lineBreak.action",
 			(e.target as HTMLSelectElement).value
 		);
 
@@ -1069,10 +1085,10 @@ function renderLineBreakSettings(
 		text: t("OPTION_LB_CRLF"),
 		value: "CRLF",
 	});
-	styleSelect.value = settings.lbStyle;
+	styleSelect.value = settings.lineBreak.style;
 	styleSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"lbStyle",
+			"lineBreak.style",
 			(e.target as HTMLSelectElement).value
 		);
 
@@ -1080,10 +1096,10 @@ function renderLineBreakSettings(
 		cls: "mtt-checkbox-label",
 	});
 	const mergeCheck = mergeLabel.createEl("input", { type: "checkbox" });
-	mergeCheck.checked = settings.lbMergeEmpty;
+	mergeCheck.checked = settings.lineBreak.mergeEmpty;
 	mergeCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"lbMergeEmpty",
+			"lineBreak.mergeEmpty",
 			(e.target as HTMLInputElement).checked
 		);
 	mergeLabel.appendText(" " + t("CHECKBOX_LB_MERGE_EMPTY"));
@@ -1169,12 +1185,12 @@ function renderClearFormatSettings(
 		cls: "mtt-settings-content",
 	});
 
-	const createCheck = (label: string, key: string) => {
+	const createCheck = (label: string, key: string, val: boolean) => {
 		const lbl = content.createEl("label", {
 			cls: "mtt-checkbox-label",
 		});
 		const chk = lbl.createEl("input", { type: "checkbox" });
-		chk.checked = (settings as any)[key];
+		chk.checked = val;
 		chk.onchange = (e) =>
 			callbacks.onSettingsChange(
 				key,
@@ -1183,12 +1199,36 @@ function renderClearFormatSettings(
 		lbl.appendText(` ${label}`);
 	};
 
-	createCheck(t("SETTING_CLEAR_FORMAT_BOLD"), "clearBold");
-	createCheck(t("SETTING_CLEAR_FORMAT_ITALIC"), "clearItalic");
-	createCheck(t("SETTING_CLEAR_FORMAT_HIGHLIGHT"), "clearHighlight");
-	createCheck(t("SETTING_CLEAR_FORMAT_STRIKE"), "clearStrikethrough");
-	createCheck(t("SETTING_CLEAR_FORMAT_CODE"), "clearCode");
-	createCheck(t("SETTING_CLEAR_FORMAT_LINKS"), "clearLinks");
+	createCheck(
+		t("SETTING_CLEAR_FORMAT_BOLD"),
+		"clearFormat.bold",
+		settings.clearFormat.bold
+	);
+	createCheck(
+		t("SETTING_CLEAR_FORMAT_ITALIC"),
+		"clearFormat.italic",
+		settings.clearFormat.italic
+	);
+	createCheck(
+		t("SETTING_CLEAR_FORMAT_HIGHLIGHT"),
+		"clearFormat.highlight",
+		settings.clearFormat.highlight
+	);
+	createCheck(
+		t("SETTING_CLEAR_FORMAT_STRIKE"),
+		"clearFormat.strikethrough",
+		settings.clearFormat.strikethrough
+	);
+	createCheck(
+		t("SETTING_CLEAR_FORMAT_CODE"),
+		"clearFormat.code",
+		settings.clearFormat.code
+	);
+	createCheck(
+		t("SETTING_CLEAR_FORMAT_LINKS"),
+		"clearFormat.links",
+		settings.clearFormat.links
+	);
 
 	const runBtn = content.createEl("button", {
 		text: t("BTN_RUN_CLEAR_FORMAT"),
@@ -1432,10 +1472,10 @@ function renderOnSelectSettings(
 		cls: "mtt-checkbox-label mtt-highlight-label",
 	});
 	const enableCheck = enableLabel.createEl("input", { type: "checkbox" });
-	enableCheck.checked = settings.onSelectEnabled;
+	enableCheck.checked = settings.onSelect.enabled;
 	enableCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectEnabled",
+			"onSelect.enabled",
 			(e.target as HTMLInputElement).checked
 		);
 	enableLabel.appendText(" " + t("SETTING_ON_SELECT_ENABLE"));
@@ -1465,10 +1505,10 @@ function renderOnSelectSettings(
 			text: act.label,
 		});
 	});
-	actionSelect.value = settings.onSelectAction;
+	actionSelect.value = settings.onSelect.action;
 	actionSelect.onchange = (e) => {
 		callbacks.onSettingsChange(
-			"onSelectAction",
+			"onSelect.action",
 			(e.target as HTMLSelectElement).value
 		);
 		// Force re-render to show/hide relevant inputs?
@@ -1485,11 +1525,11 @@ function renderOnSelectSettings(
 	const preInput = wrapDiv.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_PREFIX"),
-		value: settings.onSelectPrefix,
+		value: settings.onSelect.prefix,
 	});
 	preInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectPrefix",
+			"onSelect.prefix",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -1497,11 +1537,11 @@ function renderOnSelectSettings(
 	const sufInput = wrapDiv.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_SUFFIX"),
-		value: settings.onSelectSuffix,
+		value: settings.onSelect.suffix,
 	});
 	sufInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectSuffix",
+			"onSelect.suffix",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -1510,22 +1550,22 @@ function renderOnSelectSettings(
 	regexDiv.createEl("label", { text: t("SETTING_FIND") });
 	const findInput = regexDiv.createEl("input", {
 		type: "text",
-		value: settings.onSelectFind,
+		value: settings.onSelect.find,
 	});
 	findInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectFind",
+			"onSelect.find",
 			(e.target as HTMLInputElement).value
 		);
 
 	regexDiv.createEl("label", { text: t("SETTING_REPLACE") });
 	const replaceInput = regexDiv.createEl("input", {
 		type: "text",
-		value: settings.onSelectReplace,
+		value: settings.onSelect.replace,
 	});
 	replaceInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectReplace",
+			"onSelect.replace",
 			(e.target as HTMLInputElement).value
 		);
 
@@ -1535,10 +1575,10 @@ function renderOnSelectSettings(
 		cls: "mtt-checkbox-label",
 	});
 	const caseCheck = caseLabel.createEl("input", { type: "checkbox" });
-	caseCheck.checked = settings.onSelectCaseInsensitive;
+	caseCheck.checked = settings.onSelect.caseInsensitive;
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectCaseInsensitive",
+			"onSelect.caseInsensitive",
 			(e.target as HTMLInputElement).checked
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
@@ -1547,10 +1587,10 @@ function renderOnSelectSettings(
 		cls: "mtt-checkbox-label",
 	});
 	const regCheck = regLabel.createEl("input", { type: "checkbox" });
-	regCheck.checked = settings.onSelectRegex;
+	regCheck.checked = settings.onSelect.useRegex;
 	regCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectRegex",
+			"onSelect.useRegex",
 			(e.target as HTMLInputElement).checked
 		);
 	regLabel.appendText(" " + t("CHECKBOX_REGEX"));
@@ -1563,11 +1603,11 @@ function renderOnSelectSettings(
 	const replaceAllInput = replaceAllDiv.createEl("input", {
 		type: "text",
 		placeholder: t("PLACEHOLDER_REPLACE_ALL"),
-		value: settings.onSelectReplace, // Reuse replaceText
+		value: settings.onSelect.replace, // Reuse replaceText
 	});
 	replaceAllInput.onchange = (e) =>
 		callbacks.onSettingsChange(
-			"onSelectReplace",
+			"onSelect.replace",
 			(e.target as HTMLInputElement).value
 		);
 
