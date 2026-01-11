@@ -40,7 +40,7 @@ export interface EditorPanelHandle {
 export class EditorPanel {
 	private parent: HTMLElement;
 	private content: string;
-	private editMode: "source" | "preview";
+	private editMode: "source" | "preview" | "split";
 	private canUndo: boolean;
 	private canRedo: boolean;
 	private hasOriginalEditor: boolean;
@@ -66,7 +66,7 @@ export class EditorPanel {
 	constructor(
 		parent: HTMLElement,
 		content: string,
-		editMode: "source" | "preview",
+		editMode: "source" | "preview" | "split",
 		canUndo: boolean,
 		canRedo: boolean,
 		hasOriginalEditor: boolean,
@@ -114,11 +114,12 @@ export class EditorPanel {
 
 	private renderTitle(header: HTMLElement) {
 		const titleContainer = header.createDiv({ cls: "mtt-header-title" });
+		let titleText = t("EDITOR_HEADER");
+		if (this.editMode === "preview") titleText = t("EDITOR_PREVIEW");
+		if (this.editMode === "split") titleText = "Split View"; // Hardcoded fallback for now
+
 		titleContainer.createEl("span", {
-			text:
-				this.editMode === "source"
-					? t("EDITOR_HEADER")
-					: t("EDITOR_PREVIEW"),
+			text: titleText,
 		});
 
 		if (this.isSelectionMode) {
@@ -169,16 +170,28 @@ export class EditorPanel {
 		this.redoBtn.onclick = () => this.callbacks.onRedo();
 
 		// Mode Toggle Button
+		// Cycle: Source -> Preview -> Split -> Source
+		let nextModeIcon = "eye";
+		let nextModeLabel = t("MODE_PREVIEW");
+
+		if (this.editMode === "source") {
+			nextModeIcon = "eye";
+			nextModeLabel = t("MODE_PREVIEW");
+		} else if (this.editMode === "preview") {
+			nextModeIcon = "columns";
+			nextModeLabel = "Split View";
+		} else {
+			nextModeIcon = "code";
+			nextModeLabel = t("MODE_SOURCE");
+		}
+
 		const modeBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
 			attr: {
-				"aria-label":
-					this.editMode === "source"
-						? t("MODE_PREVIEW")
-						: t("MODE_SOURCE"),
+				"aria-label": nextModeLabel,
 			},
 		});
-		setIcon(modeBtn, this.editMode === "source" ? "eye" : "code");
+		setIcon(modeBtn, nextModeIcon);
 		modeBtn.onclick = () => this.callbacks.onModeToggle();
 
 		// Clear Button
@@ -210,7 +223,33 @@ export class EditorPanel {
 			cls: "mtt-editor-container",
 		});
 
-		if (this.editMode === "source") {
+		if (this.editMode === "split") {
+			editorContainer.style.display = "flex";
+			editorContainer.style.flexDirection = "row";
+			editorContainer.style.overflow = "hidden"; // Prevent outer scroll
+
+			const leftPane = editorContainer.createDiv({
+				cls: "mtt-split-left",
+			});
+			leftPane.style.flex = "1";
+			leftPane.style.height = "100%";
+			leftPane.style.overflow = "hidden";
+			leftPane.style.display = "flex"; // Ensure textarea fills height
+			leftPane.style.flexDirection = "column";
+
+			const rightPane = editorContainer.createDiv({
+				cls: "mtt-split-right",
+			});
+			rightPane.style.flex = "1";
+			rightPane.style.height = "100%";
+			rightPane.style.overflow = "auto";
+			rightPane.style.borderLeft =
+				"1px solid var(--background-modifier-border)";
+			rightPane.style.paddingLeft = "10px"; // Add some spacing
+
+			this.renderSourceEditor(leftPane);
+			this.renderPreviewEditor(rightPane);
+		} else if (this.editMode === "source") {
 			this.renderSourceEditor(editorContainer);
 		} else {
 			this.renderPreviewEditor(editorContainer);
@@ -221,12 +260,37 @@ export class EditorPanel {
 		const ta = container.createEl("textarea", {
 			cls: "mtt-textarea mtt-monospace",
 		});
+		// Ensure textarea takes full height of its container
+		ta.style.height = "100%";
+		ta.style.width = "100%";
+		ta.style.resize = "none";
+		ta.style.border = "none";
+		ta.style.padding = "10px";
+
 		this.textAreaRef = ta;
 		ta.value = this.content;
 		ta.oninput = (e) => {
 			const newContent = (e.target as HTMLTextAreaElement).value;
 			if (this.callbacks.onContentChange) {
 				this.callbacks.onContentChange(newContent);
+			}
+			// If in split view, we could theoretically update preview here,
+			// but since render() re-renders everything, we rely on parent re-rendering?
+			// No, parent re-renders only on tool execution usually.
+			// For split view live preview, we might need to manually trigger a preview update or debounce it.
+			// Currently, `onContentChange` just updates the model.
+			// To support live preview in split mode without full re-render,
+			// we might need a `updatePreview` method.
+			// For now, let's keep it simple: Split view updates on interactions or if we add a listener.
+			// Actually, without re-rendering, right pane won't update.
+			// Let's add a debounced preview update if we are in split mode?
+			// The callbacks interface doesn't support forcing render easily from here without passing a method.
+			// However, `renderPreviewEditor` uses `this.content`.
+			// If we want live preview, we need to update the right pane's content.
+			// Let's leave it as "update on tool run" or "update on mode toggle" for now to match current architecture,
+			// OR we can try to find the preview element and update it.
+			if (this.editMode === "split") {
+				this.updateSplitPreview(newContent);
 			}
 		};
 
@@ -244,6 +308,9 @@ export class EditorPanel {
 			if (this.callbacks.onContentChange) {
 				this.callbacks.onContentChange(ta.value);
 			}
+			if (this.editMode === "split") {
+				this.updateSplitPreview(ta.value);
+			}
 		};
 
 		const handleSelection = () => {
@@ -260,6 +327,9 @@ export class EditorPanel {
 				if (this.callbacks.onContentChange) {
 					this.callbacks.onContentChange(ta.value);
 				}
+				if (this.editMode === "split") {
+					this.updateSplitPreview(ta.value);
+				}
 			}
 		};
 
@@ -269,6 +339,20 @@ export class EditorPanel {
 				handleSelection();
 			}
 		};
+	}
+
+	private updateSplitPreview(newContent: string) {
+		const rightPane = this.parent.querySelector(".mtt-split-right");
+		if (rightPane) {
+			rightPane.empty();
+			MarkdownRenderer.render(
+				this.app,
+				newContent,
+				rightPane as HTMLElement,
+				"/",
+				new Component()
+			);
+		}
 	}
 
 	private renderPreviewEditor(container: HTMLElement) {

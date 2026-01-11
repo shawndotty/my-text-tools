@@ -45,7 +45,7 @@ interface SelectionRange {
 
 export class MyTextToolsView extends ItemView {
 	content: string = ""; // 存储中间窗口的临时文本内容
-	editMode: "source" | "preview" = "source"; // 默认源码模式
+	editMode: "source" | "preview" | "split" = "source"; // 默认源码模式
 	historyManager: HistoryManager = new HistoryManager();
 	originalEditor: Editor | null = null; // 对原笔记编辑器的引用
 	targetFile: TFile | null = null; // 当前编辑的目标文件
@@ -201,8 +201,9 @@ export class MyTextToolsView extends ItemView {
 			onUndo: () => this.undo(),
 			onRedo: () => this.redo(),
 			onModeToggle: () => {
-				this.editMode =
-					this.editMode === "source" ? "preview" : "source";
+				if (this.editMode === "source") this.editMode = "preview";
+				else if (this.editMode === "preview") this.editMode = "split";
+				else this.editMode = "source";
 				this.render();
 			},
 			onCopy: async () => {
