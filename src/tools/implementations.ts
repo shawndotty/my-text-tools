@@ -17,7 +17,27 @@ export class RegexStrategy implements IToolStrategy {
 			if (settings.regex.caseInsensitive) flags += "i";
 			if (settings.regex.multiline) flags += "m";
 			const regex = new RegExp(settings.regex.findText, flags);
-			const result = text.replace(regex, settings.regex.replaceText);
+
+			// 处理替换文本中的转义字符
+			const replaceText = settings.regex.replaceText.replace(
+				/\\([ntr\\])/g,
+				(match, char) => {
+					switch (char) {
+						case "n":
+							return "\n";
+						case "t":
+							return "\t";
+						case "r":
+							return "\r";
+						case "\\":
+							return "\\";
+						default:
+							return match;
+					}
+				}
+			);
+
+			const result = text.replace(regex, replaceText);
 			if (!options?.hideNotice) {
 				new Notice(t("NOTICE_REGEX_DONE"));
 			}
@@ -197,10 +217,15 @@ export class AddWrapStrategy implements IToolStrategy {
 		const lines = text.split("\n");
 		const result = lines
 			.map((line) => {
-				if (settings.wrap.excludeEmptyLines && line.trim().length === 0) {
+				if (
+					settings.wrap.excludeEmptyLines &&
+					line.trim().length === 0
+				) {
 					return line;
 				}
-				return `${settings.wrap.prefix || ""}${line}${settings.wrap.suffix || ""}`;
+				return `${settings.wrap.prefix || ""}${line}${
+					settings.wrap.suffix || ""
+				}`;
 			})
 			.join("\n");
 
@@ -231,7 +256,9 @@ export class RemoveStringStrategy implements IToolStrategy {
 				let isMatch = false;
 				if (settings.filter.useRegex) {
 					try {
-						const flags = settings.filter.caseSensitive ? "g" : "gi";
+						const flags = settings.filter.caseSensitive
+							? "g"
+							: "gi";
 						const regex = new RegExp(settings.filter.text, flags);
 						isMatch = regex.test(line);
 					} catch (e) {
@@ -537,9 +564,7 @@ export class WordFrequencyStrategy implements IToolStrategy {
 		const words = text
 			.replace(regex, " ")
 			.split(/\s+/) // Use regex to split by one or more whitespace characters
-			.filter(
-				(word) => word.length >= settings.frequency.minWordLength
-			);
+			.filter((word) => word.length >= settings.frequency.minWordLength);
 
 		const freqMap: { [key: string]: number } = {};
 		words.forEach((word) => {
@@ -576,7 +601,8 @@ export class ClearFormatStrategy implements IToolStrategy {
 		options?: ToolExecutionOptions
 	): string {
 		let result = text;
-		const { bold, italic, highlight, strikethrough, code, links } = settings.clearFormat;
+		const { bold, italic, highlight, strikethrough, code, links } =
+			settings.clearFormat;
 
 		// Placeholders for URLs
 		const urlPlaceholders: string[] = [];
@@ -587,11 +613,14 @@ export class ClearFormatStrategy implements IToolStrategy {
 		const LINK_SUFFIX = "】";
 
 		if (italic) {
-			result = result.replace(/\*\[([^\]]*?)\]\(([^)]+)\)\*/g, (match) => {
-				const ph = `${LINK_PREFIX}${linkPlaceholders.length}${LINK_SUFFIX}`;
-				linkPlaceholders.push(match);
-				return ph;
-			});
+			result = result.replace(
+				/\*\[([^\]]*?)\]\(([^)]+)\)\*/g,
+				(match) => {
+					const ph = `${LINK_PREFIX}${linkPlaceholders.length}${LINK_SUFFIX}`;
+					linkPlaceholders.push(match);
+					return ph;
+				}
+			);
 			result = result.replace(
 				/(https?|ftp|ftps|file):\/\/[^\s<>'"{}|\\^`\[\]]+|www\.[^\s<>'"{}|\\^`\[\]]+/gi,
 				(match) => {
@@ -607,10 +636,7 @@ export class ClearFormatStrategy implements IToolStrategy {
 		}
 
 		if (italic) {
-			result = result.replace(
-				/([^*]|^)\*([^*]+)\*([^*]|$)/g,
-				"$1$2$3"
-			);
+			result = result.replace(/([^*]|^)\*([^*]+)\*([^*]|$)/g, "$1$2$3");
 
 			const placeholderPattern = /【MTT[^】]*】/g;
 			const ranges: { start: number; end: number }[] = [];
