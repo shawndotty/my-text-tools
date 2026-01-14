@@ -88,7 +88,7 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("chevron-up")
-			.setTooltip("Move up")
+			.setTooltip(t("BTN_MOVE_UP"))
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(async () => {
@@ -103,7 +103,7 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("chevron-down")
-			.setTooltip("Move down")
+			.setTooltip(t("BTN_MOVE_DOWN"))
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(async () => {

@@ -71,7 +71,7 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("chevron-up")
-					.setTooltip("Move up")
+					.setTooltip(t("BTN_MOVE_UP"))
 					.onClick(async () => {
 						if (idx <= 0) return;
 						const arr = plugin.settings.customScripts;
@@ -85,7 +85,7 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("chevron-down")
-					.setTooltip("Move down")
+					.setTooltip(t("BTN_MOVE_DOWN"))
 					.onClick(async () => {
 						const arr = plugin.settings.customScripts;
 						if (idx >= arr.length - 1) return;
