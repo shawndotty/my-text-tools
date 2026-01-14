@@ -4,11 +4,12 @@ import {
 	Setting,
 	setIcon,
 	ButtonComponent,
+	Notice,
 } from "obsidian";
 import MyTextTools from "./main";
 import { TabbedSettings } from "UI/tabbed-settings";
 import { t } from "lang/helpers";
-import { BUILTIN_TOOLS, BatchProcess } from "./types";
+import { BUILTIN_TOOLS, BatchProcess, migrateToNestedSettings } from "./types";
 import { AIGenerateScriptModal } from "./UI/modals/AIGenerateScriptModal";
 import { AIGeneratePromptModal } from "./UI/modals/AIGeneratePromptModal";
 import { EditBatchModal } from "./UI/modals/EditBatchModal";
@@ -1050,6 +1051,31 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 							script.showInRibbon = value;
 							await this.plugin.saveSettings();
 							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addExtraButton((btn) =>
+					btn
+						.setIcon("zap")
+						.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
+						.onClick(async () => {
+							const newBatch: BatchProcess = {
+								id: Date.now().toString(),
+								name:
+									script.name ||
+									`${t("SCRIPT_GROUP_NAME")} ${idx + 1}`,
+								operations: [
+									{
+										toolId: `custom-script:${script.id}`,
+										settingsSnapshot:
+											migrateToNestedSettings(
+												this.plugin.settings
+											),
+									},
+								],
+							};
+							this.plugin.settings.savedBatches.push(newBatch);
+							await this.plugin.saveSettings();
+							new Notice(t("NOTICE_SCRIPT_BATCH_CREATED"), 2000);
 						})
 				)
 				.addExtraButton((btn) =>

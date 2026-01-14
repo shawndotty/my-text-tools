@@ -402,6 +402,7 @@ export default {
 	NOTICE_PROCESSING_FILES: "正在處理 {0} 個檔案...",
 	NOTICE_BATCH_APPLIED_FILES: "已對 {0}/{1} 個檔案應用捷徑。",
 	NOTICE_BATCH_NOT_FOUND: "找不到該捷徑。",
+	NOTICE_SCRIPT_BATCH_CREATED: "已基於腳本創建捷徑。",
 	NOTICE_NO_BATCHES: "未找到已保存的捷徑。",
 	CONFIRM_DELETE_BATCH: "確定要刪除該捷徑嗎？",
 	BTN_DELETE: "刪除",
