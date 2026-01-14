@@ -1058,6 +1058,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 						.setIcon("zap")
 						.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
 						.onClick(async () => {
+							const snapshot = migrateToNestedSettings(
+								this.plugin.settings
+							);
+							snapshot.savedBatches = [];
+
 							const newBatch: BatchProcess = {
 								id: Date.now().toString(),
 								name:
@@ -1066,10 +1071,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 								operations: [
 									{
 										toolId: `custom-script:${script.id}`,
-										settingsSnapshot:
-											migrateToNestedSettings(
-												this.plugin.settings
-											),
+										settingsSnapshot: snapshot,
 									},
 								],
 							};
