@@ -66,8 +66,12 @@ export default class MyTextTools extends Plugin implements MyTextToolsPlugin {
 		this.addRibbonIcon(
 			"remove-formatting",
 			t("COMMAND_OPEN_WORKBENCH"),
-			() => {
-				this.activateView();
+			(evt: MouseEvent) => {
+				if (evt.shiftKey) {
+					this.activateView(true);
+				} else {
+					this.activateView();
+				}
 			}
 		);
 
@@ -130,29 +134,39 @@ export default class MyTextTools extends Plugin implements MyTextToolsPlugin {
 		);
 	}
 
-	async activateView() {
+	async activateView(openInNewWindow = false) {
 		const { workspace } = this.app;
+
+		// 在切换视图之前，记录当前激活的 Markdown 笔记
+		const prevMarkdownView =
+			workspace.getActiveViewOfType(MarkdownView) || null;
 
 		// 优先检查是否已打开
 		let leaf = workspace.getLeavesOfType(MY_TEXT_TOOLS_VIEW)[0];
 
 		if (!leaf) {
-			// 这里的 'window' 会创建一个真正的弹出窗口
-			leaf = workspace.getLeaf("window");
-			await leaf.setViewState({
-				type: MY_TEXT_TOOLS_VIEW,
-				active: true,
-			});
+			if (openInNewWindow) {
+				leaf = workspace.getLeaf("window");
+			} else {
+				leaf = workspace.getLeaf("tab");
+			}
 		}
+
+		await leaf.setViewState({
+			type: MY_TEXT_TOOLS_VIEW,
+			active: true,
+		});
 
 		workspace.revealLeaf(leaf);
 
-		// 激活视图时，更新内容
-		const activeView = workspace.getActiveViewOfType(MarkdownView);
-		if (activeView && activeView.editor) {
+		// 激活视图时，更新内容：
+		// - 如果是新窗口，优先使用当时的激活笔记
+		// - 如果在 Tab 中打开，也使用打开命令触发时的笔记内容
+		const sourceView = prevMarkdownView;
+		if (sourceView && sourceView.editor) {
 			const view = leaf.view as MyTextToolsView;
 			if (view) {
-				view.updateInput(activeView.editor, activeView.file);
+				view.updateInput(sourceView.editor, sourceView.file);
 			}
 		}
 	}
