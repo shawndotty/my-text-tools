@@ -118,6 +118,14 @@ export class EditBatchModal extends Modal {
 				this.moveOp(index, 1);
 			});
 
+		new ButtonComponent(controls)
+			.setIcon("copy")
+			.setTooltip(t("BTN_DUPLICATE_STEP"))
+			.setClass("mtt-icon-btn")
+			.onClick(() => {
+				this.duplicateOp(index);
+			});
+
 		// Delete
 		new ButtonComponent(controls)
 			.setIcon("trash")
@@ -264,6 +272,20 @@ export class EditBatchModal extends Modal {
 
 	deleteOp(index: number) {
 		this.workingBatch.operations.splice(index, 1);
+		this.renderContent();
+	}
+
+	duplicateOp(index: number) {
+		const ops = this.workingBatch.operations;
+		const op = ops[index];
+		if (!op) return;
+		const cloned: BatchOperation = {
+			toolId: op.toolId,
+			settingsSnapshot: JSON.parse(
+				JSON.stringify(op.settingsSnapshot)
+			) as SettingsState,
+		};
+		ops.splice(index + 1, 0, cloned);
 		this.renderContent();
 	}
 

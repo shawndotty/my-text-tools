@@ -444,6 +444,7 @@ export default {
 	BTN_MOVE_UP: "Move Up",
 	BTN_MOVE_DOWN: "Move Down",
 	BTN_DELETE_OP: "Delete Step",
+	BTN_DUPLICATE_STEP: "Duplicate Step",
 	NOTICE_NO_CHANGES: "No changes made.",
 	CONFIRM_DISCARD: "Discard unsaved changes?",
 	CONFIRM_DISCARD_TITLE: "Discard Changes",

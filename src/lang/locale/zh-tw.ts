@@ -421,6 +421,7 @@ export default {
 	BTN_MOVE_UP: "上移",
 	BTN_MOVE_DOWN: "下移",
 	BTN_DELETE_OP: "刪除步驟",
+	BTN_DUPLICATE_STEP: "複製步驟",
 	NOTICE_NO_CHANGES: "未作任何變更。",
 	CONFIRM_DISCARD: "放棄未保存的變更？",
 	CONFIRM_DISCARD_TITLE: "放棄變更",

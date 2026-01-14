@@ -433,6 +433,7 @@ export default {
 	BTN_MOVE_DOWN: "下移",
 	BTN_DELETE_OP: "删除步骤",
 	BTN_REMOVE_OP: "删除",
+	BTN_DUPLICATE_STEP: "复制步骤",
 	NOTICE_NO_CHANGES: "没有进行任何修改。",
 	CONFIRM_DISCARD: "放弃未保存的修改？",
 	CONFIRM_DISCARD_TITLE: "放弃修改",
