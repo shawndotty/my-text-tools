@@ -649,7 +649,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			});
 
 			const headerSetting = new Setting(cardContainer)
-				.setName(`${t("PROMPT_GROUP_NAME")} ${idx + 1}`)
+				.setName(
+					`${t("PROMPT_GROUP_NAME")} ${idx + 1}${
+						card.name ? ` - ${card.name}` : ""
+					}`
+				)
 				.addToggle((toggle) =>
 					toggle
 						.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
@@ -999,7 +1003,11 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			});
 
 			const headerSetting = new Setting(cardContainer)
-				.setName(`${t("SCRIPT_GROUP_NAME")} ${idx + 1}`)
+				.setName(
+					`${t("SCRIPT_GROUP_NAME")} ${idx + 1}${
+						script.name ? ` - ${script.name}` : ""
+					}`
+				)
 				.addToggle((toggle) =>
 					toggle
 						.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
