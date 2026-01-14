@@ -681,6 +681,25 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				)
 				.addExtraButton((btn) =>
 					btn
+						.setIcon("copy")
+						.setTooltip(t("BTN_SAVE_AS_NEW"))
+						.onClick(async () => {
+							const newCard: CustomAIAction = JSON.parse(
+								JSON.stringify(card)
+							);
+							newCard.id = `${Date.now()}`;
+							if (newCard.name) {
+								newCard.name = `${newCard.name} (copy)`;
+							}
+							this.plugin.settings.customActions.push(newCard);
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+							containerEl.empty();
+							this.renderUserPromptsSettings(containerEl);
+						})
+				)
+				.addExtraButton((btn) =>
+					btn
 						.setIcon("trash")
 						.setTooltip(t("TOOLTIP_DELETE_PROMPT"))
 						.onClick(async () => {
@@ -1031,6 +1050,25 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 							script.showInRibbon = value;
 							await this.plugin.saveSettings();
 							(this.plugin as any).refreshCustomRibbons?.();
+						})
+				)
+				.addExtraButton((btn) =>
+					btn
+						.setIcon("copy")
+						.setTooltip(t("BTN_SAVE_AS_NEW"))
+						.onClick(async () => {
+							const newScript: CustomScript = JSON.parse(
+								JSON.stringify(script)
+							);
+							newScript.id = `${Date.now()}`;
+							if (newScript.name) {
+								newScript.name = `${newScript.name} (copy)`;
+							}
+							this.plugin.settings.customScripts.push(newScript);
+							await this.plugin.saveSettings();
+							(this.plugin as any).refreshCustomRibbons?.();
+							containerEl.empty();
+							this.renderCustomScriptsSettings(containerEl);
 						})
 				)
 				.addExtraButton((btn) =>
