@@ -68,6 +68,34 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			)
 			.addExtraButton((btn) =>
 				btn
+					.setIcon("chevron-up")
+					.setTooltip("Move up")
+					.onClick(async () => {
+						if (idx <= 0) return;
+						const arr = plugin.settings.customActions;
+						const [item] = arr.splice(idx, 1);
+						if (!item) return;
+						arr.splice(idx - 1, 0, item);
+						await plugin.saveSettings();
+						refresh();
+					})
+			)
+			.addExtraButton((btn) =>
+				btn
+					.setIcon("chevron-down")
+					.setTooltip("Move down")
+					.onClick(async () => {
+						const arr = plugin.settings.customActions;
+						if (idx >= arr.length - 1) return;
+						const [item] = arr.splice(idx, 1);
+						if (!item) return;
+						arr.splice(idx + 1, 0, item);
+						await plugin.saveSettings();
+						refresh();
+					})
+			)
+			.addExtraButton((btn) =>
+				btn
 					.setIcon("zap")
 					.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
 					.onClick(async () => {
@@ -410,4 +438,3 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 		renderOverride();
 	});
 }
-

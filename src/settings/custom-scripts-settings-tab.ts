@@ -29,7 +29,8 @@ export function renderCustomScriptsSettingsTab(
 		.setDesc(t("CUSTOM_SCRIPTS_DESC"))
 		.addButton((btn) =>
 			btn.setButtonText(t("BTN_ADD_SCRIPT")).onClick(async () => {
-				const nextIndex = (plugin.settings.customScripts?.length || 0) + 1;
+				const nextIndex =
+					(plugin.settings.customScripts?.length || 0) + 1;
 				const newScript: CustomScript = {
 					id: `${Date.now()}`,
 					name: `${t("SCRIPT_GROUP_NAME")} ${nextIndex}`,
@@ -65,6 +66,34 @@ export function renderCustomScriptsSettingsTab(
 						script.showInRibbon = value;
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
+					})
+			)
+			.addExtraButton((btn) =>
+				btn
+					.setIcon("chevron-up")
+					.setTooltip("Move up")
+					.onClick(async () => {
+						if (idx <= 0) return;
+						const arr = plugin.settings.customScripts;
+						const [item] = arr.splice(idx, 1);
+						if (!item) return;
+						arr.splice(idx - 1, 0, item);
+						await plugin.saveSettings();
+						refresh();
+					})
+			)
+			.addExtraButton((btn) =>
+				btn
+					.setIcon("chevron-down")
+					.setTooltip("Move down")
+					.onClick(async () => {
+						const arr = plugin.settings.customScripts;
+						if (idx >= arr.length - 1) return;
+						const [item] = arr.splice(idx, 1);
+						if (!item) return;
+						arr.splice(idx + 1, 0, item);
+						await plugin.saveSettings();
+						refresh();
 					})
 			)
 			.addExtraButton((btn) =>
@@ -246,15 +275,11 @@ export function renderCustomScriptsSettingsTab(
 				.setIcon("sparkles")
 				.onClick(() => {
 					const aiService = new AIService(plugin.settings);
-					new AIGenerateScriptModal(
-						app,
-						aiService,
-						async (code) => {
-							script.code = code;
-							codeArea.value = code;
-							await plugin.saveSettings();
-						}
-					).open();
+					new AIGenerateScriptModal(app, aiService, async (code) => {
+						script.code = code;
+						codeArea.value = code;
+						await plugin.saveSettings();
+					}).open();
 				})
 		);
 
@@ -410,8 +435,7 @@ export function renderCustomScriptsSettingsTab(
 				});
 				input.onchange = async (e) => {
 					const val = (e.target as HTMLInputElement).value;
-					param.default =
-						param.type === "number" ? Number(val) : val;
+					param.default = param.type === "number" ? Number(val) : val;
 					await plugin.saveSettings();
 				};
 			}
@@ -445,4 +469,3 @@ export function renderCustomScriptsSettingsTab(
 		});
 	});
 }
-

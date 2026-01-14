@@ -324,6 +324,12 @@
 	height: 18px;
 }
 
+.mtt-icon-btn.mtt-bare-btn {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
+
 /* 撤销重做按钮特化 (如果与 icon-btn 完全一致可合并，但此处保留原类名以防差异) */
 .mtt-undo-btn {
 	background: transparent;

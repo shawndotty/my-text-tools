@@ -34,7 +34,7 @@ export function renderBatchProcessSettingsTab(
 	listContainer.style.flexDirection = "column";
 	listContainer.style.gap = "10px";
 
-	batches.forEach((batch) => {
+	batches.forEach((batch, idx) => {
 		const row = listContainer.createDiv({ cls: "mtt-batch-item" });
 		row.style.display = "flex";
 		row.style.justifyContent = "space-between";
@@ -87,9 +87,40 @@ export function renderBatchProcessSettingsTab(
 		});
 
 		new ButtonComponent(btnGroup)
+			.setIcon("chevron-up")
+			.setTooltip("Move up")
+			.setClass("mtt-icon-btn")
+			.setClass("mtt-bare-btn")
+			.onClick(async () => {
+				if (idx <= 0) return;
+				const arr = plugin.settings.savedBatches;
+				const [item] = arr.splice(idx, 1);
+				if (!item) return;
+				arr.splice(idx - 1, 0, item);
+				await plugin.saveSettings();
+				renderBatchProcessSettingsTab(ctx);
+			});
+
+		new ButtonComponent(btnGroup)
+			.setIcon("chevron-down")
+			.setTooltip("Move down")
+			.setClass("mtt-icon-btn")
+			.setClass("mtt-bare-btn")
+			.onClick(async () => {
+				const arr = plugin.settings.savedBatches;
+				if (idx >= arr.length - 1) return;
+				const [item] = arr.splice(idx, 1);
+				if (!item) return;
+				arr.splice(idx + 1, 0, item);
+				await plugin.saveSettings();
+				renderBatchProcessSettingsTab(ctx);
+			});
+
+		new ButtonComponent(btnGroup)
 			.setIcon("pencil")
 			.setTooltip(t("BTN_EDIT"))
 			.setClass("mtt-icon-btn")
+			.setClass("mtt-bare-btn")
 			.onClick(() => {
 				new EditBatchModal(
 					app,
@@ -120,6 +151,7 @@ export function renderBatchProcessSettingsTab(
 			.setIcon("copy")
 			.setTooltip(t("BTN_SAVE_AS_NEW"))
 			.setClass("mtt-icon-btn")
+			.setClass("mtt-bare-btn")
 			.onClick(async () => {
 				const newBatch: BatchProcess = {
 					id: Date.now().toString(),
@@ -135,6 +167,7 @@ export function renderBatchProcessSettingsTab(
 			.setIcon("trash")
 			.setTooltip(t("BTN_DELETE"))
 			.setClass("mtt-icon-btn")
+			.setClass("mtt-bare-btn")
 			.onClick(() => {
 				new ConfirmModal(
 					app,
