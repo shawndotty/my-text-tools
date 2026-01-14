@@ -1,5 +1,5 @@
 import { Plugin } from "obsidian";
-import { MyTextToolsSettings } from "./settings";
+import { MyTextToolsSettings } from "./settings/types";
 
 export interface BatchOperation {
 	toolId: string;
