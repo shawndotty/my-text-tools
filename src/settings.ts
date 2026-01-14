@@ -682,6 +682,33 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				)
 				.addExtraButton((btn) =>
 					btn
+						.setIcon("zap")
+						.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
+						.onClick(async () => {
+							const snapshot = migrateToNestedSettings(
+								this.plugin.settings
+							);
+							snapshot.savedBatches = [];
+
+							const newBatch: BatchProcess = {
+								id: Date.now().toString(),
+								name:
+									card.name ||
+									`${t("PROMPT_GROUP_NAME")} ${idx + 1}`,
+								operations: [
+									{
+										toolId: `custom-ai:${card.id}`,
+										settingsSnapshot: snapshot,
+									},
+								],
+							};
+							this.plugin.settings.savedBatches.push(newBatch);
+							await this.plugin.saveSettings();
+							new Notice(t("NOTICE_PROMPT_BATCH_CREATED"), 2000);
+						})
+				)
+				.addExtraButton((btn) =>
+					btn
 						.setIcon("copy")
 						.setTooltip(t("BTN_SAVE_AS_NEW"))
 						.onClick(async () => {

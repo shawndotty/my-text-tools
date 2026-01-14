@@ -420,6 +420,7 @@ export default {
 	NOTICE_BATCH_APPLIED_FILES: "已对 {0}/{1} 个文件应用快捷指令。",
 	NOTICE_BATCH_NOT_FOUND: "找不到该快捷指令。",
 	NOTICE_SCRIPT_BATCH_CREATED: "已基于脚本创建快捷指令。",
+	NOTICE_PROMPT_BATCH_CREATED: "已基于提示词创建快捷指令。",
 
 	// Edit Batch
 	MODAL_EDIT_BATCH_TITLE: "编辑快捷指令",

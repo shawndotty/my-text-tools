@@ -426,6 +426,7 @@ export default {
 	NOTICE_BATCH_APPLIED_FILES: "Shortcuts applied to {0} of {1} files.",
 	NOTICE_BATCH_NOT_FOUND: "Shortcuts not found.",
 	NOTICE_SCRIPT_BATCH_CREATED: "Shortcut has been created from this script.",
+	NOTICE_PROMPT_BATCH_CREATED: "Shortcut has been created from this prompt.",
 	NOTICE_NO_BATCHES: "No saved Shortcutses found.",
 	CONFIRM_DELETE_BATCH: "Are you sure you want to delete this Shortcuts?",
 	BTN_DELETE: "Delete",
