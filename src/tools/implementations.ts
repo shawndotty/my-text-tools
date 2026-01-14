@@ -39,12 +39,12 @@ export class RegexStrategy implements IToolStrategy {
 
 			const result = text.replace(regex, replaceText);
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_REGEX_DONE"));
+				new Notice(t("NOTICE_REGEX_DONE"), 2000);
 			}
 			return result;
 		} catch (e) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_REGEX_ERROR"));
+				new Notice(t("NOTICE_REGEX_ERROR"), 2000);
 			}
 			return text;
 		}
@@ -60,7 +60,7 @@ export class RegexExtractStrategy implements IToolStrategy {
 	): string {
 		if (!settings.regexExtract.rule) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+				new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"), 2000);
 			}
 			return text;
 		}
@@ -72,7 +72,7 @@ export class RegexExtractStrategy implements IToolStrategy {
 
 			if (!matches || matches.length === 0) {
 				if (!options?.hideNotice) {
-					new Notice(t("NOTICE_NO_MATCH"));
+					new Notice(t("NOTICE_NO_MATCH"), 2000);
 				}
 				return text;
 			}
@@ -83,13 +83,14 @@ export class RegexExtractStrategy implements IToolStrategy {
 
 			if (!options?.hideNotice) {
 				new Notice(
-					t("NOTICE_REGEX_EXTRACT_DONE", [matches.length.toString()])
+					t("NOTICE_REGEX_EXTRACT_DONE", [matches.length.toString()]),
+					2000
 				);
 			}
 			return matches.join(sep);
 		} catch (e) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"));
+				new Notice(t("NOTICE_REGEX_EXTRACT_ERROR"), 2000);
 			}
 			return text;
 		}
@@ -124,7 +125,7 @@ export class RemoveWhitespaceStrategy implements IToolStrategy {
 		}
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_WS_DONE"));
+			new Notice(t("NOTICE_WS_DONE"), 2000);
 		}
 		return result;
 	}
@@ -161,7 +162,7 @@ export class DedupeStrategy implements IToolStrategy {
 		}
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_DEDUPE"));
+			new Notice(t("NOTICE_DEDUPE"), 2000);
 		}
 		return result;
 	}
@@ -200,7 +201,8 @@ export class EmptyLineStrategy implements IToolStrategy {
 			new Notice(
 				settings.emptyLineMode === "all"
 					? t("NOTICE_EMPTY_LINE")
-					: t("NOTICE_EMPTY_LINE_MERGED")
+					: t("NOTICE_EMPTY_LINE_MERGED"),
+				2000
 			);
 		}
 		return result;
@@ -230,7 +232,7 @@ export class AddWrapStrategy implements IToolStrategy {
 			.join("\n");
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_WRAP_DONE"));
+			new Notice(t("NOTICE_WRAP_DONE"), 2000);
 		}
 		return result;
 	}
@@ -246,7 +248,7 @@ export class RemoveStringStrategy implements IToolStrategy {
 		const lines = text.split("\n");
 		if (!settings.filter.text) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_FILTER_INPUT"));
+				new Notice(t("NOTICE_FILTER_INPUT"), 2000);
 			}
 			return text;
 		}
@@ -263,7 +265,7 @@ export class RemoveStringStrategy implements IToolStrategy {
 						isMatch = regex.test(line);
 					} catch (e) {
 						if (!options?.hideNotice) {
-							new Notice(t("NOTICE_REGEX_INVALID"));
+							new Notice(t("NOTICE_REGEX_INVALID"), 2000);
 						}
 						return true;
 					}
@@ -283,7 +285,7 @@ export class RemoveStringStrategy implements IToolStrategy {
 			.join("\n");
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_FILTER_DONE"));
+			new Notice(t("NOTICE_FILTER_DONE"), 2000);
 		}
 		return result;
 	}
@@ -307,7 +309,7 @@ export class NumberListStrategy implements IToolStrategy {
 			.join("\n");
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_NUMBER_DONE"));
+			new Notice(t("NOTICE_NUMBER_DONE"), 2000);
 		}
 		return result;
 	}
@@ -338,7 +340,7 @@ export class LineBreakToolsStrategy implements IToolStrategy {
 
 		if (!settings.lineBreak.trigger) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_LB_TRIGGER"));
+				new Notice(t("NOTICE_LB_TRIGGER"), 2000);
 			}
 			return text;
 		}
@@ -389,7 +391,7 @@ export class LineBreakToolsStrategy implements IToolStrategy {
 			return out;
 		} catch (e) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_LB_ERROR"));
+				new Notice(t("NOTICE_LB_ERROR"), 2000);
 			}
 			return text;
 		}
@@ -413,7 +415,7 @@ export class ExtractColumnStrategy implements IToolStrategy {
 
 		if (!actualDelim && settings.column.delimiter === "custom") {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_CUSTOM_DELIM"));
+				new Notice(t("NOTICE_CUSTOM_DELIM"), 2000);
 			}
 			return text;
 		}
@@ -431,7 +433,8 @@ export class ExtractColumnStrategy implements IToolStrategy {
 			new Notice(
 				t("NOTICE_EXTRACT_COL_DONE", [
 					settings.column.number.toString(),
-				])
+				]),
+				2000
 			);
 		}
 		return result;
@@ -453,7 +456,7 @@ export class SwapColumnsStrategy implements IToolStrategy {
 
 		if (!delim) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_DELIM_REQUIRED"));
+				new Notice(t("NOTICE_DELIM_REQUIRED"), 2000);
 			}
 			return text;
 		}
@@ -479,7 +482,8 @@ export class SwapColumnsStrategy implements IToolStrategy {
 				t("NOTICE_SWAP_DONE", [
 					settings.swap.col1.toString(),
 					settings.swap.col2.toString(),
-				])
+				]),
+				2000
 			);
 		}
 		return result;
@@ -497,7 +501,7 @@ export class ExtractBetweenStrategy implements IToolStrategy {
 	): string {
 		if (!settings.extractBetween.start && !settings.extractBetween.end) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_EXTRACT_BOUNDS"));
+				new Notice(t("NOTICE_EXTRACT_BOUNDS"), 2000);
 			}
 			return text;
 		}
@@ -529,7 +533,8 @@ export class ExtractBetweenStrategy implements IToolStrategy {
 			if (matches.length > 0) {
 				if (!options?.hideNotice) {
 					new Notice(
-						t("NOTICE_EXTRACT_DONE", [matches.length.toString()])
+						t("NOTICE_EXTRACT_DONE", [matches.length.toString()]),
+						2000
 					);
 				}
 				// Default join is newline, but we can respect a setting if added.
@@ -538,13 +543,13 @@ export class ExtractBetweenStrategy implements IToolStrategy {
 				return matches.join(joinSep);
 			} else {
 				if (!options?.hideNotice) {
-					new Notice(t("NOTICE_NO_MATCH"));
+					new Notice(t("NOTICE_NO_MATCH"), 2000);
 				}
 				return text;
 			}
 		} catch (e) {
 			if (!options?.hideNotice) {
-				new Notice(t("NOTICE_EXTRACT_ERROR"));
+				new Notice(t("NOTICE_EXTRACT_ERROR"), 2000);
 			}
 			return text;
 		}
@@ -585,7 +590,10 @@ export class WordFrequencyStrategy implements IToolStrategy {
 			.join("\n");
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_FREQ_DONE", [sortedWords.length.toString()]));
+			new Notice(
+				t("NOTICE_FREQ_DONE", [sortedWords.length.toString()]),
+				2000
+			);
 		}
 		return result;
 	}
@@ -692,7 +700,7 @@ export class ClearFormatStrategy implements IToolStrategy {
 		}
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_CLEAR_FORMAT_DONE"));
+			new Notice(t("NOTICE_CLEAR_FORMAT_DONE"), 2000);
 		}
 		return result;
 	}
@@ -725,7 +733,7 @@ export class CombinationGeneratorStrategy implements IToolStrategy {
 		}
 
 		if (!options?.hideNotice) {
-			new Notice(t("NOTICE_COMBINATION_DONE"));
+			new Notice(t("NOTICE_COMBINATION_DONE"), 2000);
 		}
 		return result.join("\n");
 	}

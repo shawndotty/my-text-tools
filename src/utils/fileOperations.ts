@@ -10,7 +10,7 @@ export const saveToOriginal = debounce(
 			originalEditor.setValue(content);
 			new Notice(t("NOTICE_SAVE_SUCCESS"), 2000);
 		} else {
-			new Notice(t("NOTICE_SAVE_ERROR"), 2000);
+				new Notice(t("NOTICE_SAVE_ERROR"), 2000);
 		}
 	},
 	500,

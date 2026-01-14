@@ -115,9 +115,7 @@ export class TextProcessor {
 		else if (extractedHeader) noticeMsg = t("NOTICE_SKIP_HEADER");
 
 		if (noticeMsg && !hideNotice) {
-			// Only show skip notice if strategy didn't error?
-			// Ideally we queue notices.
-			new Notice(noticeMsg);
+			new Notice(noticeMsg, 2000);
 		}
 
 		return result;

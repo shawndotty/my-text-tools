@@ -54,7 +54,7 @@ export class AIManager {
 		const aiService = new AIService(this.plugin.settings);
 		if (!aiService.isConfigured()) {
 			if (!hideNotice) {
-				new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+				new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"), 2000);
 			}
 			return text;
 		}
@@ -71,7 +71,7 @@ export class AIManager {
 
 		if (!textToProcess.trim()) {
 			if (!hideNotice) {
-				new Notice("❌ " + t("NOTICE_NO_TEXT"));
+				new Notice("❌ " + t("NOTICE_NO_TEXT"), 2000);
 			}
 			return text;
 		}
@@ -96,7 +96,7 @@ export class AIManager {
 
 		if (result.error) {
 			if (!hideNotice) {
-				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]), 2000);
 			}
 			return text;
 		}
@@ -134,7 +134,7 @@ export class AIManager {
 		const aiService = new AIService(merged);
 		if (!aiService.isConfigured()) {
 			if (!hideNotice) {
-				new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"));
+				new Notice("❌ " + t("AI_CONFIG_INCOMPLETE"), 2000);
 			}
 			return text;
 		}
@@ -151,7 +151,7 @@ export class AIManager {
 
 		if (!textToProcess.trim()) {
 			if (!hideNotice) {
-				new Notice("❌ " + t("NOTICE_NO_TEXT"));
+				new Notice("❌ " + t("NOTICE_NO_TEXT"), 2000);
 			}
 			return text;
 		}
@@ -167,7 +167,7 @@ export class AIManager {
 		);
 		if (result.error) {
 			if (!hideNotice) {
-				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]), 2000);
 			}
 			return text;
 		}
@@ -188,7 +188,7 @@ export class AIManager {
 				(a) => a.id === actionId
 			) || null;
 		if (!action) {
-			new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
+			new Notice(t("NOTICE_PROMPT_NOT_FOUND"), 2000);
 
 			return;
 		}
@@ -222,7 +222,7 @@ export class AIManager {
 			view.showLoading(t("NOTICE_AI_PROCESSING"));
 			const src = view.content || "";
 			if (!src.trim()) {
-				new Notice(t("NOTICE_NO_TEXT"));
+				new Notice(t("NOTICE_NO_TEXT"), 2000);
 				view.hideLoading();
 				return;
 			}
@@ -249,7 +249,7 @@ export class AIManager {
 				action.systemPrompt || ""
 			);
 			if (result.error) {
-				new Notice(`❌ ${result.error}`);
+				new Notice(`❌ ${result.error}`, 2000);
 				view.hideLoading();
 				return;
 			}
@@ -267,7 +267,7 @@ export class AIManager {
 			view.content = finalContent;
 			view.render();
 			view.hideLoading();
-			new Notice("✅ " + t("NOTICE_AI_DONE"));
+			new Notice("✅ " + t("NOTICE_AI_DONE"), 2000);
 			return;
 		}
 
@@ -282,7 +282,7 @@ export class AIManager {
 			
 			if (useSelection) {
 				if (!selection.trim()) {
-					new Notice(t("NOTICE_NO_TEXT"));
+					new Notice(t("NOTICE_NO_TEXT"), 2000);
 					return;
 				}
 				const result = await aiService.processText(
@@ -291,17 +291,20 @@ export class AIManager {
 					action.systemPrompt || ""
 				);
 				if (result.error) {
-					new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+					new Notice(
+						"❌ " + t("NOTICE_AI_ERROR", [result.error]),
+						2000
+					);
 					return;
 				}
 				editor.replaceSelection(result.content);
-				new Notice(t("NOTICE_AI_DONE"));
+				new Notice(t("NOTICE_AI_DONE"), 2000);
 				return;
 			}
 
 			const fullText = editor.getValue();
 			if (!fullText.trim()) {
-				new Notice(t("NOTICE_NO_TEXT"));
+				new Notice(t("NOTICE_NO_TEXT"), 2000);
 				return;
 			}
 
@@ -322,7 +325,10 @@ export class AIManager {
 				action.systemPrompt || ""
 			);
 			if (result.error) {
-				new Notice("❌ " + t("NOTICE_AI_ERROR", [result.error]));
+				new Notice(
+					"❌ " + t("NOTICE_AI_ERROR", [result.error]),
+					2000
+				);
 				return;
 			}
 			
@@ -335,11 +341,11 @@ export class AIManager {
 			}
 			
 			editor.setValue(finalContent);
-			new Notice(t("NOTICE_AI_DONE"));
+			new Notice(t("NOTICE_AI_DONE"), 2000);
 			return;
 		}
 
 		// 情况三：均不可用
-		new Notice(t("NOTICE_NO_EDITOR"));
+		new Notice(t("NOTICE_NO_EDITOR"), 2000);
 	}
 }

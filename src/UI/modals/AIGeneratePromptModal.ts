@@ -66,7 +66,7 @@ export class AIGeneratePromptModal extends Modal {
 
 	private async handleGenerate(btn: ButtonComponent) {
 		if (!this.requirement.trim()) {
-			new Notice(t("MODAL_GENERATE_REQ_PLACEHOLDER"));
+			new Notice(t("MODAL_GENERATE_REQ_PLACEHOLDER"), 2000);
 			return;
 		}
 
@@ -100,7 +100,7 @@ Generate the System Prompt and User Prompt JSON.`;
 			);
 
 			if (response.error) {
-				new Notice(t("GENERATE_ERROR") + response.error);
+				new Notice(t("GENERATE_ERROR") + response.error, 2000);
 			} else {
 				let content = response.content.trim();
 				// Clean up markdown code blocks if present
@@ -116,18 +116,21 @@ Generate the System Prompt and User Prompt JSON.`;
 						result.userPrompt !== undefined
 					) {
 						this.onGenerate(result);
-						new Notice(t("GENERATE_SUCCESS"));
+						new Notice(t("GENERATE_SUCCESS"), 2000);
 						this.close();
 					} else {
 						throw new Error("Invalid JSON structure");
 					}
 				} catch (e) {
 					console.error("Failed to parse AI response:", content);
-					new Notice(t("GENERATE_ERROR") + "Failed to parse JSON.");
+					new Notice(
+						t("GENERATE_ERROR") + "Failed to parse JSON.",
+						2000
+					);
 				}
 			}
 		} catch (error) {
-			new Notice(t("GENERATE_ERROR") + error);
+			new Notice(t("GENERATE_ERROR") + error, 2000);
 		} finally {
 			btn.setDisabled(false);
 			btn.setButtonText(t("BTN_GENERATE"));

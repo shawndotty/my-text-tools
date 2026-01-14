@@ -341,11 +341,11 @@ export class BatchManager {
 			(b) => b.id === batchId
 		);
 		if (!batch) {
-			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
+			new Notice(t("NOTICE_BATCH_NOT_FOUND"), 2000);
 			return;
 		}
 
-		new Notice(t("NOTICE_PROCESSING_FILES", [String(files.length)]));
+		new Notice(t("NOTICE_PROCESSING_FILES", [String(files.length)]), 2000);
 
 		let successCount = 0;
 		const CONCURRENCY_LIMIT = 5;
@@ -376,7 +376,8 @@ export class BatchManager {
 			t("NOTICE_BATCH_APPLIED_FILES", [
 				String(successCount),
 				String(files.length),
-			])
+			]),
+			2000
 		);
 	}
 
@@ -469,7 +470,7 @@ export class BatchManager {
 				this.plugin.settings.customActions?.find((a) => a.id === id) ||
 				null;
 			if (!action) {
-				new Notice(t("NOTICE_PROMPT_NOT_FOUND"));
+				new Notice(t("NOTICE_PROMPT_NOT_FOUND"), 2000);
 				return text;
 			}
 			return await this.aiManager.applyCustomAIActionToText(
@@ -486,7 +487,7 @@ export class BatchManager {
 				this.plugin.settings.customScripts?.find((s) => s.id === id) ||
 				null;
 			if (!script) {
-				new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
+				new Notice(t("NOTICE_SCRIPT_NOT_FOUND"), 2000);
 				return text;
 			}
 			return await this.scriptManager.applyCustomScriptToText(
@@ -523,7 +524,7 @@ export class BatchManager {
 			(b) => b.id === batchId
 		);
 		if (!batch) {
-			new Notice(t("NOTICE_BATCH_NOT_FOUND"));
+			new Notice(t("NOTICE_BATCH_NOT_FOUND"), 2000);
 			await this.disableBatchShortcut(batchId);
 			return;
 		}
@@ -532,12 +533,12 @@ export class BatchManager {
 			editor ||
 			this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
 		if (!activeEditor) {
-			new Notice(t("NOTICE_NO_EDITOR"));
+			new Notice(t("NOTICE_NO_EDITOR"), 2000);
 			return;
 		}
 
 		if (scope === "selection" && !activeEditor.somethingSelected()) {
-			new Notice(t("NOTICE_NO_SELECTION"));
+			new Notice(t("NOTICE_NO_SELECTION"), 2000);
 			return;
 		}
 
@@ -556,7 +557,6 @@ export class BatchManager {
 			activeEditor.setValue(text);
 		}
 
-		new Notice(t("NOTICE_BATCH_APPLIED"));
+		new Notice(t("NOTICE_BATCH_APPLIED"), 2000);
 	}
 }
-

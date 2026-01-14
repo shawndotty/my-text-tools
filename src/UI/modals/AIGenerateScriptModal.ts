@@ -74,7 +74,7 @@ export class AIGenerateScriptModal extends Modal {
 
 	private async handleGenerate(btn: ButtonComponent) {
 		if (!this.requirement.trim()) {
-			new Notice(t("MODAL_GENERATE_REQ_PLACEHOLDER"));
+			new Notice(t("MODAL_GENERATE_REQ_PLACEHOLDER"), 2000);
 			return;
 		}
 
@@ -119,7 +119,7 @@ Generate the JavaScript code.`;
 			);
 
 			if (response.error) {
-				new Notice(t("GENERATE_ERROR") + response.error);
+				new Notice(t("GENERATE_ERROR") + response.error, 2000);
 			} else {
 				let code = response.content.trim();
 				// Remove markdown code blocks if present
@@ -130,11 +130,11 @@ Generate the JavaScript code.`;
 					.replace(/```$/, "");
 
 				this.onGenerate(code);
-				new Notice(t("GENERATE_SUCCESS"));
+				new Notice(t("GENERATE_SUCCESS"), 2000);
 				this.close();
 			}
 		} catch (error) {
-			new Notice(t("GENERATE_ERROR") + error);
+			new Notice(t("GENERATE_ERROR") + error, 2000);
 		} finally {
 			btn.setDisabled(false);
 			btn.setButtonText(t("BTN_GENERATE"));

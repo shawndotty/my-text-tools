@@ -89,7 +89,7 @@ export class MyTextToolsView extends ItemView {
 				start: editor.getCursor("from"),
 				end: editor.getCursor("to"),
 			};
-			new Notice(t("NOTICE_LOAD_SELECTION"));
+			new Notice(t("NOTICE_LOAD_SELECTION"), 2000);
 		} else {
 			this.content = editor.getValue();
 			this.selectionRange = null;
@@ -209,9 +209,9 @@ export class MyTextToolsView extends ItemView {
 			onCopy: async () => {
 				try {
 					await navigator.clipboard.writeText(this.content);
-					new Notice(t("NOTICE_COPY_CLIPBOARD_SUCCESS"));
+					new Notice(t("NOTICE_COPY_CLIPBOARD_SUCCESS"), 2000);
 				} catch (err) {
-					new Notice(t("NOTICE_COPY_CLIPBOARD_ERROR"));
+					new Notice(t("NOTICE_COPY_CLIPBOARD_ERROR"), 2000);
 				}
 			},
 			onSaveNew: () => this.saveToNewFile(),
@@ -254,13 +254,13 @@ export class MyTextToolsView extends ItemView {
 			onStartRecording: () => {
 				this.isRecording = true;
 				this.currentBatchOperations = [];
-				new Notice(t("NOTICE_RECORDING_STARTED"));
+				new Notice(t("NOTICE_RECORDING_STARTED"), 2000);
 				this.render();
 			},
 			onStopRecording: () => {
 				this.isRecording = false;
 				if (this.currentBatchOperations.length === 0) {
-					new Notice(t("NO_OPERATIONS_RECORDED"));
+					new Notice(t("NO_OPERATIONS_RECORDED"), 2000);
 					this.render();
 					return;
 				}
@@ -274,7 +274,7 @@ export class MyTextToolsView extends ItemView {
 					await this.plugin.saveSettings();
 					this.settingsState.savedBatches =
 						this.plugin.settings.savedBatches;
-					new Notice(t("NOTICE_BATCH_SAVED"));
+					new Notice(t("NOTICE_BATCH_SAVED"), 2000);
 					this.render();
 				}).open();
 				this.render();
@@ -282,7 +282,7 @@ export class MyTextToolsView extends ItemView {
 			onCancelRecording: () => {
 				this.isRecording = false;
 				this.currentBatchOperations = [];
-				new Notice(t("NOTICE_RECORDING_CANCELLED"));
+				new Notice(t("NOTICE_RECORDING_CANCELLED"), 2000);
 				this.render();
 			},
 			onApplyBatch: () => {
@@ -303,7 +303,7 @@ export class MyTextToolsView extends ItemView {
 						await this.plugin.saveSettings();
 						this.settingsState.savedBatches =
 							this.plugin.settings.savedBatches;
-						new Notice(t("NOTICE_BATCH_DELETED"));
+						new Notice(t("NOTICE_BATCH_DELETED"), 2000);
 						this.render();
 					},
 					(batch) => {
@@ -327,7 +327,7 @@ export class MyTextToolsView extends ItemView {
 									);
 									this.settingsState.savedBatches =
 										this.plugin.settings.savedBatches;
-									new Notice(t("NOTICE_BATCH_UPDATED"));
+									new Notice(t("NOTICE_BATCH_UPDATED"), 2000);
 									this.render();
 								}
 							},
@@ -339,7 +339,10 @@ export class MyTextToolsView extends ItemView {
 								await this.plugin.saveSettings();
 								this.settingsState.savedBatches =
 									this.plugin.settings.savedBatches;
-								new Notice(t("NOTICE_BATCH_SAVED_AS_NEW"));
+								new Notice(
+									t("NOTICE_BATCH_SAVED_AS_NEW"),
+									2000
+								);
 								this.render();
 							}
 						).open();
@@ -395,7 +398,7 @@ export class MyTextToolsView extends ItemView {
 							JSON.stringify(this.settingsState)
 						),
 					});
-					new Notice(t("NOTICE_OPERATION_RECORDED", [toolId]));
+					new Notice(t("NOTICE_OPERATION_RECORDED", [toolId]), 2000);
 				}
 
 				if (toolId.startsWith("custom-ai:")) {
@@ -488,7 +491,7 @@ export class MyTextToolsView extends ItemView {
 							const re = new RegExp(s.find, flags);
 							result = text.replace(re, s.replace);
 						} catch (e) {
-							new Notice(t("NOTICE_REGEX_ERROR"));
+							new Notice(t("NOTICE_REGEX_ERROR"), 2000);
 							return null;
 						}
 					} else {
@@ -532,7 +535,7 @@ export class MyTextToolsView extends ItemView {
 				default:
 					return null;
 			}
-			new Notice(t("ON_SELECT_NOTICE_PROCESSED"));
+			new Notice(t("ON_SELECT_NOTICE_PROCESSED"), 2000);
 			return result;
 		} catch (e) {
 			console.error("On-select processing error:", e);

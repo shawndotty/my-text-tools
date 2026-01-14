@@ -60,7 +60,7 @@ export class ScriptManager {
 		// If it's a selection-scope run (not a full note run) and there's no selection, warn the user.
 		if (scope === "selection" && !selection && usesSelectionOnly) {
 			if (!hideNotice) {
-				new Notice(t("NOTICE_NO_SELECTION"));
+				new Notice(t("NOTICE_NO_SELECTION"), 2000);
 			}
 			return text;
 		}
@@ -81,7 +81,7 @@ export class ScriptManager {
 			(s) => s.id === scriptId
 		);
 		if (!script) {
-			new Notice(t("NOTICE_SCRIPT_NOT_FOUND"));
+			new Notice(t("NOTICE_SCRIPT_NOT_FOUND"), 2000);
 			return;
 		}
 
@@ -132,7 +132,7 @@ export class ScriptManager {
 				}
 			};
 		} else {
-			new Notice(t("NOTICE_NO_EDITOR"));
+			new Notice(t("NOTICE_NO_EDITOR"), 2000);
 			return;
 		}
 
@@ -140,7 +140,7 @@ export class ScriptManager {
 			/\bselection\b/.test(script.code) && !/\btext\b/.test(script.code);
 		const hasSelection = !!selection;
 		if (!hasSelection && usesSelectionOnly) {
-			new Notice(t("NOTICE_NO_SELECTION"));
+			new Notice(t("NOTICE_NO_SELECTION"), 2000);
 			return;
 		}
 
@@ -163,11 +163,14 @@ export class ScriptManager {
 
 			if (typeof result === "string") {
 				updateCallback(result);
-				new Notice(t("NOTICE_SCRIPT_SUCCESS"));
+				new Notice(t("NOTICE_SCRIPT_SUCCESS"), 2000);
 			}
 		} catch (error: any) {
 			console.error("Script execution failed:", error);
-			new Notice(t("NOTICE_SCRIPT_ERROR").replace("{0}", error.message));
+			new Notice(
+				t("NOTICE_SCRIPT_ERROR").replace("{0}", error.message),
+				2000
+			);
 		}
 	}
 }
