@@ -255,7 +255,6 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 				}
 			});
 
-			// Edit Button
 			new ButtonComponent(btnGroup)
 				.setIcon("pencil")
 				.setTooltip(t("BTN_EDIT"))
@@ -292,7 +291,23 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					).open();
 				});
 
-			// Delete Button
+			new ButtonComponent(btnGroup)
+				.setIcon("copy")
+				.setTooltip(t("BTN_SAVE_AS_NEW"))
+				.setClass("mtt-icon-btn")
+				.onClick(async () => {
+					const newBatch = {
+						id: Date.now().toString(),
+						name: `${batch.name} (copy)`,
+						operations: JSON.parse(
+							JSON.stringify(batch.operations)
+						),
+					};
+					this.plugin.settings.savedBatches.push(newBatch);
+					await this.plugin.saveSettings();
+					this.renderBatchProcessSettings(containerEl);
+				});
+
 			new ButtonComponent(btnGroup)
 				.setIcon("trash")
 				.setTooltip(t("BTN_DELETE"))

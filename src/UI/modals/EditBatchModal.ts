@@ -47,7 +47,10 @@ export class EditBatchModal extends Modal {
 		new Setting(contentEl)
 			.setName(t("MODAL_SAVE_BATCH_NAME"))
 			.addText((text) =>
-				text.setValue(this.workingBatch.name).setDisabled(true)
+				text.setValue(this.workingBatch.name).onChange((value) => {
+					this.workingBatch.name = value;
+					this.updateFooter(); // 更新底部按钮状态
+				})
 			);
 
 		const opsContainer = contentEl.createDiv({
