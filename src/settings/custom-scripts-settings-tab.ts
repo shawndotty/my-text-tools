@@ -39,7 +39,10 @@ export function renderCustomScriptsSettingsTab(
 		.setButtonText(t("BTN_EXPORT_SCRIPTS"))
 		.setIcon("download")
 		.setClass("mtt-icon-btn")
-		.setTooltip(t("BTN_EXPORT_SCRIPTS"))
+		.setTooltip(t("BTN_EXPORT_SCRIPTS"), {
+			placement: "bottom",
+			delay: 300,
+		})
 		.onClick(() => {
 			if (plugin.settings.customScripts.length === 0) {
 				new Notice(t("NOTICE_NO_SCRIPTS"));
@@ -52,7 +55,10 @@ export function renderCustomScriptsSettingsTab(
 		.setButtonText(t("BTN_IMPORT_SCRIPTS"))
 		.setIcon("upload")
 		.setClass("mtt-icon-btn")
-		.setTooltip(t("BTN_IMPORT_SCRIPTS"))
+		.setTooltip(t("BTN_IMPORT_SCRIPTS"), {
+			placement: "bottom",
+			delay: 300,
+		})
 		.onClick(() => {
 			const input = document.createElement("input");
 			input.type = "file";
@@ -146,7 +152,10 @@ export function renderCustomScriptsSettingsTab(
 			)
 			.addToggle((toggle) =>
 				toggle
-					.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
+					.setTooltip(t("TOGGLE_SHOW_IN_LEFT"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.setValue(script.showInRibbon)
 					.onChange(async (value) => {
 						script.showInRibbon = value;
@@ -157,7 +166,10 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("chevron-up")
-					.setTooltip(t("BTN_MOVE_UP"))
+					.setTooltip(t("BTN_MOVE_UP"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						if (idx <= 0) return;
 						const arr = plugin.settings.customScripts;
@@ -171,7 +183,10 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("chevron-down")
-					.setTooltip(t("BTN_MOVE_DOWN"))
+					.setTooltip(t("BTN_MOVE_DOWN"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						const arr = plugin.settings.customScripts;
 						if (idx >= arr.length - 1) return;
@@ -185,7 +200,10 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("zap")
-					.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
+					.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						const snapshot = migrateToNestedSettings(
 							plugin.settings
@@ -212,7 +230,10 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("copy")
-					.setTooltip(t("BTN_SAVE_AS_NEW"))
+					.setTooltip(t("BTN_SAVE_AS_NEW"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						const newScript: CustomScript = JSON.parse(
 							JSON.stringify(script)
@@ -230,7 +251,10 @@ export function renderCustomScriptsSettingsTab(
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("trash")
-					.setTooltip(t("TOOLTIP_DELETE_SCRIPT"))
+					.setTooltip(t("TOOLTIP_DELETE_SCRIPT"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						plugin.settings.customScripts =
 							plugin.settings.customScripts.filter(
@@ -291,7 +315,10 @@ export function renderCustomScriptsSettingsTab(
 
 		const iconBtn = new ButtonComponent(iconContainer)
 			.setIcon(script.icon || "scroll")
-			.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+			.setTooltip(t("MODAL_ICON_PICKER_TITLE"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.onClick(() => {
 				new IconPickerModal(app, async (newIcon) => {
@@ -357,7 +384,10 @@ export function renderCustomScriptsSettingsTab(
 				.setButtonText(t("BTN_GENERATE_SCRIPT_AI"))
 				.setClass("mtt-icon-btn")
 				.setCta()
-				.setTooltip(t("BTN_GENERATE_SCRIPT_AI"))
+				.setTooltip(t("BTN_GENERATE_SCRIPT_AI"), {
+					placement: "left",
+					delay: 300,
+				})
 				.setIcon("sparkles")
 				.onClick(() => {
 					const aiService = new AIService(plugin.settings);
@@ -399,13 +429,19 @@ export function renderCustomScriptsSettingsTab(
 			new Setting(pCard)
 				.setName(`${t("PARAM_GROUP_NAME")} ${pIdx + 1}`)
 				.addExtraButton((btn) =>
-					btn.setIcon("trash").onClick(async () => {
-						script.params = (script.params || []).filter(
-							(_, i) => i !== pIdx
-						);
-						await plugin.saveSettings();
-						refresh();
-					})
+					btn
+						.setIcon("trash")
+						.setTooltip(t("BTN_DELETE_PARAM"), {
+							placement: "left",
+							delay: 300,
+						})
+						.onClick(async () => {
+							script.params = (script.params || []).filter(
+								(_, i) => i !== pIdx
+							);
+							await plugin.saveSettings();
+							refresh();
+						})
 				);
 
 			const grid = pCard.createDiv();

@@ -81,7 +81,11 @@ export class ApplyBatchModal extends Modal {
 				shortcutBtn.setTooltip(
 					enabled
 						? t("TOOLTIP_BATCH_SHORTCUT_DISABLE")
-						: t("TOOLTIP_BATCH_SHORTCUT_ENABLE")
+						: t("TOOLTIP_BATCH_SHORTCUT_ENABLE"),
+					{
+						placement: "bottom",
+						delay: 300,
+					}
 				);
 			};
 			updateShortcutBtnUI();
@@ -106,7 +110,10 @@ export class ApplyBatchModal extends Modal {
 
 			new ButtonComponent(btnGroup)
 				.setIcon("pencil")
-				.setTooltip(t("BTN_EDIT"))
+				.setTooltip(t("BTN_EDIT"), {
+					placement: "bottom",
+					delay: 300,
+				})
 				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					this.close();
@@ -115,7 +122,10 @@ export class ApplyBatchModal extends Modal {
 
 			new ButtonComponent(btnGroup)
 				.setIcon("trash-2")
-				.setTooltip(t("BTN_DELETE"))
+				.setTooltip(t("BTN_DELETE"), {
+					placement: "bottom",
+					delay: 300,
+				})
 				.setClass("mtt-icon-btn")
 				.onClick(() => {
 					new ConfirmModal(

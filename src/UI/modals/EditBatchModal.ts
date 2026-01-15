@@ -101,7 +101,10 @@ export class EditBatchModal extends Modal {
 		// Move Up
 		new ButtonComponent(controls)
 			.setIcon("arrow-up")
-			.setTooltip(t("BTN_MOVE_UP"))
+			.setTooltip(t("BTN_MOVE_UP"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setDisabled(index === 0)
 			.onClick(() => {
@@ -111,7 +114,10 @@ export class EditBatchModal extends Modal {
 		// Move Down
 		new ButtonComponent(controls)
 			.setIcon("arrow-down")
-			.setTooltip(t("BTN_MOVE_DOWN"))
+			.setTooltip(t("BTN_MOVE_DOWN"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setDisabled(index === this.workingBatch.operations.length - 1)
 			.onClick(() => {
@@ -120,7 +126,10 @@ export class EditBatchModal extends Modal {
 
 		new ButtonComponent(controls)
 			.setIcon("copy")
-			.setTooltip(t("BTN_DUPLICATE_STEP"))
+			.setTooltip(t("BTN_DUPLICATE_STEP"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.onClick(() => {
 				this.duplicateOp(index);
@@ -129,7 +138,10 @@ export class EditBatchModal extends Modal {
 		// Delete
 		new ButtonComponent(controls)
 			.setIcon("trash")
-			.setTooltip(t("BTN_DELETE_OP"))
+			.setTooltip(t("BTN_DELETE_OP"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-text-danger")
 			.onClick(() => {

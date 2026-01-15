@@ -19,14 +19,20 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 	});
 
 	BUILTIN_TOOLS.forEach((tool) => {
-		const setting = new Setting(containerEl).setName(t(tool.nameKey as any));
+		const setting = new Setting(containerEl).setName(
+			t(tool.nameKey as any)
+		);
 
 		setting
 			.addExtraButton((btn) => {
 				const currentIcon =
 					plugin.settings.customIcons?.[tool.id] || tool.icon;
+
 				btn.setIcon(currentIcon)
-					.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+					.setTooltip(t("MODAL_ICON_PICKER_TITLE"), {
+						placement: "left",
+						delay: 300,
+					})
 					.onClick(() => {
 						new IconPickerModal(app, async (newIcon) => {
 							if (!plugin.settings.customIcons) {
@@ -74,4 +80,3 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 			);
 	});
 }
-

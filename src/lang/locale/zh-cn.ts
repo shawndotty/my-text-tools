@@ -368,6 +368,7 @@ export default {
 	SCRIPTS_PARAMS_MANAGE: "参数管理",
 	SCRIPTS_PARAMS_DESC: "定义该脚本在运行时可配置的参数",
 	BTN_ADD_PARAM: "新增参数",
+	BTN_DELETE_PARAM: "删除参数",
 	PARAM_GROUP_NAME: "参数",
 	PARAM_KEY_LABEL: "Key",
 	PARAM_LABEL_LABEL: "标签",

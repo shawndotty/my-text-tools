@@ -35,7 +35,10 @@ export function renderBatchProcessSettingsTab(
 		.setButtonText(t("BTN_EXPORT_BATCHES"))
 		.setIcon("download")
 		.setClass("mtt-icon-btn")
-		.setTooltip(t("BTN_EXPORT_BATCHES"))
+		.setTooltip(t("BTN_EXPORT_BATCHES"), {
+			placement: "bottom",
+			delay: 300,
+		})
 		.onClick(() => {
 			if (plugin.settings.savedBatches.length === 0) {
 				new Notice(t("NOTICE_NO_BATCHES"));
@@ -48,7 +51,10 @@ export function renderBatchProcessSettingsTab(
 		.setButtonText(t("BTN_IMPORT_BATCHES"))
 		.setIcon("upload")
 		.setClass("mtt-icon-btn")
-		.setTooltip(t("BTN_IMPORT_BATCHES"))
+		.setTooltip(t("BTN_IMPORT_BATCHES"), {
+			placement: "bottom",
+			delay: 300,
+		})
 		.onClick(() => {
 			const input = document.createElement("input");
 			input.type = "file";
@@ -150,7 +156,11 @@ export function renderBatchProcessSettingsTab(
 			shortcutBtn.setTooltip(
 				enabled
 					? t("TOOLTIP_BATCH_SHORTCUT_DISABLE")
-					: t("TOOLTIP_BATCH_SHORTCUT_ENABLE")
+					: t("TOOLTIP_BATCH_SHORTCUT_ENABLE"),
+				{
+					placement: "bottom",
+					delay: 300,
+				}
 			);
 		};
 		updateShortcutBtnUI();
@@ -171,7 +181,10 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("chevron-up")
-			.setTooltip(t("BTN_MOVE_UP"))
+			.setTooltip(t("BTN_MOVE_UP"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(async () => {
@@ -186,7 +199,10 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("chevron-down")
-			.setTooltip(t("BTN_MOVE_DOWN"))
+			.setTooltip(t("BTN_MOVE_DOWN"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(async () => {
@@ -201,7 +217,10 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("pencil")
-			.setTooltip(t("BTN_EDIT"))
+			.setTooltip(t("BTN_EDIT"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(() => {
@@ -232,7 +251,10 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("copy")
-			.setTooltip(t("BTN_SAVE_AS_NEW"))
+			.setTooltip(t("BTN_SAVE_AS_NEW"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(async () => {
@@ -248,7 +270,10 @@ export function renderBatchProcessSettingsTab(
 
 		new ButtonComponent(btnGroup)
 			.setIcon("trash")
-			.setTooltip(t("BTN_DELETE"))
+			.setTooltip(t("BTN_DELETE"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.setClass("mtt-icon-btn")
 			.setClass("mtt-bare-btn")
 			.onClick(() => {

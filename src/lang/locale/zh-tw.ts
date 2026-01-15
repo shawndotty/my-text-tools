@@ -357,6 +357,7 @@ export default {
 	SCRIPTS_PARAMS_MANAGE: "參數管理",
 	SCRIPTS_PARAMS_DESC: "定義該腳本在運行時可配置的參數",
 	BTN_ADD_PARAM: "新增參數",
+	BTN_DELETE_PARAM: "刪除參數",
 	PARAM_GROUP_NAME: "參數",
 	PARAM_KEY_LABEL: "Key",
 	PARAM_LABEL_LABEL: "標籤",

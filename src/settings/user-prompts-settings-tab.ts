@@ -36,7 +36,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 		.setButtonText(t("BTN_EXPORT_PROMPTS"))
 		.setIcon("download")
 		.setClass("mtt-icon-btn")
-		.setTooltip(t("BTN_EXPORT_PROMPTS"))
+		.setTooltip(t("BTN_EXPORT_PROMPTS"), {
+			placement: "bottom",
+			delay: 300,
+		})
 		.onClick(() => {
 			if (plugin.settings.customActions.length === 0) {
 				new Notice(t("NOTICE_NO_PROMPTS"));
@@ -49,7 +52,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 		.setButtonText(t("BTN_IMPORT_PROMPTS"))
 		.setIcon("upload")
 		.setClass("mtt-icon-btn")
-		.setTooltip(t("BTN_IMPORT_PROMPTS"))
+		.setTooltip(t("BTN_IMPORT_PROMPTS"), {
+			placement: "bottom",
+			delay: 300,
+		})
 		.onClick(() => {
 			const input = document.createElement("input");
 			input.type = "file";
@@ -144,7 +150,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			)
 			.addToggle((toggle) =>
 				toggle
-					.setTooltip(t("TOGGLE_SHOW_IN_LEFT"))
+					.setTooltip(t("TOGGLE_SHOW_IN_LEFT"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.setValue(card.showInRibbon)
 					.onChange(async (value) => {
 						card.showInRibbon = value;
@@ -155,7 +164,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("chevron-up")
-					.setTooltip(t("BTN_MOVE_UP"))
+					.setTooltip(t("BTN_MOVE_UP"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						if (idx <= 0) return;
 						const arr = plugin.settings.customActions;
@@ -169,7 +181,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("chevron-down")
-					.setTooltip(t("BTN_MOVE_DOWN"))
+					.setTooltip(t("BTN_MOVE_DOWN"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						const arr = plugin.settings.customActions;
 						if (idx >= arr.length - 1) return;
@@ -183,7 +198,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("zap")
-					.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
+					.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						const snapshot = migrateToNestedSettings(
 							plugin.settings
@@ -210,7 +228,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("copy")
-					.setTooltip(t("BTN_SAVE_AS_NEW"))
+					.setTooltip(t("BTN_SAVE_AS_NEW"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						const newCard: CustomAIAction = JSON.parse(
 							JSON.stringify(card)
@@ -228,7 +249,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.addExtraButton((btn) =>
 				btn
 					.setIcon("trash")
-					.setTooltip(t("TOOLTIP_DELETE_PROMPT"))
+					.setTooltip(t("TOOLTIP_DELETE_PROMPT"), {
+						placement: "bottom",
+						delay: 300,
+					})
 					.onClick(async () => {
 						plugin.settings.customActions =
 							plugin.settings.customActions.filter(
@@ -285,7 +309,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 
 		const iconBtn = new ButtonComponent(iconContainer)
 			.setIcon(card.icon || "sparkles")
-			.setTooltip(t("MODAL_ICON_PICKER_TITLE"))
+			.setTooltip(t("MODAL_ICON_PICKER_TITLE"), {
+				placement: "bottom",
+				delay: 300,
+			})
 			.onClick(() => {
 				new IconPickerModal(app, async (newIcon) => {
 					card.icon = newIcon;
@@ -329,7 +356,10 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 
 		const promptAiBtn = new ButtonComponent(promptContainer)
 			.setIcon("sparkles")
-			.setTooltip(t("TOOLTIP_GENERATE_PROMPT_AI"))
+			.setTooltip(t("TOOLTIP_GENERATE_PROMPT_AI"), {
+				placement: "left",
+				delay: 300,
+			})
 			.onClick(() => {
 				const aiService = new AIService(plugin.settings);
 				new AIGeneratePromptModal(app, aiService, async (result) => {

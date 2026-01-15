@@ -630,6 +630,10 @@ input[type="number"].mtt-small-input {
 	align-items: center;
 }
 
+.setting-item-control .clickable-icon {
+	cursor: pointer;
+}
+
 
 
 /* ==========================================================================

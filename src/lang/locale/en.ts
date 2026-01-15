@@ -380,6 +380,7 @@ export default {
 	SCRIPTS_PARAMS_DESC:
 		"Define parameters that can be configured when the script runs",
 	BTN_ADD_PARAM: "Add Parameter",
+	BTN_DELETE_PARAM: "Delete Parameter",
 	PARAM_GROUP_NAME: "Parameter",
 	PARAM_KEY_LABEL: "Key",
 	PARAM_LABEL_LABEL: "Label",
