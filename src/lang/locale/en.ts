@@ -470,4 +470,14 @@ export default {
 	BTN_SELECT_ALL: "Select All",
 	BTN_DESELECT_ALL: "Deselect All",
 	NOTICE_EXPORT_NO_SELECTION: "No shortcuts selected.",
+
+	// Script Export/Import
+	BTN_EXPORT_SCRIPTS: "Export Scripts",
+	BTN_IMPORT_SCRIPTS: "Import Scripts",
+	MODAL_EXPORT_SCRIPT_TITLE: "Select Scripts to Export",
+	NOTICE_SCRIPT_EXPORT_SUCCESS: "Scripts exported successfully.",
+	NOTICE_SCRIPT_IMPORT_SUCCESS: "Scripts imported successfully.",
+	NOTICE_SCRIPT_IMPORT_ERROR: "Failed to import scripts: {0}",
+	NOTICE_NO_SCRIPTS: "No custom scripts found.",
+	NOTICE_EXPORT_NO_SCRIPT_SELECTION: "No scripts selected.",
 };

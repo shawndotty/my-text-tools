@@ -457,4 +457,14 @@ export default {
 	BTN_SELECT_ALL: "全选",
 	BTN_DESELECT_ALL: "取消全选",
 	NOTICE_EXPORT_NO_SELECTION: "未选择任何快捷指令。",
+
+	// Script Export/Import
+	BTN_EXPORT_SCRIPTS: "导出脚本",
+	BTN_IMPORT_SCRIPTS: "导入脚本",
+	MODAL_EXPORT_SCRIPT_TITLE: "选择要导出的脚本",
+	NOTICE_SCRIPT_EXPORT_SUCCESS: "脚本导出成功。",
+	NOTICE_SCRIPT_IMPORT_SUCCESS: "脚本导入成功。",
+	NOTICE_SCRIPT_IMPORT_ERROR: "导入脚本失败：{0}",
+	NOTICE_NO_SCRIPTS: "未找到自定义脚本。",
+	NOTICE_EXPORT_NO_SCRIPT_SELECTION: "未选择任何脚本。",
 };
