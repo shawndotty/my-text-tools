@@ -467,4 +467,14 @@ export default {
 	NOTICE_SCRIPT_IMPORT_ERROR: "导入脚本失败：{0}",
 	NOTICE_NO_SCRIPTS: "未找到自定义脚本。",
 	NOTICE_EXPORT_NO_SCRIPT_SELECTION: "未选择任何脚本。",
+
+	// Prompt Export/Import
+	BTN_EXPORT_PROMPTS: "导出提示词",
+	BTN_IMPORT_PROMPTS: "导入提示词",
+	MODAL_EXPORT_PROMPT_TITLE: "选择要导出的提示词",
+	NOTICE_PROMPT_EXPORT_SUCCESS: "提示词导出成功。",
+	NOTICE_PROMPT_IMPORT_SUCCESS: "提示词导入成功。",
+	NOTICE_PROMPT_IMPORT_ERROR: "导入提示词失败：{0}",
+	NOTICE_NO_PROMPTS: "未找到自定义提示词。",
+	NOTICE_EXPORT_NO_PROMPT_SELECTION: "未选择任何提示词。",
 };

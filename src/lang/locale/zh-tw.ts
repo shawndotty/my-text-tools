@@ -455,4 +455,14 @@ export default {
 	NOTICE_SCRIPT_IMPORT_ERROR: "匯入腳本失敗：{0}",
 	NOTICE_NO_SCRIPTS: "未找到自定義腳本。",
 	NOTICE_EXPORT_NO_SCRIPT_SELECTION: "未選擇任何腳本。",
+
+	// Prompt Export/Import
+	BTN_EXPORT_PROMPTS: "匯出提示詞",
+	BTN_IMPORT_PROMPTS: "匯入提示詞",
+	MODAL_EXPORT_PROMPT_TITLE: "選擇要匯出的提示詞",
+	NOTICE_PROMPT_EXPORT_SUCCESS: "提示詞匯出成功。",
+	NOTICE_PROMPT_IMPORT_SUCCESS: "提示詞匯入成功。",
+	NOTICE_PROMPT_IMPORT_ERROR: "匯入提示詞失敗：{0}",
+	NOTICE_NO_PROMPTS: "未找到自定義提示詞。",
+	NOTICE_EXPORT_NO_PROMPT_SELECTION: "未選擇任何提示詞。",
 };

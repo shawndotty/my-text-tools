@@ -6,6 +6,7 @@ import type { CustomAIAction } from "./types";
 import { IconPickerModal } from "../UI/modals/IconPickerModal";
 import { AIService } from "../utils/aiService";
 import { AIGeneratePromptModal } from "../UI/modals/AIGeneratePromptModal";
+import { ExportPromptModal } from "../UI/modals/ExportPromptModal";
 
 interface UserPromptsSettingsContext {
 	app: App;
@@ -21,6 +22,81 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 	containerEl.createEl("h3", {
 		text: t("CUSTOM_PROMPTS_TITLE"),
 	});
+
+	// --- Export / Import Controls ---
+	const controlsDiv = containerEl.createDiv({ cls: "mtt-prompt-controls" });
+	controlsDiv.style.display = "flex";
+	controlsDiv.style.gap = "10px";
+	controlsDiv.style.marginBottom = "15px";
+
+	new ButtonComponent(controlsDiv)
+		.setButtonText(t("BTN_EXPORT_PROMPTS"))
+		.setIcon("download")
+		.onClick(() => {
+			if (plugin.settings.customActions.length === 0) {
+				new Notice(t("NOTICE_NO_PROMPTS"));
+				return;
+			}
+			new ExportPromptModal(app, plugin.settings.customActions).open();
+		});
+
+	new ButtonComponent(controlsDiv)
+		.setButtonText(t("BTN_IMPORT_PROMPTS"))
+		.setIcon("upload")
+		.onClick(() => {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = "application/json";
+			input.style.display = "none";
+			input.onchange = async (e) => {
+				const file = (e.target as HTMLInputElement).files?.[0];
+				if (!file) return;
+
+				try {
+					const text = await file.text();
+					const imported = JSON.parse(text);
+
+					if (!Array.isArray(imported)) {
+						throw new Error("Invalid format: Root must be an array");
+					}
+
+					// Basic validation
+					const validPrompts = imported.filter(
+						(p: any) =>
+							p &&
+							typeof p.name === "string" &&
+							typeof p.prompt === "string"
+					);
+
+					if (validPrompts.length === 0) {
+						throw new Error("No valid prompts found in file");
+					}
+
+					// Generate new IDs
+					const newPrompts: CustomAIAction[] = validPrompts.map(
+						(p: any) => ({
+							...p,
+							id:
+								Date.now().toString() +
+								Math.random().toString(36).substr(2, 9),
+							name: p.name,
+						})
+					);
+
+					plugin.settings.customActions.push(...newPrompts);
+					await plugin.saveSettings();
+					(plugin as any).refreshCustomRibbons?.();
+
+					new Notice(t("NOTICE_PROMPT_IMPORT_SUCCESS"));
+					refresh(); // Refresh UI
+				} catch (err: any) {
+					new Notice(t("NOTICE_PROMPT_IMPORT_ERROR", [err.message]));
+				}
+			};
+			document.body.appendChild(input);
+			input.click();
+			document.body.removeChild(input);
+		});
 
 	new Setting(containerEl)
 		.setName(t("CUSTOM_PROMPTS_MANAGE"))

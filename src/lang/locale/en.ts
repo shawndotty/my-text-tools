@@ -480,4 +480,14 @@ export default {
 	NOTICE_SCRIPT_IMPORT_ERROR: "Failed to import scripts: {0}",
 	NOTICE_NO_SCRIPTS: "No custom scripts found.",
 	NOTICE_EXPORT_NO_SCRIPT_SELECTION: "No scripts selected.",
+
+	// Prompt Export/Import
+	BTN_EXPORT_PROMPTS: "Export Prompts",
+	BTN_IMPORT_PROMPTS: "Import Prompts",
+	MODAL_EXPORT_PROMPT_TITLE: "Select Prompts to Export",
+	NOTICE_PROMPT_EXPORT_SUCCESS: "Prompts exported successfully.",
+	NOTICE_PROMPT_IMPORT_SUCCESS: "Prompts imported successfully.",
+	NOTICE_PROMPT_IMPORT_ERROR: "Failed to import prompts: {0}",
+	NOTICE_NO_PROMPTS: "No custom prompts found.",
+	NOTICE_EXPORT_NO_PROMPT_SELECTION: "No prompts selected.",
 };
