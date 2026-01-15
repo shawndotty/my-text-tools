@@ -620,6 +620,16 @@ input[type="number"].mtt-small-input {
 	gap: 10px;
 }
 
+/* mtt settings header */
+
+.mtt-setting-tab-header {
+	
+	display: flex;
+	justify-content: space-between;
+	padding-right: 16px;
+	align-items: center;
+}
+
 
 
 /* ==========================================================================

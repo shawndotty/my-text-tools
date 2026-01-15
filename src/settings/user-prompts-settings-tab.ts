@@ -19,12 +19,15 @@ interface UserPromptsSettingsContext {
 export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 	const { app, plugin, containerEl, expandedScripts, refresh } = ctx;
 
-	containerEl.createEl("h3", {
+	const settingHeader = containerEl.createDiv({
+		cls: "mtt-setting-tab-header",
+	});
+	settingHeader.createEl("h3", {
 		text: t("CUSTOM_PROMPTS_TITLE"),
 	});
 
 	// --- Export / Import Controls ---
-	const controlsDiv = containerEl.createDiv({ cls: "mtt-prompt-controls" });
+	const controlsDiv = settingHeader.createDiv({ cls: "mtt-prompt-controls" });
 	controlsDiv.style.display = "flex";
 	controlsDiv.style.gap = "10px";
 	controlsDiv.style.marginBottom = "15px";
@@ -32,6 +35,8 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 	new ButtonComponent(controlsDiv)
 		.setButtonText(t("BTN_EXPORT_PROMPTS"))
 		.setIcon("download")
+		.setClass("mtt-icon-btn")
+		.setTooltip(t("BTN_EXPORT_PROMPTS"))
 		.onClick(() => {
 			if (plugin.settings.customActions.length === 0) {
 				new Notice(t("NOTICE_NO_PROMPTS"));
@@ -43,6 +48,8 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 	new ButtonComponent(controlsDiv)
 		.setButtonText(t("BTN_IMPORT_PROMPTS"))
 		.setIcon("upload")
+		.setClass("mtt-icon-btn")
+		.setTooltip(t("BTN_IMPORT_PROMPTS"))
 		.onClick(() => {
 			const input = document.createElement("input");
 			input.type = "file";
@@ -57,7 +64,9 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					const imported = JSON.parse(text);
 
 					if (!Array.isArray(imported)) {
-						throw new Error("Invalid format: Root must be an array");
+						throw new Error(
+							"Invalid format: Root must be an array"
+						);
 					}
 
 					// Basic validation
@@ -103,7 +112,8 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 		.setDesc(t("CUSTOM_PROMPTS_DESC"))
 		.addButton((btn) =>
 			btn.setButtonText(t("BTN_ADD_PROMPT")).onClick(async () => {
-				const nextIndex = (plugin.settings.customActions?.length || 0) + 1;
+				const nextIndex =
+					(plugin.settings.customActions?.length || 0) + 1;
 				const newCard: CustomAIAction = {
 					id: `${Date.now()}`,
 					name: `${t("PROMPT_GROUP_NAME")} ${nextIndex}`,
@@ -175,7 +185,9 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					.setIcon("zap")
 					.setTooltip(t("TOOLTIP_BATCH_SHORTCUT_ENABLE"))
 					.onClick(async () => {
-						const snapshot = migrateToNestedSettings(plugin.settings);
+						const snapshot = migrateToNestedSettings(
+							plugin.settings
+						);
 						snapshot.savedBatches = [];
 
 						const newBatch: BatchProcess = {
@@ -320,17 +332,13 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.setTooltip(t("TOOLTIP_GENERATE_PROMPT_AI"))
 			.onClick(() => {
 				const aiService = new AIService(plugin.settings);
-				new AIGeneratePromptModal(
-					app,
-					aiService,
-					async (result) => {
-						card.prompt = result.userPrompt;
-						card.systemPrompt = result.systemPrompt;
-						promptArea.value = result.userPrompt;
-						sysArea.value = result.systemPrompt;
-						await plugin.saveSettings();
-					}
-				).open();
+				new AIGeneratePromptModal(app, aiService, async (result) => {
+					card.prompt = result.userPrompt;
+					card.systemPrompt = result.systemPrompt;
+					promptArea.value = result.userPrompt;
+					sysArea.value = result.systemPrompt;
+					await plugin.saveSettings();
+				}).open();
 			});
 
 		promptAiBtn.setClass("mtt-ai-btn");
@@ -432,8 +440,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					text
 						.setPlaceholder(t("API_URL_PLACEHOLDER"))
 						.setValue(
-							card.overrideApiUrl ||
-								pluginRef.settings.aiApiUrl
+							card.overrideApiUrl || pluginRef.settings.aiApiUrl
 						)
 						.onChange(async (value) => {
 							card.overrideApiUrl = value;

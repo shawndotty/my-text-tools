@@ -21,12 +21,16 @@ export function renderCustomScriptsSettingsTab(
 ) {
 	const { app, plugin, containerEl, expandedScripts, refresh } = ctx;
 
-	containerEl.createEl("h3", {
+	const settingHeader = containerEl.createDiv({
+		cls: "mtt-setting-tab-header",
+	});
+
+	settingHeader.createEl("h3", {
 		text: t("CUSTOM_SCRIPTS_TITLE"),
 	});
 
 	// --- Export / Import Controls ---
-	const controlsDiv = containerEl.createDiv({ cls: "mtt-script-controls" });
+	const controlsDiv = settingHeader.createDiv({ cls: "mtt-script-controls" });
 	controlsDiv.style.display = "flex";
 	controlsDiv.style.gap = "10px";
 	controlsDiv.style.marginBottom = "15px";
@@ -34,6 +38,8 @@ export function renderCustomScriptsSettingsTab(
 	new ButtonComponent(controlsDiv)
 		.setButtonText(t("BTN_EXPORT_SCRIPTS"))
 		.setIcon("download")
+		.setClass("mtt-icon-btn")
+		.setTooltip(t("BTN_EXPORT_SCRIPTS"))
 		.onClick(() => {
 			if (plugin.settings.customScripts.length === 0) {
 				new Notice(t("NOTICE_NO_SCRIPTS"));
@@ -45,6 +51,8 @@ export function renderCustomScriptsSettingsTab(
 	new ButtonComponent(controlsDiv)
 		.setButtonText(t("BTN_IMPORT_SCRIPTS"))
 		.setIcon("upload")
+		.setClass("mtt-icon-btn")
+		.setTooltip(t("BTN_IMPORT_SCRIPTS"))
 		.onClick(() => {
 			const input = document.createElement("input");
 			input.type = "file";
@@ -59,7 +67,9 @@ export function renderCustomScriptsSettingsTab(
 					const imported = JSON.parse(text);
 
 					if (!Array.isArray(imported)) {
-						throw new Error("Invalid format: Root must be an array");
+						throw new Error(
+							"Invalid format: Root must be an array"
+						);
 					}
 
 					// Basic validation
