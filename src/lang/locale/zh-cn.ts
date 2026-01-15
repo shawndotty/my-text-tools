@@ -381,7 +381,7 @@ export default {
 	PARAM_OPTIONS_LABEL: "选项（逗号分隔）",
 
 	// Batch Process
-	BTN_START_RECORDING: "开始录制",
+	BTN_START_RECORDING: "录制快捷指令",
 	BTN_STOP_RECORDING: "停止录制",
 	BTN_CANCEL_RECORDING: "取消录制",
 	NOTICE_RECORDING_STARTED: "录制已开始。请执行要记录的操作。",

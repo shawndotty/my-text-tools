@@ -5,6 +5,7 @@ import {
 	Component,
 	App,
 	TFile,
+	setTooltip,
 } from "obsidian";
 import { t } from "../../lang/helpers";
 import { ImportNoteModal } from "../modals/ImportNoteModal";
@@ -154,18 +155,24 @@ export class EditorPanel {
 		// Undo Button
 		this.undoBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
-			attr: { "aria-label": t("BTN_UNDO") },
 		});
 		setIcon(this.undoBtn, "undo-2");
+		setTooltip(this.undoBtn, t("BTN_UNDO"), {
+			placement: "bottom",
+			delay: 300,
+		});
 		this.undoBtn.toggleClass("is-disabled", !this.canUndo);
 		this.undoBtn.onclick = () => this.callbacks.onUndo();
 
 		// Redo Button
 		this.redoBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
-			attr: { "aria-label": t("BTN_REDO") },
 		});
 		setIcon(this.redoBtn, "redo-2");
+		setTooltip(this.redoBtn, t("BTN_REDO"), {
+			placement: "bottom",
+			delay: 300,
+		});
 		this.redoBtn.toggleClass("is-disabled", !this.canRedo);
 		this.redoBtn.onclick = () => this.callbacks.onRedo();
 
@@ -187,19 +194,23 @@ export class EditorPanel {
 
 		const modeBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
-			attr: {
-				"aria-label": nextModeLabel,
-			},
 		});
 		setIcon(modeBtn, nextModeIcon);
+		setTooltip(modeBtn, nextModeLabel, {
+			placement: "bottom",
+			delay: 300,
+		});
 		modeBtn.onclick = () => this.callbacks.onModeToggle();
 
 		// Clear Button
 		const clearBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
-			attr: { "aria-label": t("BTN_CLEAR") },
 		});
 		setIcon(clearBtn, "trash-2");
+		setTooltip(clearBtn, t("BTN_CLEAR"), {
+			placement: "bottom",
+			delay: 300,
+		});
 		clearBtn.onclick = () => this.handleClear();
 	}
 
@@ -394,6 +405,10 @@ export class EditorPanel {
 			attr: { "aria-label": t("BTN_IMPORT") },
 		});
 		setIcon(importBtn, "import");
+		setTooltip(importBtn, t("BTN_IMPORT"), {
+			placement: "top",
+			delay: 300,
+		});
 
 		const modeSelect = leftBtnGroup.createEl("select", {
 			cls: "dropdown",
@@ -525,6 +540,10 @@ export class EditorPanel {
 			attr: { "aria-label": t("BTN_CANCEL_RECORDING") },
 		});
 		setIcon(cancelRecBtn, "x");
+		setTooltip(cancelRecBtn, t("BTN_CANCEL_RECORDING"), {
+			placement: "top",
+			delay: 300,
+		});
 		cancelRecBtn.onclick = this.callbacks.onCancelRecording;
 
 		const stopRecBtn = container.createEl("button", {
@@ -532,6 +551,10 @@ export class EditorPanel {
 			attr: { "aria-label": t("BTN_STOP_RECORDING") },
 		});
 		setIcon(stopRecBtn, "square");
+		setTooltip(stopRecBtn, t("BTN_STOP_RECORDING"), {
+			placement: "top",
+			delay: 300,
+		});
 		stopRecBtn.onclick = this.callbacks.onStopRecording;
 	}
 
@@ -542,6 +565,10 @@ export class EditorPanel {
 				attr: { "aria-label": t("BTN_APPLY_BATCH") },
 			});
 			setIcon(applyBatchBtn, "play");
+			setTooltip(applyBatchBtn, t("BTN_APPLY_BATCH"), {
+				placement: "top",
+				delay: 300,
+			});
 			applyBatchBtn.onclick = this.callbacks.onApplyBatch;
 		}
 
@@ -550,6 +577,10 @@ export class EditorPanel {
 			attr: { "aria-label": t("BTN_START_RECORDING") },
 		});
 		setIcon(startRecBtn, "circle");
+		setTooltip(startRecBtn, t("BTN_START_RECORDING"), {
+			placement: "top",
+			delay: 300,
+		});
 		startRecBtn.onclick = this.callbacks.onStartRecording;
 	}
 
@@ -562,6 +593,10 @@ export class EditorPanel {
 			attr: { "aria-label": t("BTN_COPY_CLIPBOARD") },
 		});
 		setIcon(copyClipboardBtn, "copy");
+		setTooltip(copyClipboardBtn, t("BTN_COPY_CLIPBOARD"), {
+			placement: "top",
+			delay: 300,
+		});
 		copyClipboardBtn.onclick = async () => {
 			try {
 				await navigator.clipboard.writeText(this.content);
@@ -577,19 +612,28 @@ export class EditorPanel {
 			attr: { "aria-label": t("BTN_SAVE_NEW") },
 		});
 		setIcon(saveNewBtn, "file-plus");
+		setTooltip(saveNewBtn, t("BTN_SAVE_NEW"), {
+			placement: "top",
+			delay: 300,
+		});
 		saveNewBtn.onclick = () => this.callbacks.onSaveNew();
 
 		// Save Original Button
 		if (this.hasOriginalEditor) {
+			const label = this.isSelectionMode
+				? t("BTN_UPDATE_SELECTION")
+				: t("BTN_SAVE_ORIGINAL");
 			const saveOverBtn = btnGroup.createEl("button", {
 				cls: "mtt-icon-btn mod-cta",
 				attr: {
-					"aria-label": this.isSelectionMode
-						? t("BTN_UPDATE_SELECTION" as any)
-						: t("BTN_SAVE_ORIGINAL"),
+					"aria-label": label,
 				},
 			});
 			setIcon(saveOverBtn, "save");
+			setTooltip(saveOverBtn, label, {
+				placement: "top",
+				delay: 300,
+			});
 			saveOverBtn.onclick = () => this.callbacks.onSaveOriginal();
 		}
 	}

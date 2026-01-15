@@ -393,7 +393,7 @@ export default {
 	PARAM_OPTIONS_LABEL: "Options (comma-separated)",
 
 	// Shortcuts
-	BTN_START_RECORDING: "Start Recording",
+	BTN_START_RECORDING: "Record Shortcuts",
 	BTN_STOP_RECORDING: "Stop Recording",
 	BTN_CANCEL_RECORDING: "Cancel Recording",
 	BTN_APPLY_BATCH: "Apply Shortcuts",

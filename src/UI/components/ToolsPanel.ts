@@ -164,7 +164,11 @@ export function renderToolsPanel(
 		setIcon(toggleBtn, isCollapsed ? "chevrons-right" : "chevrons-left");
 		setTooltip(
 			toggleBtn,
-			isCollapsed ? t("BTN_EXPAND_PANEL") : t("BTN_COLLAPSE_PANEL")
+			isCollapsed ? t("BTN_EXPAND_PANEL") : t("BTN_COLLAPSE_PANEL"),
+			{
+				placement: "right",
+				delay: 300,
+			}
 		);
 		toggleBtn.onclick = onToggleCollapse;
 	}
@@ -231,7 +235,10 @@ export function renderToolsPanel(
 
 			// 如果是折叠模式，添加 Tooltip
 			if (isCollapsed) {
-				setTooltip(btn, tool.name);
+				setTooltip(btn, tool.name, {
+					placement: "right",
+					delay: 300,
+				});
 			}
 
 			btn.onclick = () => {

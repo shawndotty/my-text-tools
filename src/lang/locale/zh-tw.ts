@@ -370,7 +370,7 @@ export default {
 	PARAM_OPTIONS_LABEL: "選項（逗號分隔）",
 
 	// Batch Process
-	BTN_START_RECORDING: "開始錄製",
+	BTN_START_RECORDING: "錄製捷徑",
 	BTN_STOP_RECORDING: "停止錄製",
 	BTN_CANCEL_RECORDING: "取消錄製",
 	BTN_APPLY_BATCH: "應用捷徑",
