@@ -35,6 +35,9 @@ const baseTheme = EditorView.baseTheme({
 		caretColor: "var(--text-normal)",
 		fontFamily: "var(--font-monospace)",
 	},
+	".cm-cursor, .cm-dropCursor": {
+		borderLeftColor: "var(--text-normal)",
+	},
 	// Force native selection to be transparent to avoid double rendering
 	"& ::selection": {
 		backgroundColor: "transparent !important",
