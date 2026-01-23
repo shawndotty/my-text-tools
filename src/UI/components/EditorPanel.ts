@@ -7,8 +7,24 @@ import {
 	TFile,
 	setTooltip,
 } from "obsidian";
+import {
+	EditorView,
+	keymap,
+	highlightSpecialChars,
+	drawSelection,
+	dropCursor,
+	ViewUpdate,
+} from "@codemirror/view";
+import { EditorState } from "@codemirror/state";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { t } from "../../lang/helpers";
 import { ImportNoteModal } from "../modals/ImportNoteModal";
+import {
+	regexHighlightPlugin,
+	highlightTheme,
+	setRegexPattern,
+	currentRegexField,
+} from "../editor-extensions/regex-highlight";
 
 export interface EditorPanelCallbacks {
 	onUndo: () => void;
@@ -20,7 +36,7 @@ export interface EditorPanelCallbacks {
 	onImport?: (
 		file: TFile,
 		content: string,
-		mode: "overwrite" | "insert"
+		mode: "overwrite" | "insert",
 	) => void;
 	onContentChange?: (content: string) => void;
 	onProcessSelection?: (text: string) => string | null;
@@ -36,6 +52,7 @@ export interface EditorPanelHandle {
 	getSelection: () => { start: number; end: number; text: string } | null;
 	replaceSelection: (text: string) => void;
 	updateFilePath: (path: string | null) => void;
+	updateRegexHighlight: (pattern: string, flags: string) => void;
 }
 
 export class EditorPanel {
@@ -55,7 +72,7 @@ export class EditorPanel {
 	private undoBtn: HTMLElement | null = null;
 	private redoBtn: HTMLElement | null = null;
 	private pathContainer: HTMLElement | null = null;
-	private textAreaRef: HTMLTextAreaElement | null = null;
+	private editorView: EditorView | null = null;
 
 	private getSelectionFn: () => {
 		start: number;
@@ -63,6 +80,8 @@ export class EditorPanel {
 		text: string;
 	} | null = () => null;
 	private replaceSelectionFn: (text: string) => void = () => {};
+	private updateRegexHighlightFn: (pattern: string, flags: string) => void =
+		() => {};
 
 	constructor(
 		parent: HTMLElement,
@@ -76,7 +95,7 @@ export class EditorPanel {
 		hasBatches: boolean,
 		currentFilePath: string | null,
 		callbacks: EditorPanelCallbacks,
-		app: App
+		app: App,
 	) {
 		this.parent = parent;
 		this.content = content;
@@ -102,6 +121,7 @@ export class EditorPanel {
 			getSelection: () => this.getSelectionFn(),
 			replaceSelection: (text) => this.replaceSelectionFn(text),
 			updateFilePath: this.updateFilePath.bind(this),
+			updateRegexHighlight: (p, f) => this.updateRegexHighlightFn(p, f),
 		};
 	}
 
@@ -117,7 +137,7 @@ export class EditorPanel {
 		const titleContainer = header.createDiv({ cls: "mtt-header-title" });
 		let titleText = t("EDITOR_HEADER");
 		if (this.editMode === "preview") titleText = t("EDITOR_PREVIEW");
-		if (this.editMode === "split") titleText = "Split View"; // Hardcoded fallback for now
+		if (this.editMode === "split") titleText = "Split View";
 
 		titleContainer.createEl("span", {
 			text: titleText,
@@ -177,7 +197,6 @@ export class EditorPanel {
 		this.redoBtn.onclick = () => this.callbacks.onRedo();
 
 		// Mode Toggle Button
-		// Cycle: Source -> Preview -> Split -> Source
 		let nextModeIcon = "eye";
 		let nextModeLabel = t("MODE_PREVIEW");
 
@@ -202,6 +221,17 @@ export class EditorPanel {
 		});
 		modeBtn.onclick = () => this.callbacks.onModeToggle();
 
+		// Select All Button
+		const selectAllBtn = actionGroup.createEl("button", {
+			cls: "mtt-icon-btn",
+		});
+		setIcon(selectAllBtn, "check-square");
+		setTooltip(selectAllBtn, t("BTN_SELECT_ALL"), {
+			placement: "bottom",
+			delay: 300,
+		});
+		selectAllBtn.onclick = () => this.handleSelectAll();
+
 		// Clear Button
 		const clearBtn = actionGroup.createEl("button", {
 			cls: "mtt-icon-btn",
@@ -214,14 +244,32 @@ export class EditorPanel {
 		clearBtn.onclick = () => this.handleClear();
 	}
 
+	private handleSelectAll() {
+		if (this.editorView) {
+			this.editorView.dispatch({
+				selection: {
+					anchor: 0,
+					head: this.editorView.state.doc.length,
+				},
+			});
+			this.editorView.focus();
+		}
+	}
+
 	private handleClear() {
 		if (this.callbacks.onPushHistory) {
 			this.callbacks.onPushHistory();
 		}
 
-		if (this.textAreaRef) {
-			this.textAreaRef.value = "";
-			this.textAreaRef.focus();
+		if (this.editorView) {
+			this.editorView.dispatch({
+				changes: {
+					from: 0,
+					to: this.editorView.state.doc.length,
+					insert: "",
+				},
+			});
+			this.editorView.focus();
 		}
 
 		if (this.callbacks.onContentChange) {
@@ -237,7 +285,7 @@ export class EditorPanel {
 		if (this.editMode === "split") {
 			editorContainer.style.display = "flex";
 			editorContainer.style.flexDirection = "row";
-			editorContainer.style.overflow = "hidden"; // Prevent outer scroll
+			editorContainer.style.overflow = "hidden";
 
 			const leftPane = editorContainer.createDiv({
 				cls: "mtt-split-left",
@@ -245,7 +293,7 @@ export class EditorPanel {
 			leftPane.style.flex = "1";
 			leftPane.style.height = "100%";
 			leftPane.style.overflow = "hidden";
-			leftPane.style.display = "flex"; // Ensure textarea fills height
+			leftPane.style.display = "flex";
 			leftPane.style.flexDirection = "column";
 
 			const rightPane = editorContainer.createDiv({
@@ -256,7 +304,7 @@ export class EditorPanel {
 			rightPane.style.overflow = "auto";
 			rightPane.style.borderLeft =
 				"1px solid var(--background-modifier-border)";
-			rightPane.style.paddingLeft = "10px"; // Add some spacing
+			rightPane.style.paddingLeft = "10px";
 
 			this.renderSourceEditor(leftPane);
 			this.renderPreviewEditor(rightPane);
@@ -268,88 +316,98 @@ export class EditorPanel {
 	}
 
 	private renderSourceEditor(container: HTMLElement) {
-		const ta = container.createEl("textarea", {
-			cls: "mtt-textarea mtt-monospace",
+		// Use CodeMirror EditorView
+		const editorParent = container.createDiv({ cls: "mtt-cm-editor" });
+		editorParent.style.height = "100%";
+		editorParent.style.overflow = "hidden"; // Let CM handle scroll
+
+		const state = EditorState.create({
+			doc: this.content,
+			extensions: [
+				highlightSpecialChars(),
+				history(),
+				drawSelection(),
+				dropCursor(),
+				EditorState.allowMultipleSelections.of(true),
+				keymap.of([...defaultKeymap, ...historyKeymap]),
+				EditorView.lineWrapping,
+				EditorView.updateListener.of((update: ViewUpdate) => {
+					if (update.docChanged) {
+						const newContent = update.state.doc.toString();
+						if (this.callbacks.onContentChange) {
+							this.callbacks.onContentChange(newContent);
+						}
+						if (this.editMode === "split") {
+							this.updateSplitPreview(newContent);
+						}
+					}
+				}),
+				regexHighlightPlugin,
+				highlightTheme,
+				currentRegexField,
+			],
 		});
-		// Ensure textarea takes full height of its container
-		ta.style.height = "100%";
-		ta.style.width = "100%";
-		ta.style.resize = "none";
-		ta.style.border = "none";
-		ta.style.padding = "10px";
 
-		this.textAreaRef = ta;
-		ta.value = this.content;
-		ta.oninput = (e) => {
-			const newContent = (e.target as HTMLTextAreaElement).value;
-			if (this.callbacks.onContentChange) {
-				this.callbacks.onContentChange(newContent);
-			}
-			// If in split view, we could theoretically update preview here,
-			// but since render() re-renders everything, we rely on parent re-rendering?
-			// No, parent re-renders only on tool execution usually.
-			// For split view live preview, we might need to manually trigger a preview update or debounce it.
-			// Currently, `onContentChange` just updates the model.
-			// To support live preview in split mode without full re-render,
-			// we might need a `updatePreview` method.
-			// For now, let's keep it simple: Split view updates on interactions or if we add a listener.
-			// Actually, without re-rendering, right pane won't update.
-			// Let's add a debounced preview update if we are in split mode?
-			// The callbacks interface doesn't support forcing render easily from here without passing a method.
-			// However, `renderPreviewEditor` uses `this.content`.
-			// If we want live preview, we need to update the right pane's content.
-			// Let's leave it as "update on tool run" or "update on mode toggle" for now to match current architecture,
-			// OR we can try to find the preview element and update it.
-			if (this.editMode === "split") {
-				this.updateSplitPreview(newContent);
-			}
-		};
+		this.editorView = new EditorView({
+			state,
+			parent: editorParent,
+		});
 
+		// Bind methods
 		this.getSelectionFn = () => {
-			const start = ta.selectionStart;
-			const end = ta.selectionEnd;
-			if (start === end) return null;
-			return { start, end, text: ta.value.substring(start, end) };
+			if (!this.editorView) return null;
+			const selection = this.editorView.state.selection.main;
+			if (selection.empty) return null;
+			return {
+				start: selection.from,
+				end: selection.to,
+				text: this.editorView.state.sliceDoc(
+					selection.from,
+					selection.to,
+				),
+			};
 		};
 
 		this.replaceSelectionFn = (text: string) => {
-			const start = ta.selectionStart;
-			const end = ta.selectionEnd;
-			ta.setRangeText(text, start, end, "select");
-			if (this.callbacks.onContentChange) {
-				this.callbacks.onContentChange(ta.value);
-			}
-			if (this.editMode === "split") {
-				this.updateSplitPreview(ta.value);
-			}
+			if (!this.editorView) return;
+			const transaction = this.editorView.state.replaceSelection(text);
+			this.editorView.dispatch(transaction);
+			// onContentChange will be triggered by updateListener
 		};
 
-		const handleSelection = () => {
-			if (!this.callbacks.onProcessSelection) return;
-			const start = ta.selectionStart;
-			const end = ta.selectionEnd;
-			if (start === end) return;
+		this.updateRegexHighlightFn = (pattern: string, flags: string) => {
+			if (!this.editorView) return;
+			this.editorView.dispatch({
+				effects: setRegexPattern.of({ pattern, flags }),
+			});
+		};
 
-			const selectedText = ta.value.substring(start, end);
+		// Handle on-select tool logic
+		const handleSelection = () => {
+			if (!this.callbacks.onProcessSelection || !this.editorView) return;
+			const selection = this.editorView.state.selection.main;
+			if (selection.empty) return;
+
+			const selectedText = this.editorView.state.sliceDoc(
+				selection.from,
+				selection.to,
+			);
 			const processed = this.callbacks.onProcessSelection(selectedText);
 
 			if (processed !== null && processed !== selectedText) {
-				ta.setRangeText(processed, start, end, "select");
-				if (this.callbacks.onContentChange) {
-					this.callbacks.onContentChange(ta.value);
-				}
-				if (this.editMode === "split") {
-					this.updateSplitPreview(ta.value);
-				}
+				const transaction =
+					this.editorView.state.replaceSelection(processed);
+				this.editorView.dispatch(transaction);
 			}
 		};
 
-		ta.onmouseup = handleSelection;
-		ta.onkeyup = (e) => {
+		// Attach events to DOM
+		this.editorView.contentDOM.addEventListener("mouseup", handleSelection);
+		this.editorView.contentDOM.addEventListener("keyup", (e) => {
 			if (e.shiftKey || e.key === "Shift") {
 				handleSelection();
 			}
-		};
+		});
 	}
 
 	private updateSplitPreview(newContent: string) {
@@ -361,7 +419,7 @@ export class EditorPanel {
 				newContent,
 				rightPane as HTMLElement,
 				"/",
-				new Component()
+				new Component(),
 			);
 		}
 	}
@@ -375,7 +433,7 @@ export class EditorPanel {
 			this.content,
 			previewEl,
 			"/",
-			new Component()
+			new Component(),
 		);
 	}
 
@@ -462,7 +520,7 @@ export class EditorPanel {
 	private handleImport(
 		e: MouseEvent,
 		modeSelect: HTMLSelectElement,
-		removeFrontmatterCheckbox: HTMLInputElement
+		removeFrontmatterCheckbox: HTMLInputElement,
 	) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -478,24 +536,24 @@ export class EditorPanel {
 			}
 
 			let finalContent = contentToUse;
-			if (this.textAreaRef) {
-				if (mode === "overwrite") {
-					this.textAreaRef.value = contentToUse;
-				} else {
-					const start = this.textAreaRef.selectionStart;
-					const end = this.textAreaRef.selectionEnd;
-					const text = this.textAreaRef.value;
-					const before = text.substring(0, start);
-					const after = text.substring(end);
-					finalContent = before + contentToUse + after;
-					this.textAreaRef.value = finalContent;
 
-					const newCursorPos = start + contentToUse.length;
-					this.textAreaRef.setSelectionRange(
-						newCursorPos,
-						newCursorPos
-					);
-					this.textAreaRef.focus();
+			if (this.editorView) {
+				if (mode === "overwrite") {
+					this.editorView.dispatch({
+						changes: {
+							from: 0,
+							to: this.editorView.state.doc.length,
+							insert: contentToUse,
+						},
+					});
+					finalContent = contentToUse;
+				} else {
+					// Insert at cursor
+					const transaction =
+						this.editorView.state.replaceSelection(contentToUse);
+					this.editorView.dispatch(transaction);
+					finalContent = this.editorView.state.doc.toString();
+					this.editorView.focus();
 				}
 			}
 

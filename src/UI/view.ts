@@ -373,6 +373,17 @@ export class MyTextToolsView extends ItemView {
 			this.app
 		).render();
 
+		if (this.activeTool === "regex") {
+			const regexSettings = this.settingsState.regex;
+			let flags = "g";
+			if (regexSettings.caseInsensitive) flags += "i";
+			if (regexSettings.multiline) flags += "m";
+			this.editorPanelHandle.updateRegexHighlight(
+				regexSettings.findText,
+				flags
+			);
+		}
+
 		// --- 3. 右侧：动态设置区域 ---
 		const rightPanel = container.createDiv({ cls: "mtt-right-panel" });
 		const settingsCallbacks: SettingsPanelCallbacks = {
@@ -380,14 +391,28 @@ export class MyTextToolsView extends ItemView {
 				const keys = key.split(".");
 				if (keys.length === 1) {
 					(this.settingsState as any)[key] = value;
-					return;
+				} else {
+					let current: any = this.settingsState;
+					for (let i = 0; i < keys.length - 1; i++) {
+						if (!current[keys[i]!]) current[keys[i]!] = {};
+						current = current[keys[i]!];
+					}
+					current[keys[keys.length - 1]!] = value;
 				}
-				let current: any = this.settingsState;
-				for (let i = 0; i < keys.length - 1; i++) {
-					if (!current[keys[i]!]) current[keys[i]!] = {};
-					current = current[keys[i]!];
+
+				if (
+					this.editorPanelHandle &&
+					(key.startsWith("regex.") || key === "regex")
+				) {
+					const regexSettings = this.settingsState.regex;
+					let flags = "g"; // Always use global for highlighting
+					if (regexSettings.caseInsensitive) flags += "i";
+					if (regexSettings.multiline) flags += "m";
+					this.editorPanelHandle.updateRegexHighlight(
+						regexSettings.findText,
+						flags
+					);
 				}
-				current[keys[keys.length - 1]!] = value;
 			},
 			onRun: async (toolId: string) => {
 				if (this.isRecording) {
