@@ -26,6 +26,29 @@ import {
 	currentRegexField,
 } from "../editor-extensions/regex-highlight";
 
+const baseTheme = EditorView.baseTheme({
+    "&": {
+        height: "100%",
+        fontSize: "var(--font-text-size)",
+    },
+    ".cm-content": {
+        caretColor: "var(--text-normal)",
+        fontFamily: "var(--font-monospace)",
+    },
+    ".cm-cursor, .cm-dropCursor": {
+        borderLeftColor: "var(--text-normal)",
+    },
+    "&.cm-focused .cm-cursor": {
+        borderLeftColor: "var(--text-normal)",
+    },
+    "&.cm-focused .cm-selectionBackground, ::selection": {
+        backgroundColor: "var(--text-selection)",
+    },
+    ".cm-selectionBackground, ::selection": {
+        backgroundColor: "var(--text-selection)",
+    }
+});
+
 export interface EditorPanelCallbacks {
 	onUndo: () => void;
 	onRedo: () => void;
@@ -344,6 +367,7 @@ export class EditorPanel {
 				}),
 				regexHighlightPlugin,
 				highlightTheme,
+				baseTheme,
 				currentRegexField,
 			],
 		});
