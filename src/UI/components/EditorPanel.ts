@@ -27,26 +27,28 @@ import {
 } from "../editor-extensions/regex-highlight";
 
 const baseTheme = EditorView.baseTheme({
-    "&": {
-        height: "100%",
-        fontSize: "var(--font-text-size)",
-    },
-    ".cm-content": {
-        caretColor: "var(--text-normal)",
-        fontFamily: "var(--font-monospace)",
-    },
-    ".cm-cursor, .cm-dropCursor": {
-        borderLeftColor: "var(--text-normal)",
-    },
-    "&.cm-focused .cm-cursor": {
-        borderLeftColor: "var(--text-normal)",
-    },
-    "&.cm-focused .cm-selectionBackground, ::selection": {
-        backgroundColor: "var(--text-selection)",
-    },
-    ".cm-selectionBackground, ::selection": {
-        backgroundColor: "var(--text-selection)",
-    }
+	"&": {
+		height: "100%",
+		fontSize: "var(--font-text-size)",
+	},
+	".cm-content": {
+		caretColor: "var(--text-normal)",
+		fontFamily: "var(--font-monospace)",
+	},
+	// Force native selection to be transparent to avoid double rendering
+	"& ::selection": {
+		backgroundColor: "transparent !important",
+	},
+	".cm-content ::selection": {
+		backgroundColor: "transparent !important",
+	},
+	// Apply Obsidian selection color to CodeMirror's drawn selection
+	".cm-selectionBackground": {
+		backgroundColor: "var(--text-selection) !important",
+	},
+	"&.cm-focused .cm-selectionBackground": {
+		backgroundColor: "var(--text-selection) !important",
+	},
 });
 
 export interface EditorPanelCallbacks {
