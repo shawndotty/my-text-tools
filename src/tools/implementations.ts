@@ -10,7 +10,7 @@ export class RegexStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		try {
 			let flags = "g";
@@ -34,7 +34,7 @@ export class RegexStrategy implements IToolStrategy {
 						default:
 							return match;
 					}
-				}
+				},
 			);
 
 			const result = text.replace(regex, replaceText);
@@ -56,7 +56,7 @@ export class RegexExtractStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		if (!settings.regexExtract.rule) {
 			if (!options?.hideNotice) {
@@ -84,7 +84,7 @@ export class RegexExtractStrategy implements IToolStrategy {
 			if (!options?.hideNotice) {
 				new Notice(
 					t("NOTICE_REGEX_EXTRACT_DONE", [matches.length.toString()]),
-					2000
+					2000,
 				);
 			}
 			return matches.join(sep);
@@ -102,7 +102,7 @@ export class RemoveWhitespaceStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		let result = text;
 
@@ -138,7 +138,7 @@ export class DedupeStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		let result = "";
@@ -173,7 +173,7 @@ export class EmptyLineStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		let result = "";
@@ -202,7 +202,7 @@ export class EmptyLineStrategy implements IToolStrategy {
 				settings.emptyLineMode === "all"
 					? t("NOTICE_EMPTY_LINE")
 					: t("NOTICE_EMPTY_LINE_MERGED"),
-				2000
+				2000,
 			);
 		}
 		return result;
@@ -214,7 +214,7 @@ export class AddWrapStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		const result = lines
@@ -243,7 +243,7 @@ export class RemoveStringStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		if (!settings.filter.text) {
@@ -296,7 +296,7 @@ export class NumberListStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		let currentNum = settings.numberList.startNumber;
@@ -320,19 +320,19 @@ export class LineBreakToolsStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const detected = /\r\n/.test(text)
 			? "\r\n"
 			: /\r/.test(text) && !/\n/.test(text)
-			? "\r"
-			: "\n";
+				? "\r"
+				: "\n";
 		const eol =
 			settings.lineBreak.style === "LF"
 				? "\n"
 				: settings.lineBreak.style === "CRLF"
-				? "\r\n"
-				: detected;
+					? "\r\n"
+					: detected;
 
 		if (settings.lineBreak.action === "remove-all") {
 			return text.replace(/\r\n|\n|\r/g, "");
@@ -347,7 +347,7 @@ export class LineBreakToolsStrategy implements IToolStrategy {
 
 		try {
 			const escape = (str: string) =>
-				str.replace(/[.*+?^${}()|[\\]/g, "\\$& ");
+				str.replace(/[.*+?^${}()|[\\]/g, "\\$&");
 			const patternStr = settings.lineBreak.useRegex
 				? settings.lineBreak.trigger
 				: escape(settings.lineBreak.trigger);
@@ -405,7 +405,7 @@ export class ExtractColumnStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		const actualDelim =
@@ -434,7 +434,7 @@ export class ExtractColumnStrategy implements IToolStrategy {
 				t("NOTICE_EXTRACT_COL_DONE", [
 					settings.column.number.toString(),
 				]),
-				2000
+				2000,
 			);
 		}
 		return result;
@@ -446,7 +446,7 @@ export class SwapColumnsStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const lines = text.split("\n");
 		const delim =
@@ -483,7 +483,7 @@ export class SwapColumnsStrategy implements IToolStrategy {
 					settings.swap.col1.toString(),
 					settings.swap.col2.toString(),
 				]),
-				2000
+				2000,
 			);
 		}
 		return result;
@@ -497,7 +497,7 @@ export class ExtractBetweenStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		if (!settings.extractBetween.start && !settings.extractBetween.end) {
 			if (!options?.hideNotice) {
@@ -507,14 +507,14 @@ export class ExtractBetweenStrategy implements IToolStrategy {
 		}
 
 		const escapeRegExp = (str: string) =>
-			str.replace(/[.*+?^${}()|[\\]/g, "\\$& ");
+			str.replace(/[.*+?^${}()|[\\]/g, "\\$&");
 
 		try {
 			let pattern: RegExp;
 			if (settings.extractBetween.useRegex) {
 				pattern = new RegExp(
 					`${settings.extractBetween.start}(.*?)${settings.extractBetween.end}`,
-					"g"
+					"g",
 				);
 			} else {
 				const s = escapeRegExp(settings.extractBetween.start);
@@ -534,7 +534,7 @@ export class ExtractBetweenStrategy implements IToolStrategy {
 				if (!options?.hideNotice) {
 					new Notice(
 						t("NOTICE_EXTRACT_DONE", [matches.length.toString()]),
-						2000
+						2000,
 					);
 				}
 				// Default join is newline, but we can respect a setting if added.
@@ -561,7 +561,7 @@ export class WordFrequencyStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const regex = settings.frequency.includeNumbers
 			? /[^a-zA-Z0-9\u4e00-\u9fa5]+/g
@@ -592,7 +592,7 @@ export class WordFrequencyStrategy implements IToolStrategy {
 		if (!options?.hideNotice) {
 			new Notice(
 				t("NOTICE_FREQ_DONE", [sortedWords.length.toString()]),
-				2000
+				2000,
 			);
 		}
 		return result;
@@ -606,7 +606,7 @@ export class ClearFormatStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		let result = text;
 		const { bold, italic, highlight, strikethrough, code, links } =
@@ -627,7 +627,7 @@ export class ClearFormatStrategy implements IToolStrategy {
 					const ph = `${LINK_PREFIX}${linkPlaceholders.length}${LINK_SUFFIX}`;
 					linkPlaceholders.push(match);
 					return ph;
-				}
+				},
 			);
 			result = result.replace(
 				/(https?|ftp|ftps|file):\/\/[^\s<>'"{}|\\^`\[\]]+|www\.[^\s<>'"{}|\\^`\[\]]+/gi,
@@ -635,7 +635,7 @@ export class ClearFormatStrategy implements IToolStrategy {
 					const ph = `${URL_PREFIX}${urlPlaceholders.length}${URL_SUFFIX}`;
 					urlPlaceholders.push(match);
 					return ph;
-				}
+				},
 			);
 		}
 
@@ -667,7 +667,7 @@ export class ClearFormatStrategy implements IToolStrategy {
 					)
 						return match;
 					return before + content + after;
-				}
+				},
 			);
 		}
 
@@ -711,7 +711,7 @@ export class CombinationGeneratorStrategy implements IToolStrategy {
 	execute(
 		text: string,
 		settings: SettingsState,
-		options?: ToolExecutionOptions
+		options?: ToolExecutionOptions,
 	): string {
 		const inputs = settings.combinationInputs;
 		if (!inputs || inputs.length === 0) return "";
