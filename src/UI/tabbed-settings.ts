@@ -29,4 +29,12 @@ export class TabbedSettings {
 			tab.click();
 		}
 	}
+
+	activateTab(index: number) {
+		const tabs = Array.from(this.tabs.children) as HTMLElement[];
+		if (index < 0 || index >= tabs.length) return;
+		const tab = tabs[index];
+		if (!tab) return;
+		tab.click();
+	}
 }

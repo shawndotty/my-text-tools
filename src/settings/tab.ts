@@ -12,6 +12,7 @@ import { renderCustomScriptsSettingsTab } from "./custom-scripts-settings-tab";
 export class MyTextToolsSettingTab extends PluginSettingTab {
 	plugin: MyTextTools;
 	private expandedScripts: Set<string> = new Set();
+	private currentTabIndex: number = 0;
 
 	constructor(app: App, plugin: MyTextTools) {
 		super(app, plugin);
@@ -65,6 +66,8 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 					: t(config.title as any);
 			tabbedSettings.addTab(title, config.renderMethod);
 		});
+
+		tabbedSettings.activateTab(this.currentTabIndex);
 	}
 
 	private renderBatchProcessSettings(containerEl: HTMLElement) {
@@ -87,7 +90,10 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 		renderAISettingsTab({
 			plugin: this.plugin,
 			containerEl,
-			refresh: () => this.display(),
+			refresh: () => {
+				this.currentTabIndex = 1;
+				this.display();
+			},
 		});
 	}
 
@@ -106,6 +112,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			expandedScripts: this.expandedScripts,
 			refresh: () => {
 				containerEl.empty();
+				this.currentTabIndex = 3;
 				this.renderUserPromptsSettings(containerEl);
 			},
 		});
@@ -119,6 +126,7 @@ export class MyTextToolsSettingTab extends PluginSettingTab {
 			expandedScripts: this.expandedScripts,
 			refresh: () => {
 				containerEl.empty();
+				this.currentTabIndex = 4;
 				this.renderCustomScriptsSettings(containerEl);
 			},
 		});
