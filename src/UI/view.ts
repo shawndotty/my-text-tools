@@ -420,6 +420,21 @@ export class MyTextToolsView extends ItemView {
 				pattern = escapeRegExp(pattern);
 			}
 			this.editorPanelHandle.updateRegexHighlight(pattern, flags);
+		} else if (this.activeTool === "extract-between") {
+			const ebSettings = this.settingsState.extractBetween;
+			if (!ebSettings.start && !ebSettings.end) {
+				this.editorPanelHandle.updateRegexHighlight("", "");
+			} else {
+				let pattern = "";
+				if (ebSettings.useRegex) {
+					pattern = `${ebSettings.start}(.*?)${ebSettings.end}`;
+				} else {
+					const s = escapeRegExp(ebSettings.start);
+					const e = escapeRegExp(ebSettings.end);
+					pattern = `${s}(.*?)${e}`;
+				}
+				this.editorPanelHandle.updateRegexHighlight(pattern, "g");
+			}
 		}
 
 		// --- 3. 右侧：动态设置区域 ---
@@ -490,6 +505,29 @@ export class MyTextToolsView extends ItemView {
 						pattern = escapeRegExp(pattern);
 					}
 					this.editorPanelHandle.updateRegexHighlight(pattern, flags);
+				} else if (
+					this.editorPanelHandle &&
+					(key.startsWith("extractBetween.") ||
+						key === "extractBetween") &&
+					this.activeTool === "extract-between"
+				) {
+					const ebSettings = this.settingsState.extractBetween;
+					if (!ebSettings.start && !ebSettings.end) {
+						this.editorPanelHandle.updateRegexHighlight("", "");
+					} else {
+						let pattern = "";
+						if (ebSettings.useRegex) {
+							pattern = `${ebSettings.start}(.*?)${ebSettings.end}`;
+						} else {
+							const s = escapeRegExp(ebSettings.start);
+							const e = escapeRegExp(ebSettings.end);
+							pattern = `${s}(.*?)${e}`;
+						}
+						this.editorPanelHandle.updateRegexHighlight(
+							pattern,
+							"g"
+						);
+					}
 				}
 			},
 			onRun: async (toolId: string) => {

@@ -915,6 +915,12 @@ function renderExtractBetweenSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks,
 ): void {
+	const debouncedUpdate = debounce(
+		(key: string, value: string) => callbacks.onSettingsChange(key, value),
+		300,
+		true,
+	);
+
 	parent.createEl("label", {
 		text: t("SETTING_EXTRACT_START"),
 	});
@@ -923,8 +929,8 @@ function renderExtractBetweenSettings(
 		placeholder: t("PLACEHOLDER_EXTRACT_START"),
 		value: settings.extractBetween.start,
 	});
-	startInput.onchange = (e) =>
-		callbacks.onSettingsChange(
+	startInput.oninput = (e) =>
+		debouncedUpdate(
 			"extractBetween.start",
 			(e.target as HTMLInputElement).value,
 		);
@@ -937,8 +943,8 @@ function renderExtractBetweenSettings(
 		placeholder: t("PLACEHOLDER_EXTRACT_END"),
 		value: settings.extractBetween.end,
 	});
-	endInput.onchange = (e) =>
-		callbacks.onSettingsChange(
+	endInput.oninput = (e) =>
+		debouncedUpdate(
 			"extractBetween.end",
 			(e.target as HTMLInputElement).value,
 		);
