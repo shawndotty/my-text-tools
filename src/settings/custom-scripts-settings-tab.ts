@@ -17,7 +17,7 @@ interface CustomScriptsSettingsContext {
 }
 
 export function renderCustomScriptsSettingsTab(
-	ctx: CustomScriptsSettingsContext
+	ctx: CustomScriptsSettingsContext,
 ) {
 	const { app, plugin, containerEl, expandedScripts, refresh } = ctx;
 
@@ -36,8 +36,7 @@ export function renderCustomScriptsSettingsTab(
 	controlsDiv.style.marginBottom = "15px";
 
 	new ButtonComponent(controlsDiv)
-		.setButtonText(t("BTN_EXPORT_SCRIPTS"))
-		.setIcon("download")
+		.setButtonText(t("BTN_EXPORT_TEXT"))
 		.setClass("mtt-icon-btn")
 		.setTooltip(t("BTN_EXPORT_SCRIPTS"), {
 			placement: "bottom",
@@ -52,8 +51,7 @@ export function renderCustomScriptsSettingsTab(
 		});
 
 	new ButtonComponent(controlsDiv)
-		.setButtonText(t("BTN_IMPORT_SCRIPTS"))
-		.setIcon("upload")
+		.setButtonText(t("BTN_IMPORT_TEXT"))
 		.setClass("mtt-icon-btn")
 		.setTooltip(t("BTN_IMPORT_SCRIPTS"), {
 			placement: "bottom",
@@ -74,7 +72,7 @@ export function renderCustomScriptsSettingsTab(
 
 					if (!Array.isArray(imported)) {
 						throw new Error(
-							"Invalid format: Root must be an array"
+							"Invalid format: Root must be an array",
 						);
 					}
 
@@ -83,7 +81,7 @@ export function renderCustomScriptsSettingsTab(
 						(s: any) =>
 							s &&
 							typeof s.name === "string" &&
-							typeof s.code === "string"
+							typeof s.code === "string",
 					);
 
 					if (validScripts.length === 0) {
@@ -98,7 +96,7 @@ export function renderCustomScriptsSettingsTab(
 								Date.now().toString() +
 								Math.random().toString(36).substr(2, 9),
 							name: s.name,
-						})
+						}),
 					);
 
 					plugin.settings.customScripts.push(...newScripts);
@@ -136,7 +134,7 @@ export function renderCustomScriptsSettingsTab(
 				await plugin.saveSettings();
 				(plugin as any).refreshCustomRibbons?.();
 				refresh();
-			})
+			}),
 		);
 
 	plugin.settings.customScripts.forEach((script, idx) => {
@@ -148,7 +146,7 @@ export function renderCustomScriptsSettingsTab(
 			.setName(
 				`${t("SCRIPT_GROUP_NAME")} ${idx + 1}${
 					script.name ? ` - ${script.name}` : ""
-				}`
+				}`,
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -161,7 +159,7 @@ export function renderCustomScriptsSettingsTab(
 						script.showInRibbon = value;
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -178,7 +176,7 @@ export function renderCustomScriptsSettingsTab(
 						arr.splice(idx - 1, 0, item);
 						await plugin.saveSettings();
 						refresh();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -195,7 +193,7 @@ export function renderCustomScriptsSettingsTab(
 						arr.splice(idx + 1, 0, item);
 						await plugin.saveSettings();
 						refresh();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -206,7 +204,7 @@ export function renderCustomScriptsSettingsTab(
 					})
 					.onClick(async () => {
 						const snapshot = migrateToNestedSettings(
-							plugin.settings
+							plugin.settings,
 						);
 						snapshot.savedBatches = [];
 
@@ -225,7 +223,7 @@ export function renderCustomScriptsSettingsTab(
 						plugin.settings.savedBatches.push(newBatch);
 						await plugin.saveSettings();
 						new Notice(t("NOTICE_SCRIPT_BATCH_CREATED"), 2000);
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -236,7 +234,7 @@ export function renderCustomScriptsSettingsTab(
 					})
 					.onClick(async () => {
 						const newScript: CustomScript = JSON.parse(
-							JSON.stringify(script)
+							JSON.stringify(script),
 						);
 						newScript.id = `${Date.now()}`;
 						if (newScript.name) {
@@ -246,7 +244,7 @@ export function renderCustomScriptsSettingsTab(
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
 						refresh();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -258,16 +256,16 @@ export function renderCustomScriptsSettingsTab(
 					.onClick(async () => {
 						plugin.settings.customScripts =
 							plugin.settings.customScripts.filter(
-								(s) => s.id !== script.id
+								(s) => s.id !== script.id,
 							);
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
 						refresh();
-					})
+					}),
 			);
 
 		const headerInfo = headerSetting.settingEl.querySelector(
-			".setting-item-info"
+			".setting-item-info",
 		) as HTMLElement | null;
 		const bodyEl = cardContainer.createDiv({ cls: "mtt-card-body" });
 		let expanded = expandedScripts.has(script.id);
@@ -396,7 +394,7 @@ export function renderCustomScriptsSettingsTab(
 						codeArea.value = code;
 						await plugin.saveSettings();
 					}).open();
-				})
+				}),
 		);
 
 		const paramsHeader = bodyEl.createEl("h4", {
@@ -421,7 +419,7 @@ export function renderCustomScriptsSettingsTab(
 					});
 					await plugin.saveSettings();
 					refresh();
-				})
+				}),
 			);
 
 		(script.params || []).forEach((param, pIdx) => {
@@ -437,11 +435,11 @@ export function renderCustomScriptsSettingsTab(
 						})
 						.onClick(async () => {
 							script.params = (script.params || []).filter(
-								(_, i) => i !== pIdx
+								(_, i) => i !== pIdx,
 							);
 							await plugin.saveSettings();
 							refresh();
-						})
+						}),
 				);
 
 			const grid = pCard.createDiv();
@@ -499,12 +497,12 @@ export function renderCustomScriptsSettingsTab(
 					opt === "text"
 						? (t("PARAM_TYPE_TEXT") as string)
 						: opt === "number"
-						? (t("PARAM_TYPE_NUMBER") as string)
-						: opt === "boolean"
-						? (t("PARAM_TYPE_BOOLEAN") as string)
-						: opt === "select"
-						? (t("PARAM_TYPE_SELECT") as string)
-						: (t("PARAM_TYPE_ARRAY") as string);
+							? (t("PARAM_TYPE_NUMBER") as string)
+							: opt === "boolean"
+								? (t("PARAM_TYPE_BOOLEAN") as string)
+								: opt === "select"
+									? (t("PARAM_TYPE_SELECT") as string)
+									: (t("PARAM_TYPE_ARRAY") as string);
 				if (param.type === opt) o.selected = true;
 				typeSelect.appendChild(o);
 			});

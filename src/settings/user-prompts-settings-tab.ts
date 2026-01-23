@@ -33,8 +33,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 	controlsDiv.style.marginBottom = "15px";
 
 	new ButtonComponent(controlsDiv)
-		.setButtonText(t("BTN_EXPORT_PROMPTS"))
-		.setIcon("download")
+		.setButtonText(t("BTN_EXPORT_TEXT"))
 		.setClass("mtt-icon-btn")
 		.setTooltip(t("BTN_EXPORT_PROMPTS"), {
 			placement: "bottom",
@@ -49,8 +48,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 		});
 
 	new ButtonComponent(controlsDiv)
-		.setButtonText(t("BTN_IMPORT_PROMPTS"))
-		.setIcon("upload")
+		.setButtonText(t("BTN_IMPORT_TEXT"))
 		.setClass("mtt-icon-btn")
 		.setTooltip(t("BTN_IMPORT_PROMPTS"), {
 			placement: "bottom",
@@ -71,7 +69,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 
 					if (!Array.isArray(imported)) {
 						throw new Error(
-							"Invalid format: Root must be an array"
+							"Invalid format: Root must be an array",
 						);
 					}
 
@@ -80,7 +78,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						(p: any) =>
 							p &&
 							typeof p.name === "string" &&
-							typeof p.prompt === "string"
+							typeof p.prompt === "string",
 					);
 
 					if (validPrompts.length === 0) {
@@ -95,7 +93,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 								Date.now().toString() +
 								Math.random().toString(36).substr(2, 9),
 							name: p.name,
-						})
+						}),
 					);
 
 					plugin.settings.customActions.push(...newPrompts);
@@ -134,7 +132,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 				await plugin.saveSettings();
 				(plugin as any).refreshCustomRibbons?.();
 				refresh();
-			})
+			}),
 		);
 
 	plugin.settings.customActions.forEach((card, idx) => {
@@ -146,7 +144,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 			.setName(
 				`${t("PROMPT_GROUP_NAME")} ${idx + 1}${
 					card.name ? ` - ${card.name}` : ""
-				}`
+				}`,
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -159,7 +157,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						card.showInRibbon = value;
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -176,7 +174,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						arr.splice(idx - 1, 0, item);
 						await plugin.saveSettings();
 						refresh();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -193,7 +191,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						arr.splice(idx + 1, 0, item);
 						await plugin.saveSettings();
 						refresh();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -204,7 +202,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					})
 					.onClick(async () => {
 						const snapshot = migrateToNestedSettings(
-							plugin.settings
+							plugin.settings,
 						);
 						snapshot.savedBatches = [];
 
@@ -223,7 +221,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						plugin.settings.savedBatches.push(newBatch);
 						await plugin.saveSettings();
 						new Notice(t("NOTICE_PROMPT_BATCH_CREATED"), 2000);
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -234,7 +232,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					})
 					.onClick(async () => {
 						const newCard: CustomAIAction = JSON.parse(
-							JSON.stringify(card)
+							JSON.stringify(card),
 						);
 						newCard.id = `${Date.now()}`;
 						if (newCard.name) {
@@ -244,7 +242,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
 						refresh();
-					})
+					}),
 			)
 			.addExtraButton((btn) =>
 				btn
@@ -256,16 +254,16 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					.onClick(async () => {
 						plugin.settings.customActions =
 							plugin.settings.customActions.filter(
-								(c) => c.id !== card.id
+								(c) => c.id !== card.id,
 							);
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
 						refresh();
-					})
+					}),
 			);
 
 		const headerInfo = headerSetting.settingEl.querySelector(
-			".setting-item-info"
+			".setting-item-info",
 		) as HTMLElement | null;
 		const bodyEl = cardContainer.createDiv({ cls: "mtt-card-body" });
 		let expanded = expandedScripts.has(card.id);
@@ -408,7 +406,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					.onChange(async (value) => {
 						card.applyToSelection = value;
 						await plugin.saveSettings();
-					})
+					}),
 			);
 
 		let useOverride =
@@ -435,7 +433,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						.addOption("custom", t("PROVIDER_OPTION_CUSTOM"))
 						.setValue(
 							card.overrideProvider ||
-								pluginRef.settings.aiProvider
+								pluginRef.settings.aiProvider,
 						)
 						.onChange(async (value) => {
 							card.overrideProvider = value as any;
@@ -449,7 +447,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 								card.overrideModel = "gpt-3.5-turbo";
 							}
 							await pluginRef.saveSettings();
-						})
+						}),
 				);
 
 			new Setting(overrideSection)
@@ -470,12 +468,12 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					text
 						.setPlaceholder(t("API_URL_PLACEHOLDER"))
 						.setValue(
-							card.overrideApiUrl || pluginRef.settings.aiApiUrl
+							card.overrideApiUrl || pluginRef.settings.aiApiUrl,
 						)
 						.onChange(async (value) => {
 							card.overrideApiUrl = value;
 							await pluginRef.saveSettings();
-						})
+						}),
 				);
 
 			new Setting(overrideSection)
@@ -484,12 +482,12 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					text
 						.setPlaceholder(t("MODEL_PLACEHOLDER"))
 						.setValue(
-							card.overrideModel || pluginRef.settings.aiModel
+							card.overrideModel || pluginRef.settings.aiModel,
 						)
 						.onChange(async (value) => {
 							card.overrideModel = value;
 							await pluginRef.saveSettings();
-						})
+						}),
 				);
 
 			new Setting(overrideSection)
@@ -499,13 +497,13 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						.setLimits(500, 4000, 100)
 						.setValue(
 							card.overrideMaxTokens ??
-								pluginRef.settings.aiMaxTokens
+								pluginRef.settings.aiMaxTokens,
 						)
 						.setDynamicTooltip()
 						.onChange(async (value) => {
 							card.overrideMaxTokens = value;
 							await pluginRef.saveSettings();
-						})
+						}),
 				);
 
 			new Setting(overrideSection)
@@ -515,13 +513,13 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 						.setLimits(0, 1, 0.1)
 						.setValue(
 							card.overrideTemperature ??
-								pluginRef.settings.aiTemperature
+								pluginRef.settings.aiTemperature,
 						)
 						.setDynamicTooltip()
 						.onChange(async (value) => {
 							card.overrideTemperature = value;
 							await pluginRef.saveSettings();
-						})
+						}),
 				);
 		}
 
@@ -542,7 +540,7 @@ export function renderUserPromptsSettingsTab(ctx: UserPromptsSettingsContext) {
 					}
 					await plugin.saveSettings();
 					renderOverride();
-				})
+				}),
 			);
 
 		const overrideSection = bodyEl.createDiv({

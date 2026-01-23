@@ -460,7 +460,9 @@ export default {
 	NOTICE_EXPORT_NO_SELECTION: "未选择任何快捷指令。",
 
 	// Script Export/Import
+	BTN_EXPORT_TEXT: "导出",
 	BTN_EXPORT_SCRIPTS: "导出脚本",
+	BTN_IMPORT_TEXT: "导入",
 	BTN_IMPORT_SCRIPTS: "导入脚本",
 	MODAL_EXPORT_SCRIPT_TITLE: "选择要导出的脚本",
 	NOTICE_SCRIPT_EXPORT_SUCCESS: "脚本导出成功。",

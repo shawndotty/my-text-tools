@@ -13,7 +13,7 @@ interface BatchProcessSettingsContext {
 }
 
 export function renderBatchProcessSettingsTab(
-	ctx: BatchProcessSettingsContext
+	ctx: BatchProcessSettingsContext,
 ) {
 	const { app, plugin, containerEl } = ctx;
 
@@ -32,8 +32,7 @@ export function renderBatchProcessSettingsTab(
 	controlsDiv.style.marginBottom = "15px";
 
 	new ButtonComponent(controlsDiv)
-		.setButtonText(t("BTN_EXPORT_BATCHES"))
-		.setIcon("download")
+		.setButtonText(t("BTN_EXPORT_TEXT"))
 		.setClass("mtt-icon-btn")
 		.setTooltip(t("BTN_EXPORT_BATCHES"), {
 			placement: "bottom",
@@ -48,8 +47,7 @@ export function renderBatchProcessSettingsTab(
 		});
 
 	new ButtonComponent(controlsDiv)
-		.setButtonText(t("BTN_IMPORT_BATCHES"))
-		.setIcon("upload")
+		.setButtonText(t("BTN_IMPORT_TEXT"))
 		.setClass("mtt-icon-btn")
 		.setTooltip(t("BTN_IMPORT_BATCHES"), {
 			placement: "bottom",
@@ -70,7 +68,7 @@ export function renderBatchProcessSettingsTab(
 
 					if (!Array.isArray(imported)) {
 						throw new Error(
-							"Invalid format: Root must be an array"
+							"Invalid format: Root must be an array",
 						);
 					}
 
@@ -79,7 +77,7 @@ export function renderBatchProcessSettingsTab(
 						(b: any) =>
 							b &&
 							typeof b.name === "string" &&
-							Array.isArray(b.operations)
+							Array.isArray(b.operations),
 					);
 
 					if (validBatches.length === 0) {
@@ -94,7 +92,7 @@ export function renderBatchProcessSettingsTab(
 								Date.now().toString() +
 								Math.random().toString(36).substr(2, 9),
 							name: b.name,
-						})
+						}),
 					);
 
 					plugin.settings.savedBatches.push(...newBatches);
@@ -160,7 +158,7 @@ export function renderBatchProcessSettingsTab(
 				{
 					placement: "bottom",
 					delay: 300,
-				}
+				},
 			);
 		};
 		updateShortcutBtnUI();
@@ -230,7 +228,7 @@ export function renderBatchProcessSettingsTab(
 					batch,
 					async (updatedBatch: BatchProcess) => {
 						const index = plugin.settings.savedBatches.findIndex(
-							(b) => b.id === batch.id
+							(b) => b.id === batch.id,
 						);
 						if (index !== -1) {
 							plugin.settings.savedBatches[index] = updatedBatch;
@@ -245,7 +243,7 @@ export function renderBatchProcessSettingsTab(
 						plugin.settings.savedBatches.push(newBatch);
 						await plugin.saveSettings();
 						renderBatchProcessSettingsTab(ctx);
-					}
+					},
 				).open();
 			});
 
@@ -284,12 +282,12 @@ export function renderBatchProcessSettingsTab(
 					async () => {
 						plugin.settings.savedBatches =
 							plugin.settings.savedBatches.filter(
-								(b) => b.id !== batch.id
+								(b) => b.id !== batch.id,
 							);
 						await plugin.saveSettings();
 						await plugin.disableBatchShortcut(batch.id);
 						renderBatchProcessSettingsTab(ctx);
-					}
+					},
 				).open();
 			});
 	});

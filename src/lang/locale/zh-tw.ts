@@ -448,7 +448,9 @@ export default {
 	NOTICE_EXPORT_NO_SELECTION: "未選擇任何捷徑。",
 
 	// Script Export/Import
+	BTN_EXPORT_TEXT: "匯出",
 	BTN_EXPORT_SCRIPTS: "匯出腳本",
+	BTN_IMPORT_TEXT: "匯入",
 	BTN_IMPORT_SCRIPTS: "匯入腳本",
 	MODAL_EXPORT_SCRIPT_TITLE: "選擇要匯出的腳本",
 	NOTICE_SCRIPT_EXPORT_SUCCESS: "腳本匯出成功。",

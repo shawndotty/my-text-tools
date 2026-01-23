@@ -473,7 +473,9 @@ export default {
 	NOTICE_EXPORT_NO_SELECTION: "No shortcuts selected.",
 
 	// Script Export/Import
+	BTN_EXPORT_TEXT: "Export",
 	BTN_EXPORT_SCRIPTS: "Export Scripts",
+	BTN_IMPORT_TEXT: "Import",
 	BTN_IMPORT_SCRIPTS: "Import Scripts",
 	MODAL_EXPORT_SCRIPT_TITLE: "Select Scripts to Export",
 	NOTICE_SCRIPT_EXPORT_SUCCESS: "Scripts exported successfully.",
