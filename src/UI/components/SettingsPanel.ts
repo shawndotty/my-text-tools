@@ -1,4 +1,4 @@
-import { setIcon } from "obsidian";
+import { setIcon, debounce } from "obsidian";
 import { t } from "../../lang/helpers";
 import { SettingsState } from "../../types";
 import { AIToolConfig, CustomScript, CustomAIAction } from "../../settings";
@@ -8,11 +8,11 @@ export interface SettingsPanelCallbacks {
 	onRun: (toolId: string) => void | Promise<void>;
 	onSaveAISettings?: (
 		toolId: string,
-		config: AIToolConfig
+		config: AIToolConfig,
 	) => void | Promise<void>;
 	onSaveCustomAIAction?: (
 		actionId: string,
-		updates: Partial<CustomAIAction>
+		updates: Partial<CustomAIAction>,
 	) => void | Promise<void>;
 }
 
@@ -42,7 +42,7 @@ export function renderGlobalSettings(
 	parent: HTMLElement,
 	activeTool: string,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("h4", {
 		text: t("SETTINGS_GLOBAL_TITLE"),
@@ -61,7 +61,7 @@ export function renderGlobalSettings(
 	fmCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"preserveFrontmatter",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	fmLabel.appendText(t("CHECKBOX_PRESERVE_FRONTMATTER"));
 
@@ -75,7 +75,7 @@ export function renderGlobalSettings(
 		headerCheck.onchange = (e) =>
 			callbacks.onSettingsChange(
 				"preserveHeader",
-				(e.target as HTMLInputElement).checked
+				(e.target as HTMLInputElement).checked,
 			);
 		headerLabel.appendText(t("CHECKBOX_PRESERVE_HEADER"));
 	}
@@ -96,7 +96,7 @@ export function renderToolSettings(
 		hideRunButton?: boolean;
 		hasApiKey?: boolean;
 		isBatchMode?: boolean;
-	}
+	},
 ): void {
 	parent.createEl("hr"); // 分隔线
 
@@ -229,7 +229,7 @@ export function renderToolSettings(
 				input.onchange = (e) =>
 					callbacks.onSettingsChange(
 						key,
-						(e.target as HTMLInputElement).checked
+						(e.target as HTMLInputElement).checked,
 					);
 				valueEl = input;
 			} else if (param.type === "select") {
@@ -244,7 +244,7 @@ export function renderToolSettings(
 				select.onchange = (e) =>
 					callbacks.onSettingsChange(
 						key,
-						(e.target as HTMLSelectElement).value
+						(e.target as HTMLSelectElement).value,
 					);
 				valueEl = select;
 			} else if (param.type === "array") {
@@ -256,7 +256,7 @@ export function renderToolSettings(
 				textarea.onchange = (e) =>
 					callbacks.onSettingsChange(
 						key,
-						(e.target as HTMLTextAreaElement).value
+						(e.target as HTMLTextAreaElement).value,
 					);
 				valueEl = textarea;
 			} else {
@@ -269,7 +269,7 @@ export function renderToolSettings(
 						key,
 						param.type === "number"
 							? Number((e.target as HTMLInputElement).value)
-							: (e.target as HTMLInputElement).value
+							: (e.target as HTMLInputElement).value,
 					);
 				valueEl = input;
 			}
@@ -335,7 +335,7 @@ export function renderToolSettings(
 				settingsContent,
 				activeTool,
 				callbacks,
-				aiToolsConfig?.[activeTool]
+				aiToolsConfig?.[activeTool],
 			);
 			break;
 		case "on-select":
@@ -345,7 +345,7 @@ export function renderToolSettings(
 			renderCombinationGeneratorSettings(
 				settingsContent,
 				settings,
-				callbacks
+				callbacks,
 			);
 			break;
 		default:
@@ -360,7 +360,7 @@ export function renderToolSettings(
 function renderFilterSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", {
 		text: t("SETTING_FILTER_TEXT"),
@@ -373,7 +373,7 @@ function renderFilterSettings(
 	filterInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"filter.text",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	// 包含 / 不包含 切换
@@ -394,7 +394,7 @@ function renderFilterSettings(
 	modeSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"filter.mode",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 
 	// 复选框：区分大小写
@@ -406,7 +406,7 @@ function renderFilterSettings(
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"filter.caseSensitive",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
 
@@ -421,7 +421,7 @@ function renderFilterSettings(
 	regexCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"filter.useRegex",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	regexLabel.appendText(" " + t("CHECKBOX_REGEX"));
 
@@ -435,18 +435,21 @@ function renderFilterSettings(
 function renderRegexSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
+	const debouncedUpdate = debounce(
+		(key: string, value: string) => callbacks.onSettingsChange(key, value),
+		300,
+		true,
+	);
+
 	parent.createEl("label", { text: t("SETTING_FIND") });
 	const findInput = parent.createEl("input", {
 		type: "text",
 		value: settings.regex.findText,
 	});
-	findInput.onchange = (e) =>
-		callbacks.onSettingsChange(
-			"regex.findText",
-			(e.target as HTMLInputElement).value
-		);
+	findInput.oninput = (e) =>
+		debouncedUpdate("regex.findText", (e.target as HTMLInputElement).value);
 
 	parent.createEl("label", {
 		text: t("SETTING_REPLACE"),
@@ -455,10 +458,10 @@ function renderRegexSettings(
 		type: "text",
 		value: settings.regex.replaceText,
 	});
-	replaceInput.onchange = (e) =>
-		callbacks.onSettingsChange(
+	replaceInput.oninput = (e) =>
+		debouncedUpdate(
 			"regex.replaceText",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const regexOpts = parent.createDiv({ cls: "mtt-setting-row" });
@@ -472,7 +475,7 @@ function renderRegexSettings(
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"regex.caseInsensitive",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
 
@@ -487,7 +490,7 @@ function renderRegexSettings(
 	multilineCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"regex.multiline",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	multilineLabel.appendText(" " + t("CHECKBOX_MULTILINE"));
 
@@ -501,7 +504,7 @@ function renderRegexSettings(
 function renderRegexExtractSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", { text: t("SETTING_REGEX_EXTRACT_RULE") });
 	const ruleInput = parent.createEl("input", {
@@ -511,7 +514,7 @@ function renderRegexExtractSettings(
 	ruleInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"regexExtract.rule",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	// Case Insensitive
@@ -523,7 +526,7 @@ function renderRegexExtractSettings(
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"regexExtract.caseSensitive",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
 
@@ -545,7 +548,7 @@ function renderRegexExtractSettings(
 	sepSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"regexExtract.separator",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 
 	const runBtn = parent.createEl("button", {
@@ -558,7 +561,7 @@ function renderRegexExtractSettings(
 function renderWrapSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const wrapContent = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -573,7 +576,7 @@ function renderWrapSettings(
 	preInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"wrap.prefix",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	wrapContent.createEl("label", { text: t("SETTING_SUFFIX") });
@@ -585,7 +588,7 @@ function renderWrapSettings(
 	sufInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"wrap.suffix",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const excludeEmptyLabel = wrapContent.createEl("label", {
@@ -598,7 +601,7 @@ function renderWrapSettings(
 	excludeEmptyCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"wrap.excludeEmptyLines",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	excludeEmptyLabel.appendText(t("CHECKBOX_WRAP_EXCLUDE_EMPTY"));
 
@@ -612,7 +615,7 @@ function renderWrapSettings(
 function renderExtractColumnSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", {
 		text: t("SETTING_DELIMITER"),
@@ -661,7 +664,7 @@ function renderExtractColumnSettings(
 	customInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"column.customDelimiter",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	parent.createEl("label", {
@@ -675,7 +678,7 @@ function renderExtractColumnSettings(
 	numInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"column.number",
-			parseInt((e.target as HTMLInputElement).value) || 1
+			parseInt((e.target as HTMLInputElement).value) || 1,
 		);
 
 	const runBtn = parent.createEl("button", {
@@ -688,7 +691,7 @@ function renderExtractColumnSettings(
 function renderSwapColumnsSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", {
 		text: t("SETTING_DELIMITER"),
@@ -737,7 +740,7 @@ function renderSwapColumnsSettings(
 	customInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"swap.customDelimiter",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const colInputGroup = parent.createDiv({
@@ -753,7 +756,7 @@ function renderSwapColumnsSettings(
 	input1.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"swap.col1",
-			parseInt((e.target as HTMLInputElement).value) || 1
+			parseInt((e.target as HTMLInputElement).value) || 1,
 		);
 
 	colInputGroup.createSpan({ text: t("LABEL_SWAP_2") });
@@ -765,7 +768,7 @@ function renderSwapColumnsSettings(
 	input2.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"swap.col2",
-			parseInt((e.target as HTMLInputElement).value) || 1
+			parseInt((e.target as HTMLInputElement).value) || 1,
 		);
 
 	colInputGroup.createSpan({ text: t("LABEL_SWAP_3") });
@@ -780,7 +783,7 @@ function renderSwapColumnsSettings(
 function renderWordFrequencySettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", {
 		text: t("SETTING_MIN_LEN"),
@@ -792,7 +795,7 @@ function renderWordFrequencySettings(
 	minLenInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"frequency.minWordLength",
-			parseInt((e.target as HTMLInputElement).value) || 1
+			parseInt((e.target as HTMLInputElement).value) || 1,
 		);
 
 	const numLabel = parent.createEl("label", {
@@ -803,7 +806,7 @@ function renderWordFrequencySettings(
 	numCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"frequency.includeNumbers",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	numLabel.appendText(" " + t("CHECKBOX_INCLUDE_NUM"));
 
@@ -823,7 +826,7 @@ function renderWordFrequencySettings(
 	sortSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"frequency.sortOrder",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 
 	const runBtn = parent.createEl("button", {
@@ -836,7 +839,7 @@ function renderWordFrequencySettings(
 function renderNumberListSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", { text: t("SETTING_START_NUM") });
 	const startInput = parent.createEl("input", {
@@ -846,7 +849,7 @@ function renderNumberListSettings(
 	startInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"numberList.startNumber",
-			parseInt((e.target as HTMLInputElement).value) || 1
+			parseInt((e.target as HTMLInputElement).value) || 1,
 		);
 
 	parent.createEl("label", { text: t("SETTING_STEP_NUM") });
@@ -857,7 +860,7 @@ function renderNumberListSettings(
 	stepInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"numberList.stepNumber",
-			parseInt((e.target as HTMLInputElement).value) || 1
+			parseInt((e.target as HTMLInputElement).value) || 1,
 		);
 
 	parent.createEl("label", {
@@ -871,7 +874,7 @@ function renderNumberListSettings(
 	preInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"numberList.prefix",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	parent.createEl("label", {
@@ -885,7 +888,7 @@ function renderNumberListSettings(
 	sepInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"numberList.separator",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const runBtn = parent.createEl("button", {
@@ -898,7 +901,7 @@ function renderNumberListSettings(
 function renderExtractBetweenSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", {
 		text: t("SETTING_EXTRACT_START"),
@@ -911,7 +914,7 @@ function renderExtractBetweenSettings(
 	startInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"extractBetween.start",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	parent.createEl("label", {
@@ -925,7 +928,7 @@ function renderExtractBetweenSettings(
 	endInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"extractBetween.end",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const regexLabel = parent.createEl("label", {
@@ -938,7 +941,7 @@ function renderExtractBetweenSettings(
 	regexCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"extractBetween.useRegex",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	regexLabel.appendText(" " + t("CHECKBOX_EXTRACT_REGEX"));
 
@@ -952,7 +955,7 @@ function renderExtractBetweenSettings(
 function renderWhitespaceSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const wsContent = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -967,7 +970,7 @@ function renderWhitespaceSettings(
 		chk.onchange = (e) =>
 			callbacks.onSettingsChange(
 				key,
-				(e.target as HTMLInputElement).checked
+				(e.target as HTMLInputElement).checked,
 			);
 		lbl.appendText(` ${label}`);
 	};
@@ -975,22 +978,22 @@ function renderWhitespaceSettings(
 	createCheck(
 		t("CHECKBOX_WS_COMPRESS"),
 		"whitespace.compress",
-		settings.whitespace.compress
+		settings.whitespace.compress,
 	);
 	createCheck(
 		t("CHECKBOX_WS_TRIM"),
 		"whitespace.trim",
-		settings.whitespace.trim
+		settings.whitespace.trim,
 	);
 	createCheck(
 		t("CHECKBOX_WS_ALL"),
 		"whitespace.removeAll",
-		settings.whitespace.removeAll
+		settings.whitespace.removeAll,
 	);
 	createCheck(
 		t("CHECKBOX_WS_TABS"),
 		"whitespace.removeTabs",
-		settings.whitespace.removeTabs
+		settings.whitespace.removeTabs,
 	);
 
 	const runBtn = parent.createEl("button", {
@@ -1003,7 +1006,7 @@ function renderWhitespaceSettings(
 function renderLineBreakSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	parent.createEl("label", {
 		text: t("SETTING_LB_TRIGGER"),
@@ -1016,7 +1019,7 @@ function renderLineBreakSettings(
 	triggerInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"lineBreak.trigger",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const regexLabel = parent.createEl("label", {
@@ -1029,7 +1032,7 @@ function renderLineBreakSettings(
 	regexCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"lineBreak.useRegex",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	regexLabel.appendText(" " + t("CHECKBOX_LB_REGEX"));
 
@@ -1064,7 +1067,7 @@ function renderLineBreakSettings(
 	actionSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"lineBreak.action",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 
 	parent.createEl("label", {
@@ -1089,7 +1092,7 @@ function renderLineBreakSettings(
 	styleSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"lineBreak.style",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 
 	const mergeLabel = parent.createEl("label", {
@@ -1100,7 +1103,7 @@ function renderLineBreakSettings(
 	mergeCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"lineBreak.mergeEmpty",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	mergeLabel.appendText(" " + t("CHECKBOX_LB_MERGE_EMPTY"));
 
@@ -1114,7 +1117,7 @@ function renderLineBreakSettings(
 function renderDedupeSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const dedupeContent = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -1130,7 +1133,7 @@ function renderDedupeSettings(
 	emptyCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"dedupeIncludeEmpty",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	emptyLabel.appendText(t("CHECKBOX_DEDUPE_INCLUDE_EMPTY"));
 
@@ -1144,7 +1147,7 @@ function renderDedupeSettings(
 function renderEmptyLineSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const content = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -1166,7 +1169,7 @@ function renderEmptyLineSettings(
 	modeSelect.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"emptyLineMode",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 
 	const runBtn = content.createEl("button", {
@@ -1179,7 +1182,7 @@ function renderEmptyLineSettings(
 function renderClearFormatSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const content = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -1194,7 +1197,7 @@ function renderClearFormatSettings(
 		chk.onchange = (e) =>
 			callbacks.onSettingsChange(
 				key,
-				(e.target as HTMLInputElement).checked
+				(e.target as HTMLInputElement).checked,
 			);
 		lbl.appendText(` ${label}`);
 	};
@@ -1202,32 +1205,32 @@ function renderClearFormatSettings(
 	createCheck(
 		t("SETTING_CLEAR_FORMAT_BOLD"),
 		"clearFormat.bold",
-		settings.clearFormat.bold
+		settings.clearFormat.bold,
 	);
 	createCheck(
 		t("SETTING_CLEAR_FORMAT_ITALIC"),
 		"clearFormat.italic",
-		settings.clearFormat.italic
+		settings.clearFormat.italic,
 	);
 	createCheck(
 		t("SETTING_CLEAR_FORMAT_HIGHLIGHT"),
 		"clearFormat.highlight",
-		settings.clearFormat.highlight
+		settings.clearFormat.highlight,
 	);
 	createCheck(
 		t("SETTING_CLEAR_FORMAT_STRIKE"),
 		"clearFormat.strikethrough",
-		settings.clearFormat.strikethrough
+		settings.clearFormat.strikethrough,
 	);
 	createCheck(
 		t("SETTING_CLEAR_FORMAT_CODE"),
 		"clearFormat.code",
-		settings.clearFormat.code
+		settings.clearFormat.code,
 	);
 	createCheck(
 		t("SETTING_CLEAR_FORMAT_LINKS"),
 		"clearFormat.links",
-		settings.clearFormat.links
+		settings.clearFormat.links,
 	);
 
 	const runBtn = content.createEl("button", {
@@ -1240,7 +1243,7 @@ function renderClearFormatSettings(
 function renderCombinationGeneratorSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const container = parent.createDiv();
 
@@ -1357,7 +1360,7 @@ function renderAISettings(
 	parent: HTMLElement,
 	toolId: string,
 	callbacks: SettingsPanelCallbacks,
-	config?: AIToolConfig
+	config?: AIToolConfig,
 ): void {
 	const content = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -1455,7 +1458,7 @@ function renderAISettings(
 function renderOnSelectSettings(
 	parent: HTMLElement,
 	settings: SettingsState,
-	callbacks: SettingsPanelCallbacks
+	callbacks: SettingsPanelCallbacks,
 ): void {
 	const content = parent.createDiv({
 		cls: "mtt-settings-content",
@@ -1476,7 +1479,7 @@ function renderOnSelectSettings(
 	enableCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.enabled",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	enableLabel.appendText(" " + t("SETTING_ON_SELECT_ENABLE"));
 
@@ -1509,7 +1512,7 @@ function renderOnSelectSettings(
 	actionSelect.onchange = (e) => {
 		callbacks.onSettingsChange(
 			"onSelect.action",
-			(e.target as HTMLSelectElement).value
+			(e.target as HTMLSelectElement).value,
 		);
 		// Force re-render to show/hide relevant inputs?
 		// Or just manually toggle visibility here.
@@ -1530,7 +1533,7 @@ function renderOnSelectSettings(
 	preInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.prefix",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	wrapDiv.createEl("label", { text: t("SETTING_SUFFIX") });
@@ -1542,7 +1545,7 @@ function renderOnSelectSettings(
 	sufInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.suffix",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	// --- Inputs for Regex ---
@@ -1555,7 +1558,7 @@ function renderOnSelectSettings(
 	findInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.find",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	regexDiv.createEl("label", { text: t("SETTING_REPLACE") });
@@ -1566,7 +1569,7 @@ function renderOnSelectSettings(
 	replaceInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.replace",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	const regexOpts = regexDiv.createDiv({ cls: "mtt-setting-row" });
@@ -1579,7 +1582,7 @@ function renderOnSelectSettings(
 	caseCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.caseInsensitive",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	caseLabel.appendText(" " + t("CHECKBOX_CASE"));
 	// Regex
@@ -1591,7 +1594,7 @@ function renderOnSelectSettings(
 	regCheck.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.useRegex",
-			(e.target as HTMLInputElement).checked
+			(e.target as HTMLInputElement).checked,
 		);
 	regLabel.appendText(" " + t("CHECKBOX_REGEX"));
 
@@ -1608,7 +1611,7 @@ function renderOnSelectSettings(
 	replaceAllInput.onchange = (e) =>
 		callbacks.onSettingsChange(
 			"onSelect.replace",
-			(e.target as HTMLInputElement).value
+			(e.target as HTMLInputElement).value,
 		);
 
 	// Visibility Logic
