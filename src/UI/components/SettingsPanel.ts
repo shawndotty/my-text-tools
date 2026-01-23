@@ -506,13 +506,19 @@ function renderRegexExtractSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks,
 ): void {
+	const debouncedUpdate = debounce(
+		(key: string, value: string) => callbacks.onSettingsChange(key, value),
+		300,
+		true,
+	);
+
 	parent.createEl("label", { text: t("SETTING_REGEX_EXTRACT_RULE") });
 	const ruleInput = parent.createEl("input", {
 		type: "text",
 		value: settings.regexExtract.rule,
 	});
-	ruleInput.onchange = (e) =>
-		callbacks.onSettingsChange(
+	ruleInput.oninput = (e) =>
+		debouncedUpdate(
 			"regexExtract.rule",
 			(e.target as HTMLInputElement).value,
 		);

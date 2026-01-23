@@ -382,6 +382,23 @@ export class MyTextToolsView extends ItemView {
 				regexSettings.findText,
 				flags
 			);
+		} else if (this.activeTool === "regex-extract") {
+			const extractSettings = this.settingsState.regexExtract;
+			let flags = "g";
+			if (extractSettings.caseSensitive === false) flags += "i"; // Default might be sensitive? Checking usage.
+            // Wait, standard regex case sensitive means NO 'i' flag. 
+            // If the setting is 'caseSensitive', then true -> no 'i', false -> 'i'.
+            // Let's verify the setting name. It is 'caseSensitive' in SettingsPanel.ts.
+            // But usually 'caseSensitive' default is false? 
+            // In SettingsPanel.ts: caseCheck.checked = settings.regexExtract.caseSensitive;
+            // If checked (true) -> sensitive -> no 'i'.
+            // If unchecked (false) -> insensitive -> 'i'.
+            if (!extractSettings.caseSensitive) flags += "i";
+            
+			this.editorPanelHandle.updateRegexHighlight(
+				extractSettings.rule,
+				flags
+			);
 		}
 
 		// --- 3. 右侧：动态设置区域 ---
@@ -402,7 +419,8 @@ export class MyTextToolsView extends ItemView {
 
 				if (
 					this.editorPanelHandle &&
-					(key.startsWith("regex.") || key === "regex")
+					(key.startsWith("regex.") || key === "regex") && 
+                    this.activeTool === "regex"
 				) {
 					const regexSettings = this.settingsState.regex;
 					let flags = "g"; // Always use global for highlighting
@@ -412,7 +430,19 @@ export class MyTextToolsView extends ItemView {
 						regexSettings.findText,
 						flags
 					);
-				}
+				} else if (
+                    this.editorPanelHandle &&
+                    (key.startsWith("regexExtract.") || key === "regexExtract") &&
+                    this.activeTool === "regex-extract"
+                ) {
+                    const extractSettings = this.settingsState.regexExtract;
+                    let flags = "g";
+                    if (!extractSettings.caseSensitive) flags += "i";
+                    this.editorPanelHandle.updateRegexHighlight(
+                        extractSettings.rule,
+                        flags
+                    );
+                }
 			},
 			onRun: async (toolId: string) => {
 				if (this.isRecording) {
