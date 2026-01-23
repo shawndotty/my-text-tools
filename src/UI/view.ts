@@ -38,6 +38,9 @@ import { EditBatchModal } from "./modals/EditBatchModal";
 
 export const MY_TEXT_TOOLS_VIEW = "my-text-tools-view";
 
+const escapeRegExp = (str: string) =>
+	str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 interface SelectionRange {
 	start: EditorPosition;
 	end: EditorPosition;
@@ -64,7 +67,7 @@ export class MyTextToolsView extends ItemView {
 		leaf: WorkspaceLeaf,
 		originalEditor: any,
 		file: TFile | null,
-		plugin: MyTextTools
+		plugin: MyTextTools,
 	) {
 		super(leaf);
 		this.plugin = plugin;
@@ -187,7 +190,7 @@ export class MyTextToolsView extends ItemView {
 				this.plugin.settings.isToolsPanelCollapsed =
 					this.isToolsPanelCollapsed;
 				await this.plugin.saveSettings();
-			}
+			},
 		);
 
 		// 恢复左侧面板的滚动位置
@@ -219,7 +222,7 @@ export class MyTextToolsView extends ItemView {
 			onImport: (
 				file: TFile,
 				content: string,
-				mode: "overwrite" | "insert"
+				mode: "overwrite" | "insert",
 			) => {
 				// 设置导入标志位，防止触发自动保存逻辑
 				this.isImporting = true;
@@ -247,7 +250,7 @@ export class MyTextToolsView extends ItemView {
 				if (this.editorPanelHandle) {
 					this.editorPanelHandle.updateHistoryButtons(
 						this.historyManager.canUndo(),
-						this.historyManager.canRedo()
+						this.historyManager.canRedo(),
 					);
 				}
 			},
@@ -298,7 +301,7 @@ export class MyTextToolsView extends ItemView {
 						await this.plugin.disableBatchShortcut(batch.id);
 						this.plugin.settings.savedBatches =
 							this.plugin.settings.savedBatches.filter(
-								(b) => b.id !== batch.id
+								(b) => b.id !== batch.id,
 							);
 						await this.plugin.saveSettings();
 						this.settingsState.savedBatches =
@@ -316,14 +319,14 @@ export class MyTextToolsView extends ItemView {
 								// Save changes
 								const index =
 									this.plugin.settings.savedBatches.findIndex(
-										(b) => b.id === updatedBatch.id
+										(b) => b.id === updatedBatch.id,
 									);
 								if (index !== -1) {
 									this.plugin.settings.savedBatches[index] =
 										updatedBatch;
 									await this.plugin.saveSettings();
 									await this.plugin.refreshBatchShortcut(
-										updatedBatch.id
+										updatedBatch.id,
 									);
 									this.settingsState.savedBatches =
 										this.plugin.settings.savedBatches;
@@ -334,17 +337,17 @@ export class MyTextToolsView extends ItemView {
 							async (newBatch) => {
 								// Save as new
 								this.plugin.settings.savedBatches.push(
-									newBatch
+									newBatch,
 								);
 								await this.plugin.saveSettings();
 								this.settingsState.savedBatches =
 									this.plugin.settings.savedBatches;
 								new Notice(
 									t("NOTICE_BATCH_SAVED_AS_NEW"),
-									2000
+									2000,
 								);
 								this.render();
-							}
+							},
 						).open();
 					},
 					(batch) => this.plugin.isBatchShortcutEnabled(batch.id),
@@ -354,7 +357,7 @@ export class MyTextToolsView extends ItemView {
 						} else {
 							await this.plugin.disableBatchShortcut(batch.id);
 						}
-					}
+					},
 				).open();
 			},
 		};
@@ -370,7 +373,7 @@ export class MyTextToolsView extends ItemView {
 			this.settingsState.savedBatches.length > 0,
 			this.targetFile ? this.targetFile.path : null,
 			editorCallbacks,
-			this.app
+			this.app,
 		).render();
 
 		if (this.activeTool === "regex") {
@@ -380,25 +383,35 @@ export class MyTextToolsView extends ItemView {
 			if (regexSettings.multiline) flags += "m";
 			this.editorPanelHandle.updateRegexHighlight(
 				regexSettings.findText,
-				flags
+				flags,
 			);
 		} else if (this.activeTool === "regex-extract") {
 			const extractSettings = this.settingsState.regexExtract;
 			let flags = "g";
 			if (extractSettings.caseSensitive === false) flags += "i"; // Default might be sensitive? Checking usage.
-            // Wait, standard regex case sensitive means NO 'i' flag. 
-            // If the setting is 'caseSensitive', then true -> no 'i', false -> 'i'.
-            // Let's verify the setting name. It is 'caseSensitive' in SettingsPanel.ts.
-            // But usually 'caseSensitive' default is false? 
-            // In SettingsPanel.ts: caseCheck.checked = settings.regexExtract.caseSensitive;
-            // If checked (true) -> sensitive -> no 'i'.
-            // If unchecked (false) -> insensitive -> 'i'.
-            if (!extractSettings.caseSensitive) flags += "i";
-            
+			// Wait, standard regex case sensitive means NO 'i' flag.
+			// If the setting is 'caseSensitive', then true -> no 'i', false -> 'i'.
+			// Let's verify the setting name. It is 'caseSensitive' in SettingsPanel.ts.
+			// But usually 'caseSensitive' default is false?
+			// In SettingsPanel.ts: caseCheck.checked = settings.regexExtract.caseSensitive;
+			// If checked (true) -> sensitive -> no 'i'.
+			// If unchecked (false) -> insensitive -> 'i'.
+			if (!extractSettings.caseSensitive) flags += "i";
+
 			this.editorPanelHandle.updateRegexHighlight(
 				extractSettings.rule,
-				flags
+				flags,
 			);
+		} else if (this.activeTool === "remove-string") {
+			const filterSettings = this.settingsState.filter;
+			let flags = "g";
+			if (!filterSettings.caseSensitive) flags += "i";
+
+			let pattern = filterSettings.text;
+			if (!filterSettings.useRegex) {
+				pattern = escapeRegExp(pattern);
+			}
+			this.editorPanelHandle.updateRegexHighlight(pattern, flags);
 		}
 
 		// --- 3. 右侧：动态设置区域 ---
@@ -419,8 +432,8 @@ export class MyTextToolsView extends ItemView {
 
 				if (
 					this.editorPanelHandle &&
-					(key.startsWith("regex.") || key === "regex") && 
-                    this.activeTool === "regex"
+					(key.startsWith("regex.") || key === "regex") &&
+					this.activeTool === "regex"
 				) {
 					const regexSettings = this.settingsState.regex;
 					let flags = "g"; // Always use global for highlighting
@@ -428,21 +441,36 @@ export class MyTextToolsView extends ItemView {
 					if (regexSettings.multiline) flags += "m";
 					this.editorPanelHandle.updateRegexHighlight(
 						regexSettings.findText,
-						flags
+						flags,
 					);
 				} else if (
-                    this.editorPanelHandle &&
-                    (key.startsWith("regexExtract.") || key === "regexExtract") &&
-                    this.activeTool === "regex-extract"
-                ) {
-                    const extractSettings = this.settingsState.regexExtract;
-                    let flags = "g";
-                    if (!extractSettings.caseSensitive) flags += "i";
-                    this.editorPanelHandle.updateRegexHighlight(
-                        extractSettings.rule,
-                        flags
-                    );
-                }
+					this.editorPanelHandle &&
+					(key.startsWith("regexExtract.") ||
+						key === "regexExtract") &&
+					this.activeTool === "regex-extract"
+				) {
+					const extractSettings = this.settingsState.regexExtract;
+					let flags = "g";
+					if (!extractSettings.caseSensitive) flags += "i";
+					this.editorPanelHandle.updateRegexHighlight(
+						extractSettings.rule,
+						flags,
+					);
+				} else if (
+					this.editorPanelHandle &&
+					(key.startsWith("filter.") || key === "filter") &&
+					this.activeTool === "remove-string"
+				) {
+					const filterSettings = this.settingsState.filter;
+					let flags = "g";
+					if (!filterSettings.caseSensitive) flags += "i";
+
+					let pattern = filterSettings.text;
+					if (!filterSettings.useRegex) {
+						pattern = escapeRegExp(pattern);
+					}
+					this.editorPanelHandle.updateRegexHighlight(pattern, flags);
+				}
 			},
 			onRun: async (toolId: string) => {
 				if (this.isRecording) {
@@ -450,7 +478,7 @@ export class MyTextToolsView extends ItemView {
 					this.currentBatchOperations.push({
 						toolId,
 						settingsSnapshot: JSON.parse(
-							JSON.stringify(this.settingsState)
+							JSON.stringify(this.settingsState),
 						),
 					});
 					new Notice(t("NOTICE_OPERATION_RECORDED", [toolId]), 2000);
@@ -477,10 +505,10 @@ export class MyTextToolsView extends ItemView {
 			},
 			onSaveCustomAIAction: async (
 				actionId: string,
-				updates: Partial<CustomAIAction>
+				updates: Partial<CustomAIAction>,
 			) => {
 				const target = this.plugin.settings.customActions.find(
-					(a) => a.id === actionId
+					(a) => a.id === actionId,
 				);
 				if (target) {
 					if (updates.prompt !== undefined) {
@@ -497,7 +525,7 @@ export class MyTextToolsView extends ItemView {
 			rightPanel,
 			this.activeTool,
 			this.settingsState,
-			settingsCallbacks
+			settingsCallbacks,
 		);
 		renderToolSettings(
 			rightPanel,
@@ -507,7 +535,7 @@ export class MyTextToolsView extends ItemView {
 			this.plugin.settings.aiTools,
 			this.plugin.settings.customScripts,
 			this.plugin.settings.customActions,
-			{ hasApiKey: !!this.plugin.settings.aiApiKey }
+			{ hasApiKey: !!this.plugin.settings.aiApiKey },
 		);
 	}
 
@@ -527,7 +555,7 @@ export class MyTextToolsView extends ItemView {
 		if (this.editorPanelHandle) {
 			this.editorPanelHandle.updateHistoryButtons(
 				this.historyManager.canUndo(),
-				this.historyManager.canRedo()
+				this.historyManager.canRedo(),
 			);
 		}
 
@@ -551,8 +579,6 @@ export class MyTextToolsView extends ItemView {
 						}
 					} else {
 						// 普通查找替换 (转义正则字符)
-						const escapeRegExp = (str: string) =>
-							str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 						const re = new RegExp(escapeRegExp(s.find), flags);
 						result = text.replace(re, s.replace);
 					}
@@ -617,7 +643,7 @@ export class MyTextToolsView extends ItemView {
 		const processedContent = processText(
 			type as ToolType,
 			this.content,
-			this.settingsState
+			this.settingsState,
 		);
 		this.content = processedContent;
 
@@ -630,7 +656,7 @@ export class MyTextToolsView extends ItemView {
 			const currentBatches = this.settingsState.savedBatches;
 			// Migrate potentially old settings
 			const migratedSnapshot = migrateToNestedSettings(
-				op.settingsSnapshot
+				op.settingsSnapshot,
 			);
 			this.settingsState = {
 				...migratedSnapshot,
@@ -765,7 +791,7 @@ export class MyTextToolsView extends ItemView {
 					this.originalEditor.replaceRange(
 						this.content,
 						range.start,
-						range.end
+						range.end,
 					);
 
 					new Notice(t("NOTICE_SAVE_SELECTION_SUCCESS"), 2000);
@@ -791,7 +817,7 @@ export class MyTextToolsView extends ItemView {
 			}
 		},
 		500,
-		true
+		true,
 	);
 
 	async onClose() {
@@ -832,7 +858,7 @@ export class MyTextToolsView extends ItemView {
 	updateHistoryUI() {
 		this.editorPanelHandle?.updateHistoryButtons(
 			this.historyManager.canUndo(),
-			this.historyManager.canRedo()
+			this.historyManager.canRedo(),
 		);
 	}
 }

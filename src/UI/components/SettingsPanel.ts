@@ -362,6 +362,12 @@ function renderFilterSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks,
 ): void {
+	const debouncedUpdate = debounce(
+		(key: string, value: string) => callbacks.onSettingsChange(key, value),
+		300,
+		true,
+	);
+
 	parent.createEl("label", {
 		text: t("SETTING_FILTER_TEXT"),
 	});
@@ -370,8 +376,8 @@ function renderFilterSettings(
 		placeholder: t("PLACEHOLDER_FILTER"),
 		value: settings.filter.text,
 	});
-	filterInput.onchange = (e) =>
-		callbacks.onSettingsChange(
+	filterInput.oninput = (e) =>
+		debouncedUpdate(
 			"filter.text",
 			(e.target as HTMLInputElement).value,
 		);
