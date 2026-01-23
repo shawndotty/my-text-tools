@@ -412,6 +412,14 @@ export class MyTextToolsView extends ItemView {
 				pattern = escapeRegExp(pattern);
 			}
 			this.editorPanelHandle.updateRegexHighlight(pattern, flags);
+		} else if (this.activeTool === "line-break-tools") {
+			const lbSettings = this.settingsState.lineBreak;
+			let flags = "g";
+			let pattern = lbSettings.trigger;
+			if (!lbSettings.useRegex) {
+				pattern = escapeRegExp(pattern);
+			}
+			this.editorPanelHandle.updateRegexHighlight(pattern, flags);
 		}
 
 		// --- 3. 右侧：动态设置区域 ---
@@ -467,6 +475,18 @@ export class MyTextToolsView extends ItemView {
 
 					let pattern = filterSettings.text;
 					if (!filterSettings.useRegex) {
+						pattern = escapeRegExp(pattern);
+					}
+					this.editorPanelHandle.updateRegexHighlight(pattern, flags);
+				} else if (
+					this.editorPanelHandle &&
+					(key.startsWith("lineBreak.") || key === "lineBreak") &&
+					this.activeTool === "line-break-tools"
+				) {
+					const lbSettings = this.settingsState.lineBreak;
+					let flags = "g";
+					let pattern = lbSettings.trigger;
+					if (!lbSettings.useRegex) {
 						pattern = escapeRegExp(pattern);
 					}
 					this.editorPanelHandle.updateRegexHighlight(pattern, flags);

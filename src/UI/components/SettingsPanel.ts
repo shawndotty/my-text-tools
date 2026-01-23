@@ -1020,6 +1020,12 @@ function renderLineBreakSettings(
 	settings: SettingsState,
 	callbacks: SettingsPanelCallbacks,
 ): void {
+	const debouncedUpdate = debounce(
+		(key: string, value: string) => callbacks.onSettingsChange(key, value),
+		300,
+		true,
+	);
+
 	parent.createEl("label", {
 		text: t("SETTING_LB_TRIGGER"),
 	});
@@ -1028,8 +1034,8 @@ function renderLineBreakSettings(
 		placeholder: t("PLACEHOLDER_LB_TRIGGER"),
 		value: settings.lineBreak.trigger,
 	});
-	triggerInput.onchange = (e) =>
-		callbacks.onSettingsChange(
+	triggerInput.oninput = (e) =>
+		debouncedUpdate(
 			"lineBreak.trigger",
 			(e.target as HTMLInputElement).value,
 		);
