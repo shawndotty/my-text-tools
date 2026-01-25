@@ -38,15 +38,8 @@ const baseTheme = EditorView.baseTheme({
 	".cm-cursor, .cm-dropCursor": {
 		borderLeftColor: "var(--text-normal)",
 	},
-	// Force native selection to be transparent to avoid double rendering
-	"& ::selection": {
-		backgroundColor: "transparent !important",
-	},
-	".cm-content ::selection": {
-		backgroundColor: "transparent !important",
-	},
 	// Apply Obsidian selection color to CodeMirror's drawn selection
-	".cm-selectionBackground": {
+	"& .cm-selectionBackground": {
 		backgroundColor: "var(--text-selection) !important",
 	},
 	"&.cm-focused .cm-selectionBackground": {
