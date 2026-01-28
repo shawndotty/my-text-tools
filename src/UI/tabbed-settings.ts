@@ -3,17 +3,17 @@ export class TabbedSettings {
 	private content: HTMLElement;
 
 	constructor(private container: HTMLElement) {
-		this.tabs = container.createDiv("settings-tabs");
+		this.tabs = container.createDiv("mtt-settings-tabs");
 		this.content = container.createDiv("settings-content");
 	}
 
 	addTab(name: string, callback: (content: HTMLElement) => void) {
-		const tab = this.tabs.createDiv("settings-tab");
+		const tab = this.tabs.createDiv("mtt-settings-tab");
 		tab.setText(name);
 		tab.onclick = () => {
 			// 移除所有active类
 			this.tabs
-				.querySelectorAll(".settings-tab")
+				.querySelectorAll(".mtt-settings-tab")
 				.forEach((t) => t.removeClass("active"));
 			this.content.empty();
 

@@ -147,10 +147,10 @@ export function renderBatchProcessSettingsTab(
 		btnGroup.style.gap = "10px";
 
 		const shortcutBtn = new ButtonComponent(btnGroup).setIcon("zap");
-		shortcutBtn.setClass("mod-cta-size");
+		shortcutBtn.setClass("mtt-cta-size");
 		const updateShortcutBtnUI = () => {
 			const enabled = plugin.isBatchShortcutEnabled(batch.id);
-			shortcutBtn.buttonEl.toggleClass("mod-cta", enabled);
+			shortcutBtn.buttonEl.toggleClass("mtt-cta", enabled);
 			shortcutBtn.setTooltip(
 				enabled
 					? t("TOOLTIP_BATCH_SHORTCUT_DISABLE")

@@ -704,7 +704,7 @@ export class EditorPanel {
 				? t("BTN_UPDATE_SELECTION")
 				: t("BTN_SAVE_ORIGINAL");
 			const saveOverBtn = btnGroup.createEl("button", {
-				cls: "mtt-icon-btn mod-cta",
+				cls: "mtt-icon-btn mtt-cta",
 				attr: {
 					"aria-label": label,
 				},

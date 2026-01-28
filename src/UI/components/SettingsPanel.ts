@@ -1374,7 +1374,7 @@ function renderCombinationGeneratorSettings(
 	// Generate Button
 	const genBtn = container.createEl("button", {
 		text: t("BTN_GENERATE_COMBINATIONS"),
-		cls: "mod-cta",
+		cls: "mtt-cta",
 	});
 	genBtn.style.width = "100%";
 	genBtn.onclick = () => callbacks.onRun("combination-generator");

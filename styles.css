@@ -4,24 +4,24 @@
    ========================================================================== */
 
 /* 设置标签页 */
-.settings-tabs {
+.mtt-settings-tabs {
 	display: flex;
 	border-bottom: 1px solid var(--background-modifier-border);
 	margin-bottom: 1em;
 }
 
-.settings-tab {
+.mtt-settings-tab {
 	padding: 8px 16px;
 	cursor: pointer;
 	border-bottom: 2px solid transparent;
 }
 
-.settings-tab.active {
+.mtt-settings-tab.active {
 	border-bottom-color: var(--interactive-accent);
 	color: var(--interactive-accent);
 }
 
-.settings-tab:hover {
+.mtt-settings-tab:hover {
 	color: var(--text-accent);
 }
 
@@ -392,15 +392,16 @@
 	filter: brightness(1.1);
 }
 
-/* Obsidian 默认 mod-cta 覆盖 */
-button.mod-cta-size{
+/* Obsidian 默认 mod-cta 覆盖 - now mtt scoped */
+button.mtt-cta-size {
 	padding: 6px;
 	border-radius: 4px;
 	display: flex;
 	align-items: center;
 	cursor: pointer;
 }
-button.mod-cta {
+
+button.mtt-cta {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border: none;
@@ -630,7 +631,7 @@ input[type="number"].mtt-small-input {
 	align-items: center;
 }
 
-.setting-item-control .clickable-icon {
+.mtt-setting-tab-header .setting-item-control .clickable-icon {
 	cursor: pointer;
 }
 
