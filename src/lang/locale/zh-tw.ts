@@ -468,4 +468,34 @@ export default {
 	NOTICE_PROMPT_IMPORT_ERROR: "匯入提示詞失敗：{0}",
 	NOTICE_NO_PROMPTS: "未找到自定義提示詞。",
 	NOTICE_EXPORT_NO_PROMPT_SELECTION: "未選擇任何提示詞。",
+
+	"Invalid GitHub repository URL": "無效的 GitHub 倉庫連結",
+	"Checking for updates from": "正在檢查更新：",
+	"No release found for this repository": "未找到此倉庫的發布版本",
+	"Release is missing manifest.json or main.js. Cannot install.":
+		"發布版本缺少 manifest.json 或 main.js，無法安裝。",
+	"Invalid manifest.json: missing 'id' field":
+		"無效的 manifest.json：缺少 'id' 欄位",
+	Plugin: "插件",
+	"installed/updated successfully": "安裝/更新成功",
+	reloaded: "已重新載入",
+	"Automatic reload failed": "自動重載失敗",
+	"Plugin updated but reload failed":
+		"插件已更新，但自動重載失敗，請手動重啟 Obsidian 或重新啟用插件。",
+	"Plugin installed, please enable manually":
+		"插件安裝完成，請在設定中手動啟用。",
+	"Failed to install plugin": "安裝插件失敗",
+	"Check console for details": "請查看控制台了解詳情",
+	"is already up to date": "已經是最新版",
+	"Current Version": "目前版本",
+	"Check for Updates": "檢查更新",
+	"Checking...": "正在檢查...",
+	"Already up to date": "已經是最新版本",
+	"Update available": "有可用更新",
+	"Start Update": "開始更新",
+	"You are using a development version": "您正在使用開發版本",
+	"Failed to check for updates": "檢查更新失敗",
+	"Updating...": "正在更新...",
+	Updated: "更新完成",
+	"Restart Obsidian to apply changes": "重啟 Obsidian 以應用更改",
 };

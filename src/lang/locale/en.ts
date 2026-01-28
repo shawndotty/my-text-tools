@@ -493,4 +493,35 @@ export default {
 	NOTICE_PROMPT_IMPORT_ERROR: "Failed to import prompts: {0}",
 	NOTICE_NO_PROMPTS: "No custom prompts found.",
 	NOTICE_EXPORT_NO_PROMPT_SELECTION: "No prompts selected.",
+	"Current Version": "Current Version",
+	"Check for Updates": "Check for Updates",
+	"Checking...": "Checking...",
+	"Already up to date": "Already up to date",
+	"Update available": "Update available",
+	"Start Update": "Start Update",
+	"You are using a development version":
+		"You are using a development version",
+	"Failed to check for updates": "Failed to check for updates",
+	"Updating...": "Updating...",
+	Updated: "Updated",
+	"Restart Obsidian to apply changes": "Restart Obsidian to apply changes",
+	"Invalid GitHub repository URL": "Invalid GitHub repository URL",
+	"Checking for updates from": "Checking for updates from",
+	"No release found for this repository":
+		"No release found for this repository",
+	"Release is missing manifest.json or main.js. Cannot install.":
+		"Release is missing manifest.json or main.js. Cannot install.",
+	"Invalid manifest.json: missing 'id' field":
+		"Invalid manifest.json: missing 'id' field",
+	Plugin: "Plugin",
+	"installed/updated successfully": "installed/updated successfully",
+	reloaded: "reloaded",
+	"Automatic reload failed": "Automatic reload failed",
+	"Plugin updated but reload failed":
+		"Plugin updated but reload failed. Please restart Obsidian or re-enable the plugin manually.",
+	"Plugin installed, please enable manually":
+		"Plugin installed, please enable it in settings manually.",
+	"Failed to install plugin": "Failed to install plugin",
+	"Check console for details": "Check console for details",
+	"is already up to date": "is already up to date",
 };

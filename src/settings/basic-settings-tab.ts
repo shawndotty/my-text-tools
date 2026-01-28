@@ -1,8 +1,10 @@
-import { App, ButtonComponent, Setting, setIcon } from "obsidian";
+import { App, ButtonComponent, Setting, setIcon, Notice } from "obsidian";
 import { t } from "lang/helpers";
 import MyTextTools from "../main";
 import { BUILTIN_TOOLS } from "../types";
 import { IconPickerModal } from "../UI/modals/IconPickerModal";
+import { GithubService } from "../services/github-service";
+import { Utils } from "../utils";
 
 interface BasicSettingsContext {
 	app: App;
@@ -13,6 +15,67 @@ interface BasicSettingsContext {
 export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 	const { app, plugin, containerEl } = ctx;
 
+	const currentVersion = plugin.manifest.version;
+	const repoUrl = "https://github.com/shawndotty/my-text-tools";
+
+	const versionSetting = new Setting(containerEl)
+		.setName(`${t("Current Version")}: ${currentVersion}`)
+		.setDesc(t("Check for Updates"))
+		.addButton((button) => {
+			button.setButtonText(t("Check for Updates")).onClick(async () => {
+				button.setButtonText(t("Checking..."));
+				button.setDisabled(true);
+
+				const latestVersion =
+					await GithubService.getLatestPluginVersion(repoUrl);
+
+				button.setDisabled(false);
+
+				if (!latestVersion) {
+					button.setButtonText(t("Check for Updates"));
+					new Notice(t("Failed to check for updates"));
+					return;
+				}
+
+				const cmp = Utils.compareVersions(
+					currentVersion,
+					latestVersion,
+				);
+
+				if (cmp === 0) {
+					versionSetting.setDesc(t("Already up to date"));
+					button.setButtonText(t("Check for Updates"));
+				} else if (cmp < 0) {
+					versionSetting.setDesc(
+						`${t("Update available")}: ${latestVersion}`,
+					);
+					versionSetting.controlEl.empty();
+					versionSetting.addButton((b) => {
+						b.setButtonText(t("Start Update"))
+							.setCta()
+							.onClick(async () => {
+								b.setButtonText(t("Updating..."));
+								b.setDisabled(true);
+								await GithubService.installPluginFrom(
+									app,
+									repoUrl,
+								);
+								b.setButtonText(t("Updated"));
+								b.setDisabled(false);
+								new Notice(
+									t("Restart Obsidian to apply changes"),
+								);
+							});
+					});
+				} else {
+					versionSetting.setDesc(
+						t("You are using a development version"),
+					);
+					button.setButtonText(t("Check for Updates"));
+				}
+			});
+		});
+
 	containerEl.createEl("p", {
 		text: t("BasicSettingsDesc" as any),
 		cls: "setting-item-description",
@@ -20,7 +83,7 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 
 	BUILTIN_TOOLS.forEach((tool) => {
 		const setting = new Setting(containerEl).setName(
-			t(tool.nameKey as any)
+			t(tool.nameKey as any),
 		);
 
 		setting
@@ -42,7 +105,7 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 							await plugin.saveSettings();
 							btn.setIcon(newIcon);
 							const inputEl = setting.controlEl.querySelector(
-								"input[type='text']"
+								"input[type='text']",
 							) as HTMLInputElement;
 							if (inputEl) inputEl.value = newIcon;
 							(plugin as any).refreshCustomRibbons?.();
@@ -60,11 +123,11 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 						plugin.settings.customIcons[tool.id] = value;
 						await plugin.saveSettings();
 						const btnEl = setting.controlEl.querySelector(
-							".clickable-icon"
+							".clickable-icon",
 						) as HTMLElement;
 						if (btnEl && value) setIcon(btnEl, value);
 						(plugin as any).refreshCustomRibbons?.();
-					})
+					}),
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -76,7 +139,7 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 						plugin.settings.enabledTools[tool.id] = value;
 						await plugin.saveSettings();
 						(plugin as any).refreshCustomRibbons?.();
-					})
+					}),
 			);
 	});
 }
