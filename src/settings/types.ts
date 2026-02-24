@@ -73,6 +73,7 @@ export interface MyTextToolsSettings {
 	isToolsPanelCollapsed?: boolean;
 	preserveFrontmatter: boolean;
 	preserveHeader: boolean;
+	updateSource: "github" | "gitee";
 }
 
 export const DEFAULT_SETTINGS: MyTextToolsSettings = {
@@ -102,5 +103,6 @@ export const DEFAULT_SETTINGS: MyTextToolsSettings = {
 	isToolsPanelCollapsed: false,
 	preserveFrontmatter: true,
 	preserveHeader: false,
+	updateSource: "gitee",
 };
 

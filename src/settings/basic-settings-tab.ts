@@ -4,6 +4,7 @@ import MyTextTools from "../main";
 import { BUILTIN_TOOLS } from "../types";
 import { IconPickerModal } from "../UI/modals/IconPickerModal";
 import { GithubService } from "../services/github-service";
+import { GiteeService } from "../services/gitee-service";
 import { Utils } from "../utils";
 
 interface BasicSettingsContext {
@@ -16,18 +17,39 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 	const { app, plugin, containerEl } = ctx;
 
 	const currentVersion = plugin.manifest.version;
-	const repoUrl = "https://github.com/shawndotty/my-text-tools";
+	const githubRepoUrl = "https://github.com/shawndotty/my-text-tools";
+	const giteeRepoUrl = "https://gitee.com/johnnylearns/my-text-tools";
+
+	new Setting(containerEl)
+		.setName(t("Update Source"))
+		.setDesc(t("Choose where to check for updates"))
+		.addDropdown((dropdown) => {
+			dropdown
+				.addOption("github", "GitHub")
+				.addOption("gitee", "Gitee")
+				.setValue(plugin.settings.updateSource || "gitee")
+				.onChange(async (value) => {
+					plugin.settings.updateSource = value as "github" | "gitee";
+					await plugin.saveSettings();
+				});
+		});
 
 	const versionSetting = new Setting(containerEl)
 		.setName(`${t("Current Version")}: ${currentVersion}`)
 		.setDesc(t("Check for Updates"))
 		.addButton((button) => {
 			button.setButtonText(t("Check for Updates")).onClick(async () => {
+				const source = plugin.settings.updateSource || "gitee";
+				const repoUrl =
+					source === "github" ? githubRepoUrl : giteeRepoUrl;
+
 				button.setButtonText(t("Checking..."));
 				button.setDisabled(true);
 
 				const latestVersion =
-					await GithubService.getLatestPluginVersion(repoUrl);
+					source === "github"
+						? await GithubService.getLatestPluginVersion(repoUrl)
+						: await GiteeService.getLatestPluginVersion(repoUrl);
 
 				button.setDisabled(false);
 
@@ -56,10 +78,17 @@ export function renderBasicSettingsTab(ctx: BasicSettingsContext) {
 							.onClick(async () => {
 								b.setButtonText(t("Updating..."));
 								b.setDisabled(true);
-								await GithubService.installPluginFrom(
-									app,
-									repoUrl,
-								);
+								if (source === "github") {
+									await GithubService.installPluginFrom(
+										app,
+										repoUrl,
+									);
+								} else {
+									await GiteeService.installPluginFrom(
+										app,
+										repoUrl,
+									);
+								}
 								b.setButtonText(t("Updated"));
 								b.setDisabled(false);
 								new Notice(

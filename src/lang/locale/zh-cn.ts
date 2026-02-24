@@ -509,4 +509,7 @@ export default {
 	"Updating...": "正在更新...",
 	Updated: "更新完成",
 	"Restart Obsidian to apply changes": "重启 Obsidian 以应用更改",
+	"Update Source": "更新源",
+	"Choose where to check for updates": "选择检查更新的来源",
+	"Invalid Gitee repository URL": "无效的 Gitee 仓库地址",
 };
