@@ -33,7 +33,7 @@ const baseTheme = EditorView.baseTheme({
 	},
 	".cm-content": {
 		caretColor: "var(--text-normal)",
-		fontFamily: "var(--font-monospace)",
+		// fontFamily: "var(--font-monospace)",
 	},
 	".cm-cursor, .cm-dropCursor": {
 		borderLeftColor: "var(--text-normal)",
